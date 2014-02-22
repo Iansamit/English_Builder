@@ -9,14 +9,18 @@ var cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
 var countTime = 180;
 var currentCat = "actions";
 var currentLev = "P1";
+var currentPhonUnit="1";
 var currentTitle = "Actions";
 var fbImInd = 0;
 var fbMode = "common";
+var finalC="all";
 var finAudio;
 var finished;
+var iIndex;
 var imChHeight = "270px";
 var imChWidth = "452px";
 var imgArray = new Array(new Image());
+var initC="all";
 var inds;
 var penalty = false;
 var penaltyTCol;
@@ -32,6 +36,21 @@ var tickFast;
 var tickTock="tick";
 var uMode = "r_1word4pic";
 var vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
+var vowel="all";
+
+var vIndex;
+var vSpecIndex;
+var fIndex;
+var eCompIndex;
+var iArray=new Array("m","s","p","t","");
+var vArray=new Array("a","i","o");
+var fArray=new Array("m","s","p","t","");
+var vSpecArray=new Array("e","i");
+var eCompArray=new Array ("e","");
+var syll;
+var tabSylls = new Array ("fuck", "pis", "cock", "tit");
+
+
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement, fromIndex) {
@@ -64,11 +83,10 @@ if (!Array.prototype.indexOf) {
     };
   }
 
-			function init() {
-				initAudio();
-				resize();
-				selectLev("P1");
-
+function init() {
+	initAudio();
+	resize();
+	selectLev("P1");
 
 	var plImg1 = new Image();
 	plImg1.src = "images/vocab/titles/actions.jpg";
@@ -115,6 +133,10 @@ function resize() {
 
 	var z = Math.floor((w / 1600) * 35) + "px";
 	document.getElementById("spacer").style.height = z;
+
+	var mainDH = Math.floor((w / 1600) * 610) + "px";
+	document.getElementById("imageDiv").style.height = mainDH;
+	document.getElementById("phonDisplay").style.height = mainDH;
 
 }
 
@@ -284,6 +306,7 @@ function b_press(b, dir, origw) {
 	}
 }
 
+
 function selectMode(mode) {
 	if (mode != uMode) {
 		var prevMode = uMode;
@@ -295,23 +318,63 @@ function selectMode(mode) {
 		uMode = mode;
 		audCtrls(aclick, "play");
 
+		if (mode!="r_phonics"){
+		  	document.getElementById("imageDiv").style.display="block";
+  			document.getElementById("phonDisplay").style.display="none";
+  			document.getElementById("errDiv").style.display="block";
+  		}
+
 		if (mode == "r_1pic4word") {
 			document.getElementById("choiceDev").style.display = "block";
-		} else if (mode == "r_1word4pic") {
+		}
+		else if (mode == "r_1word4pic") {
 			document.getElementById("choiceDev").style.display = "none";
 			document.getElementById("vocdisplay").style.display = "block";
-		} else if (mode == "sp_teacher") {
+		}
+		else if (mode == "sp_teacher") {
 			document.getElementById("choiceDev").style.display = "none";
-		} else if (mode == "l_4pic") {
+		}
+		else if (mode == "l_4pic") {
 			document.getElementById("choiceDev").style.display = "none";
 			document.getElementById("vocdisplay").style.display = "none";
+		}
+		else if (mode=="r_phonics"){
+		  	document.getElementById("imageDiv").style.display="none";
+  			document.getElementById("phonDisplay").style.display="block";
+  			document.getElementById("errDiv").style.display="none";
 		}
 	}
 }
 
+function selectPhonUnit(unit) {
+	if (parseInt(unit) < 8) {
+		currentPhonUnit=unit;
+		document.getElementById("phonDisplay").innerHTML = "&nbsp;";
+		setPhonArrays();
+		resetScore();
+	}
+	else {
+		document.getElementById("u"+currentPhonUnit).checked=true;
+		document.getElementById("phonDisplay").innerHTML = "&nbsp;<span style='font-size:40px'>Sorry, this unit is not ready yet. </ span>&nbsp;";
+	}
+}
+
+function iSet (setting) {
+	initC=setting;
+}
+
+function vSet (setting) {
+	vowel=setting;
+}
+
+function fSet (setting) {
+	finalC=setting;
+}
+
+
 function selectLev(level) {
 	currentLev = level;
-	setArrays();
+	setVocArrays();
 	setTitle();
 	resetScore();
 	audCtrls(aswitch, "play");
@@ -340,7 +403,7 @@ function selectCat(category) {
 		document.getElementById("b_" + prevCat).style.width = "100%";
 		document.getElementById("b_" + prevCat).style.border = "none";
 		currentCat = category;
-		setArrays();
+		setVocArrays();
 		setTitle();
 		resetScore();
 		audCtrls(aclick, "play");
@@ -391,13 +454,13 @@ function setTitle() {
 function selectFB(mode) {
 	fbMode = mode;
 	if (mode == "recent") {
-		document.getElementById("errDiv").innerHTML = "Recent Errors";
+		document.getElementById("errTitle").innerHTML = "Recent Errors";
 	} else {
-		document.getElementById("errDiv").innerHTML = "Common Errors";
+		document.getElementById("errTitle").innerHTML = "Common Errors";
 	}
 }
 
-function setArrays() {
+function setVocArrays() {
 	if (currentLev == "A2") {
 		availCats = new Array("actions", "animals", "clothes", "describing", "occupations", "school");
 		switch (currentCat) {
@@ -564,6 +627,56 @@ function setArrays() {
 		}
 	}
 }
+
+
+function setPhonicsArrays () {
+		switch (currentPhonUnit) {
+			case "1":
+			iArray=["m","s","p","t",""];
+			vArray=["a","i","o"];
+			fArray=["m","s","p","t",""];
+			break;
+		case "2":
+			iArray=["m","s","p","t","n","f","h",""];
+			vArray=["a","i","o","e","u"];
+			fArray=["m","s","p","t","n","f",""];
+			break;
+		case "3":
+			iArray=["m","s","p","t","n","f","h","b","d","z",""];
+			vArray=["a","e","i","o","u"];
+			fArray=["m","s","p","t","n","f","b","d","z",""];
+			break;
+		case "4":
+			iArray=["m","s","p","t","n","f","h","b","d","z","c","k",""];
+			vArray=["a","e","i","o","u"];
+			fArray=["m","s","p","t","n","f","b","d","z","ck",""];
+			vSpecArray["e","i"];
+			break;
+		case "5":
+			iArray=["m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu",""];
+			vArray=["a","e","i","o","u"];
+			fArray=["m","s","p","t","n","f","b","d","z","ck","g","j",""];
+			vSpecArray["e","i"];
+			break;
+		case "6":
+			iArray=["m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu",""];
+			vArray=["a","e","i","o","u","ee"];
+			fArray=["m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu",""];
+			vSpecArray=["e","i","ee"];
+			break;
+		case "7":
+			iArray=["m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu",""];
+			vArray=["a","e","i","o","u","ee"];
+			fArray=["m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk",""];
+			vSpecArray=["e","i","ee"];
+			//alert (vArray[5]);
+			break;
+
+		}
+
+}
+
+
 
 function preloadAudio() {
 	if (currentCat == "occupations" || currentCat == "animals") {
@@ -781,9 +894,12 @@ function feedback(ch, answer) {
 		document.getElementById(fBDiv).innerHTML = "<span class='choiceDevFeedback'>" + answer + "</span>";
 
 	}
+	if (!uMode=="r_phonics"){
+		recentErrors(answer);
+		upcmnErrs(answer);
+	}
 
-	recentErrors(answer);
-	upcmnErrs(answer);
+
 
 	document.getElementById("timer").style.color = "#f00";
 	if (penalty == false) {
@@ -919,6 +1035,255 @@ function displayErrors(errIm1, errTx1, errIm2, errTx2, errIm3, errTx3) {
 	}
 }
 
+function activity(button){
+	if (uMode=="r_phonics"){
+		newSyllable(button);
+	}
+	else{
+		newImage(button);
+	}
+}
+
+function newSyllable(button) {
+	if (button == "start") {
+		newCount();
+		document.getElementById("b_start").style.display = "none";
+		document.getElementById("optDiv").style.display = "none";
+		document.getElementById("contentSelect").style.display = "none";
+		document.getElementById("yes-no").style.display = "block";
+	}
+	else if (button == "yes") {
+		points++;
+	}
+	else if (button == "no") {
+		feedback();
+	}
+
+
+	switch (currentPhonUnit) {
+	case "1":
+		unit1();
+		break;
+	case "2":
+		unit2();
+		break;
+	case "3":
+		unit3();
+		break;
+	case "4":
+		unit4();
+		break;
+	case "5":
+		unit5();
+		break;
+	case "6":
+		unit6();
+		break;
+	case "7":
+		unit7();
+		break;
+	}
+	tabooCheck();
+	document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+	document.getElementById("phonDisplay").innerHTML = syll;
+}
+
+
+function setIndices (iLen, vLen, fLen, iNLen, vNLen, fNLen, vSLen) {
+	// set index of initial consonant
+	if (initC=="all") {
+		iIndex=Math.floor(Math.random()*iLen);
+	}
+	else if (initC=="new") {
+		iIndex=Math.floor(Math.random()*iNLen+(iLen-iNLen));
+	}
+	else {
+		iIndex=iLen;
+	}
+
+	//set index of vowel
+	if (vowel=="all") {
+		vIndex=Math.floor(Math.random()*vLen);
+	}
+	else {
+		vIndex=Math.floor(Math.random()*vNLen+(vLen-vNLen));
+	}
+
+	//set index of final consonant
+	if (initC=="all") {
+		fIndex=Math.floor(Math.random()*fLen);
+	}
+	else if (initC=="new") {
+		fIndex=Math.floor(Math.random()*fNLen+(fLen-fNLen));
+	}
+	else {
+		fIndex=fLen;
+	}
+
+	//alert (vSLen);
+	//set index of "e" or "i" in case of "k" or "gu"
+	vSpecIndex=Math.floor(Math.random()*vSLen);
+
+	//set index of final "e" in compound vowels
+	if (vIndex==5) {
+		eCompIndex=1;
+	}
+	else if (vowel=="new" && vIndex!=5) {
+		eCompIndex=0;
+	}
+	else {
+		eCompIndex=Math.floor(Math.random()*2);
+	}
+}
+
+
+function tabooCheck() {
+	var check = tabSylls.indexOf(syll);
+	if (check != -1) {
+	points--;
+	newSyllable();
+	}
+}
+
+
+	function unit1() {
+
+		setIndices (4,3,4,4,3,4);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+
+		syll=igraph.concat (vgraph,fgraph);
+	}
+
+	function unit2() {
+
+		setIndices (7,5,6,3,2,2);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+
+		syll=igraph.concat (vgraph,fgraph);
+	}
+
+	function unit3() {
+
+		setIndices (10,5,9,3,5,3);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+
+		syll=igraph.concat (vgraph,fgraph);
+	}
+
+	function unit4() {
+
+		setIndices (12,5,10,2,5,1,2);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+
+		if (igraph=="k") {
+			vgraph=vSpecArray[vSpecIndex];
+		}
+
+		syll=igraph.concat (vgraph,fgraph);
+	}
+
+	function unit5() {
+
+		setIndices (15,5,12,5,5,3,2);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+
+		if (igraph=="k"||igraph=="gu") {
+			vgraph=vSpecArray[vSpecIndex];
+		}
+
+		syll=igraph.concat (vgraph,fgraph);
+	}
+
+	function unit6() {
+
+		setIndices (15,6,15,5,6,5,3);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+		var eCompGraph=eCompArray[eCompIndex];
+
+		if (igraph=="k"||igraph=="gu") {
+			vgraph=vSpecArray[vSpecIndex];
+		}
+
+
+		if ((fgraph=="ck")&&(vgraph=="ee"||eCompGraph=="e")) {
+			fgraph="k";
+		}
+		else if (fgraph=="c" && vgraph=="ee") {
+			fgraph="k";
+		}
+		else if (fgraph=="gu" && vgraph=="ee") {
+			fgraph="g";
+		}
+		else {}
+
+
+		if (vgraph=="ee"||fgraph=="ck") {
+			eCompGraph="";
+		}
+		else if (fgraph=="c"||fgraph=="k"||fgraph=="gu") {
+			eCompGraph="e";
+		}
+		else {}
+
+		syll=igraph.concat (vgraph,fgraph,eCompGraph);
+	}
+
+	function unit7() {
+
+		setIndices (15,6,18,5,6,3,3);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+		var eCompGraph=eCompArray[eCompIndex];
+
+		if (igraph=="k"||igraph=="gu") {
+			vgraph=vSpecArray[vSpecIndex];
+		}
+
+
+		if ((fgraph=="ck")&&(vgraph=="ee"||eCompGraph=="e")) {
+			fgraph="k";
+		}
+		else if (fgraph=="c" && vgraph=="ee") {
+			fgraph="k";
+		}
+		else if (fgraph=="gu" && vgraph=="ee") {
+			fgraph="g";
+		}
+		else {}
+
+
+		if (vgraph=="ee"||fgraph=="ck") {
+			eCompGraph="";
+		}
+		else if (fgraph=="c"||fgraph=="k"||fgraph=="gu") {
+			eCompGraph="e";
+		}
+		else {}
+
+		syll=igraph.concat (vgraph,fgraph,eCompGraph);
+	}
+
+
 function newImage(button) {
 	if (button == "start") {
 		newCount();
@@ -957,6 +1322,10 @@ function newImage(button) {
 		document.getElementById("mainImage").src = "images/vocab/" + currentCat + "/" + RImg + ".jpg";
 	}
 }
+
+// =====================================================
+// End of functions for Language Builder 				|
+// =====================================================
 
 
 
@@ -1234,13 +1603,13 @@ fadeimages[93]=["images/slideshow/slide094.jpg","",""];
 var fadebgcolor="white";
 
 ////NO need to edit beyond here/////////////
- 
+
 var fadearray=new Array(); //array to cache fadeshow instances
 var fadeclear=new Array(); //array to cache corresponding clearinterval pointers
- 
+
 var dom=(document.getElementById); //modern dom browsers
 var iebrowser=document.all;
- 
+
 function fadeshow(theimages, fadewidth, fadeheight, borderwidth, delay, pause, displayorder){
 this.pausecheck=pause;
 this.mouseovercheck=0;
@@ -1261,15 +1630,15 @@ for (p=0;p<theimages.length;p++){
 this.postimages[p]=new Image();
 this.postimages[p].src=theimages[p][0];
 }
- 
+
 var fadewidth=fadewidth+this.imageborder*2;
 var fadeheight=fadeheight+this.imageborder*2;
- 
+
 if (iebrowser&&dom||dom) //if IE5+ or modern browsers (ie: Firefox)
 document.write('<div id="master'+this.slideshowid+'" style="position:relative;width:'+fadewidth+'px;height:'+fadeheight+'px;overflow:hidden;"><div id="'+this.canvasbase+'_0" style="position:absolute;width:'+fadewidth+'px;height:'+fadeheight+'px;top:0;left:0;filter:progid:DXImageTransform.Microsoft.alpha(opacity=10);opacity:0.1;-moz-opacity:0.1;-khtml-opacity:0.1;background-color:'+fadebgcolor+'"></div><div id="'+this.canvasbase+'_1" style="position:absolute;width:'+fadewidth+'px;height:'+fadeheight+'px;top:0;left:0;filter:progid:DXImageTransform.Microsoft.alpha(opacity=10);opacity:0.1;-moz-opacity:0.1;-khtml-opacity:0.1;background-color:'+fadebgcolor+'"></div></div>');
 else
 document.write('<div><img name="defaultslide'+this.slideshowid+'" src="'+this.postimages[0].src+'"></div>');
- 
+
 if (iebrowser&&dom||dom) //if IE5+ or modern browsers such as Firefox
 this.startit();
 else{
@@ -1303,7 +1672,7 @@ obj.nextimageindex=(obj.nextimageindex<obj.postimages.length-1)? obj.nextimagein
 setTimeout("fadearray["+obj.slideshowid+"].rotateimage()", obj.delay);
 }
 }
- 
+
 fadeshow.prototype.populateslide=function(picobj, picindex){
 var slideHTML="";
 if (this.theimages[picindex][1]!="") //if associated link exists for image
@@ -1313,8 +1682,8 @@ if (this.theimages[picindex][1]!="") //if associated link exists for image
 slideHTML+='</a>';
 picobj.innerHTML=slideHTML;
 };
- 
- 
+
+
 fadeshow.prototype.rotateimage=function(){
 if (this.pausecheck==1) //if pause onMouseover enabled, cache object
 var cacheobj=this;
@@ -1333,7 +1702,7 @@ ns4imgobj.src=this.postimages[this.curimageindex].src;
 }
 this.curimageindex=(this.curimageindex<this.postimages.length-1)? this.curimageindex+1 : 0;
 };
- 
+
 fadeshow.prototype.resetit=function(){
 this.degree=10;
 var crossobj=iebrowser? iebrowser[this.curcanvas] : document.getElementById(this.curcanvas);
@@ -1350,8 +1719,8 @@ crossobj.style.KhtmlOpacity=this.degree/100;
 else if (crossobj.style.opacity&&!crossobj.filters)
 crossobj.style.opacity=this.degree/101;
 };
- 
- 
+
+
 fadeshow.prototype.startit=function(){
 var crossobj=iebrowser? iebrowser[this.curcanvas] : document.getElementById(this.curcanvas);
 this.populateslide(crossobj, this.curimageindex);

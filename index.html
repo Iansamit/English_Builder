@@ -20,9 +20,9 @@
 			//---------------   END LOCALIZEABLE ---------------
 		</script>
 		<!--Scripts for changing language etc. --><script type="text/javascript" src="tpf_scripts.js"></script>
-		
-				
-		
+
+
+
 		<style>
 			* {
 				-webkit-user-select: none;
@@ -109,8 +109,8 @@
 			<!-- Feedback     -->
 			<!--_____________ -->
 
-			<div align="right" style="width:100%; z-index:2; right: 1%; top: 15%; background:#f60; border:ridge black;">
-				<div id="errDiv" align="center" style="font-size:40%; font-weight:bold; background:#fa4">
+			<div id="errDiv" align="right" style="width:100%; z-index:2; right: 1%; top: 15%; background:#f60; border:ridge black;">
+				<div id="errTitle" align="center" style="font-size:40%; font-weight:bold; background:#fa4">
 					Common Errors
 				</div>
 				<table summary="Table for feedback - recent or common errors." >
@@ -125,7 +125,6 @@
 					</tr>
 				</table>
 			</div>
-
 		</div>
 
 		<!-- =================================================================================
@@ -150,9 +149,13 @@
 							<input id="b_l_4pic" type="image" src='images/buttons/l_4pic_mode.png' style="width:100%" onClick="selectMode('l_4pic')"/>
 							Listen and Choose. </td>
 							<td style="font:bold 80% sans-serif;	padding:inherit;">
-							<input id="b_sp_teacher" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onClick="selectMode('sp_teacher')"/>
-							Say the word. </td>
-							<td> </td>
+								<input id="b_sp_teacher" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onClick="selectMode('sp_teacher')"/>
+								Say the word.
+							</td>
+							<td style="font:bold 80% sans-serif;	padding:inherit;">
+								<input id="b_r_phonics" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onClick="selectMode('r_phonics')"/>
+								Phonics.
+							</td>
 						</tr>
 						<tr>
 							<td colspan="6">
@@ -408,20 +411,22 @@
 									<td id="fbTxt4" style="font:inherit; "> </td>
 								</tr>
 							</tbody>
-						</table></td>
+						</table>
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 
-		<!--_____________ -->
-		<!-- Main Image	 -->
-		<!--_____________ -->
-		<div align="center" style="background-color:#fff; height:100%; display:none"	id="imageDiv">
+		<!-- =============== -->
+		<!-- Main Display	 -->
+		<!-- =============== -->
+		<div id="imageDiv" align="center" style="background-color:#fff; height:610px; display:block"	>
 			<img id="mainImage" src='images/vocab/titles/actions.jpg' alt='Loading. Please wait ...' style='border-style: none; margin-top: 0.5%; width:64%' ondragstart='return false;' />
 		</div>
-		
-		<div align="center" style="background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; font: 300px 'Nunito', sans-serif;"  id="syllable">&nbsp;<span style="font-size:40px;">Select a phonics unit, then click "Start".</span>&nbsp;	
+
+		<div id="phonDisplay" align="center" style="height:610px ; background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; font: 'Nunito', sans-serif; font-size:763%; display: none" >
+			&nbsp;<span style="font-size:40px;">Select a phonics unit, then click "Start".</span>&nbsp;
 		</div>
 
 		<div style="background:white; clear:left; margin-bottom:1%">
@@ -438,16 +443,25 @@
 					<td style="width:7.15%;">
 					<input id="b_reset" type="image" src='images/buttons/reset_button.png' style="display:block; width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_reset','down','100%')" onmouseup="b_press('b_reset','up','100%')" onmouseout="b_press('b_reset','out','100%')" onclick="resetScore()"/>
 					</td>
-					<td style="width:32.7%;"><img src='images/formatting/1000X597clear_spacer.png' alt="Finished!" style="width:32%" /></td>
+					<td style="width:32.7%;"><img src='images/formatting/1000X597clear_spacer.png' alt="Finished!" style="width:32%" />
+					</td>
 					<td style="width:20.3%;">
-					<input type="image" src='images/buttons/start_button.png' id="b_start"	style="display:none; width:60.31%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_start','down','60.31%')" onmouseup="b_press('b_start','up','60.31%')" onmouseout="b_press('b_start','out','60.31%')" onClick="newImage('start')"/>
+
+					<input id="b_start" type="image" src='images/buttons/start_button.png'	style="display:block; width:60.31%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_start','down','60.31%')" onmouseup="b_press('b_start','up','60.31%')" onmouseout="b_press('b_start','out','60.31%')" onClick="activity('start')"/>
+
+
 					<div style="display:block" id="finishedButton">
 						<img src='images/buttons/finished_button.png' alt="Finished!" style="width:100%" />
 					</div>
+
+
 					<div id="yes-no" style=" width:100%; border:gray; display:none; margin-left:auto; margin-right:auto">
-						<input type="image" style="float:left; width:38%;" src='images//buttons/no_button.png' id="noButton"	onmousedown="b_press('noButton','down','38%')" onmouseup="b_press('noButton','up','38%')" onmouseout="b_press('noButton','out','38%')" onClick="newImage('no')"/>
-						<input type="image" style="float:right; width:38%" src='images/buttons/yes_button.png' id="yesButton" onmousedown="b_press('yesButton','down','38%')" onmouseup="b_press('yesButton','up','38%')" onmouseout="b_press('yesButton','out','38%')" onClick="newImage('yes')"/>
+						<input type="image" style="float:left; width:38%;" src='images//buttons/no_button.png' id="noButton"	onmousedown="b_press('noButton','down','38%')" onmouseup="b_press('noButton','up','38%')" onmouseout="b_press('noButton','out','38%')" onClick="activity('no')"/>
+
+						<input id="yesButton" type="image" style="float:right; width:38%" src='images/buttons/yes_button.png' onmousedown="b_press('yesButton','down','38%')" onmouseup="b_press('yesButton','up','38%')" onmouseout="b_press('yesButton','out','38%')" onClick="activity('yes')"/>
 					</div>
+
+
 					<input id="b_replay" type="image" style="width:42.15%; display:none; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png'	onmousedown="b_press('b_replay','down','42.15%')" onmouseup="b_press('b_replay','up','42.15%')" onmouseout="b_press('b_replay','out','42.15%')" onclick="playVocab()" />
 					</td>
 
@@ -463,9 +477,9 @@
 			</tbody>
 		</table>
 
-		<embed height="50" width="100" src="audio/klaxon_short.mp3" AUTOSTART="false" style="display:none;">
-		<embed height="50" width="100" src="audio/clock_ticking_fast.mp3" AUTOSTART="false" AutoRewind="true" style="display:none;">
-		<embed height="50" width="100" src="audio/clock_ticking_slow.mp3" AUTOSTART="false" AutoRewind="true" style="display:none;">
+		<embed height="50" width="100" src="audio/klaxon_short.mp3" AUTOSTART="false" style="display:none;"> </embed>
+		<embed height="50" width="100" src="audio/clock_ticking_fast.mp3" AUTOSTART="false" AutoRewind="true" style="display:none;"> </embed>
+		<embed height="50" width="100" src="audio/clock_ticking_slow.mp3" AUTOSTART="false" AutoRewind="true" style="display:none;"> </embed>
 
 		<div style="clear:both;font:20% sans-serif;">&nbsp;</div>
 
