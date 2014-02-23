@@ -288,6 +288,8 @@ function resetScore() {
 
 	document.getElementById("yes-no").style.display = "none";
 	document.getElementById("mainImage").src = "images/vocab/titles/" + currentCat + ".jpg";
+	document.getElementById("phonDisplay").style.fontSize="300%";
+	document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+currentPhonUnit+".png' />";
 	document.getElementById("ch1").innerHTML = "";
 	document.getElementById("ch2").innerHTML = "";
 	document.getElementById("ch3").innerHTML = "";
@@ -322,6 +324,9 @@ function selectMode(mode) {
 		  	document.getElementById("imageDiv").style.display="block";
   			document.getElementById("phonDisplay").style.display="none";
   			document.getElementById("errDiv").style.display="block";
+  			document.getElementById("levels").style.display="table-row";
+  			document.getElementById("vocSelect").style.display="table-row";
+  			document.getElementById("phonUSelect").style.display="none";
   		}
 
 		if (mode == "r_1pic4word") {
@@ -340,22 +345,37 @@ function selectMode(mode) {
 		}
 		else if (mode=="r_phonics"){
 		  	document.getElementById("imageDiv").style.display="none";
+		  	document.getElementById("choiceDev").style.display = "none";
   			document.getElementById("phonDisplay").style.display="block";
   			document.getElementById("errDiv").style.display="none";
+  			document.getElementById("levels").style.display="none";
+  			document.getElementById("vocSelect").style.display="none";
+  			document.getElementById("phonUSelect").style.display="table-row";
 		}
 	}
 }
 
 function selectPhonUnit(unit) {
-	if (parseInt(unit) < 8) {
-		currentPhonUnit=unit;
-		document.getElementById("phonDisplay").innerHTML = "&nbsp;";
-		setPhonArrays();
-		resetScore();
-	}
-	else {
-		document.getElementById("u"+currentPhonUnit).checked=true;
-		document.getElementById("phonDisplay").innerHTML = "&nbsp;<span style='font-size:40px'>Sorry, this unit is not ready yet. </ span>&nbsp;";
+		if (unit != currentPhonUnit) {
+		var prevUnit = currentPhonUnit;
+
+			document.getElementById("b_phon_u" + unit).style.width = "94%";
+			document.getElementById("b_phon_u" + unit).style.border = "outset #aa8b3f";
+			document.getElementById("b_phon_u" + prevUnit).style.width = "100%";
+			document.getElementById("b_phon_u" + prevUnit).style.border = "none";
+
+
+		if (parseInt(unit) < 8) {
+			currentPhonUnit=unit;
+			document.getElementById("phonDisplay").style.fontSize = "300%";
+			document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+unit+".png' />";
+			setPhonicsArrays();
+			resetScore();
+		}
+		else {
+			document.getElementById("u"+currentPhonUnit).checked=true;
+			document.getElementById("phonDisplay").innerHTML = "&nbsp;<span style='font-size:40px'>Sorry, this unit is not ready yet. </ span>&nbsp;";
+		}
 	}
 }
 
@@ -894,7 +914,7 @@ function feedback(ch, answer) {
 		document.getElementById(fBDiv).innerHTML = "<span class='choiceDevFeedback'>" + answer + "</span>";
 
 	}
-	if (!uMode=="r_phonics"){
+	if (uMode!="r_phonics"){
 		recentErrors(answer);
 		upcmnErrs(answer);
 	}
@@ -1046,6 +1066,7 @@ function activity(button){
 
 function newSyllable(button) {
 	if (button == "start") {
+		document.getElementById("phonDisplay").style.fontSize = "763%";
 		newCount();
 		document.getElementById("b_start").style.display = "none";
 		document.getElementById("optDiv").style.display = "none";

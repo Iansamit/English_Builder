@@ -2,7 +2,7 @@
 <html lang="en">
 
 	<head>
-		<title>Vocabulary Practice</title>
+		<title>Teacher Plus English Language Builder</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css' />
 
@@ -59,16 +59,13 @@
 			<!-- ============ -->
 			<!-- Spacer       -->
 			<!-- ============ -->
-			<img src="images/formatting/250X20clear_spacer.png" style="width:50%; " />
+			<img id="spacerRP" src="images/formatting/30clear_spacer.png" style="height:48px; " />
 
 			<!--_____________ -->
 			<!-- Word Choice  -->
 			<!--_____________ -->
 			<div align="center" style="padding:0.15%; background-color:#000; border-style:ridge; width:60%; display:none;" id="choiceDev" >
-
-				<img src="images/formatting/250X20clear_spacer.png" style="width:20%;" />
-
-				<table summary="multiple choice words." align="center" style="table-layout:fixed; width:inherit; position:absolute; background:#000;" >
+				<table summary="multiple choice words." align="center" style="table-layout:fixed; width:inherit; position:absolute; top:20%; background:#000;" >
 					<tbody>
 						<tr>
 							<td style="color:#fff; font: 40% 'Nunito', sans-serif; text-align:center;">Click on the word that matches the picture:</td>
@@ -87,7 +84,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<img src="images/formatting/choicedivsizer.png" style="width:95%; " />
+				<img src="images/formatting/30clear_spacer.png" style="height:290px; " />
 			</div>
 		</div>
 
@@ -103,7 +100,7 @@
 				&nbsp;03:00&nbsp;
 			</div>
 
-			<img src="images/formatting/250X20clear_spacer.png" style="width:600%; " />
+			<img src="images/formatting/30clear_spacer.png" style="height:48px; " />
 			<!--_____________ -->
 			<!-- Feedback     -->
 			<!--_____________ -->
@@ -120,7 +117,7 @@
 						<td id="fBIm1" align="left" style="font-family:'Nunito', sans-serif; font-weight:bold; font-size:42%;"> </td>
 					</tr>
 					<tr>
-						<td id="fBIm2" align="left" style="font-family:'Nunito, sans-serif; font-weight:bold; font-size:42%;"> </td>
+						<td id="fBIm2" align="left" style="font-family:'Nunito', sans-serif; font-weight:bold; font-size:42%;"> </td>
 					</tr>
 				</table>
 			</div>
@@ -130,32 +127,13 @@
 		|    Options                                                                          |
 		|                                                                                     |
 		|     GIMP notes for new buttons: 1) size - 150X90px; 2) emboss: Bumpmap; Azimuth: 75;|
-		|     Elevation: 80; Depth: 2;   3)add bevel - width:14;                              |
+		|     Elevation: 80; Depth: 3;   3)add bevel - width:14;                              |
 		=================================================================================== -->
-		<div id="optDiv" align="center" style ="position:absolute; width:100%; display:none;" >
+		<div id="optDiv" align="center" style="position: absolute; width:100%; display:none;">
 			<div style="border:ridge brown; width: 60%; padding:0.5%; background-color:#d1b162; font:32% 'Nunito', sans-serif;">
 				<table style="border:none; table-layout:fixed; width:100%; vertical-align:center; text-align:center; border-spacing:0px; padding:0.3%; font:inherit;">
 					<tbody style="padding:inherit; font:inherit;">
-						<tr style="background:#aa8b3f; padding:inherit;">
-							<td> </td>
-							<td style="font:bold 80% sans-serif; padding:inherit;">
-							<input id="b_r_1word4pic" type="image" src='images/buttons/r_1word4pic_mode.png' style="width:94%; border:outset #aa8b3f;" onclick="selectMode('r_1word4pic')"/>
-							1 Word 4 Pictures </td>
-							<td style="font:bold 80% sans-serif;	padding:inherit;">
-							<input id="b_r_1pic4word" type="image" src='images/buttons/r_1pic4word_mode.png' style="width:100%" onclick="selectMode('r_1pic4word')"/>
-							1 Picture 4 Words </td>
-							<td style="font:bold 80% sans-serif;	padding:inherit;">
-							<input id="b_l_4pic" type="image" src='images/buttons/l_4pic_mode.png' style="width:100%" onclick="selectMode('l_4pic')"/>
-							Listen and Choose. </td>
-							<td style="font:bold 80% sans-serif;	padding:inherit;">
-								<input id="b_sp_teacher" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onclick="selectMode('sp_teacher')"/>
-								Say the word.
-							</td>
-							<td style="font:bold 80% sans-serif;	padding:inherit;">
-								<input id="b_r_phonics" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onclick="selectMode('r_phonics')"/>
-								Phonics.
-							</td>
-						</tr>
+
 						<tr>
 							<td colspan="6">
 							<br />
@@ -219,11 +197,40 @@
 		|	GIMP notes for new buttons: 1) scale width - 150px; 2)add bevel - width:14;    	  |
 		|	3) (for ghosted) desaturate: luminosity; 4) brightness: +90, contrast: -20        |
 		=================================================================================== -->
+			<div id="contentSelect" align="center" style="position: absolute; z-index:2; width:100%; display:none;"	>
 
-		<div align="center" style ="position: absolute; width:100%; display:none;"  id="contentSelect">
-			<div style="border:thick ridge #7bd8e8; width: 70%; padding:0.5%; background-color:#b8e4ec; font:32% 'Nunito', sans-serif;">
-				<table border="0" style="table-layout:fixed; width:100%; vertical-align:center; text-align:center; border-spacing:0px; padding:0.3%;">
+			<div style="border:thick ridge #7bd8e8; width: 70%; padding:5px; background-color:#b8e4ec; font:32% 'Nunito', sans-serif;">
+				<table style="table-layout:fixed; width:100%; vertical-align:center; text-align:center; border-spacing:0px; padding:5px;">
+					<tr style="font: inherit">
+						<td colspan="6" style="font: inherit">
+							<table style="border:thick ridge #7bd8e8; table-layout:fixed; width:100%; font:inherit; border-spacing:0px;">
+								<tr style="background:#7bd8e8; padding:0.3%; font: inherit">
+									<td>Activities</td>
+									<td style="font:bold 80% sans-serif; padding:inherit; ">
+									<input id="b_r_1word4pic" type="image" src='images/buttons/r_1word4pic_mode.png' style="width:94%; border:outset #aa8b3f;" onclick="selectMode('r_1word4pic')"/>
+									1 Word 4 Pictures </td>
+									<td style="font:bold 80% sans-serif; padding:inherit; text-align: center;">
+									<input id="b_r_1pic4word" type="image" src='images/buttons/r_1pic4word_mode.png' style="width:100%" onclick="selectMode('r_1pic4word')"/>
+									1 Picture 4 Words </td>
+									<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
+									<input id="b_l_4pic" type="image" src='images/buttons/l_4pic_mode.png' style="width:100%" onclick="selectMode('l_4pic')"/>
+									Listen and Choose. </td>
+									<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
+										<input id="b_sp_teacher" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onclick="selectMode('sp_teacher')"/>
+										Say the word.
+									</td>
+									<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
+										<input id="b_r_phonics" type="image" src='images/buttons/sp_teacher_mode.png' style="width:100%" onclick="selectMode('r_phonics')"/>
+										Phonics.
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
 					<tr>
+						<td colspan="6"><img id="spacerCont1" src="images/formatting/30clear_spacer.png" style="height:0px;" /></td>
+					</tr>
+					<tr id="levels">
 						<td colspan="6" style="background-color:#7bd8e8; border:thick ridge #7bd8e8; font:100% 'Nunito', sans-serif;">
 						<form name="level" action="">
 							<div style="float:left;">Level:</div>
@@ -254,58 +261,108 @@
 							</div>
 						</form></td>
 					</tr>
+					<tr id="phonUSelect" style="display: none">
+						<td colspan="6" style="font:inherit;">
+							<table style="table-layout:fixed; width:100%; border-spacing:0px; border:thick ridge #7bd8e8; font:inherit;">
+								<tr style="background:#7bd8e8; padding:0.2%;">
+									<td style="padding:inherit; font:inherit;">
+										<input id="b_phon_u1" type="image" src='images/buttons/b_phon_u1.png'  style="width:94%; border:outset #f62;" onclick="selectPhonUnit('1')"/>									</td>
+									<td style="padding:inherit; font:inherit; ">
+										<input id="b_phon_u2" type="image" src='images/buttons/b_phon_u2.png'  style="width:100%;" onclick="selectPhonUnit('2')"/>
+									</td>
+									<td style="padding:inherit; font:inherit;">
+										<input id="b_phon_u3" type="image" src='images/buttons/b_phon_u3.png'  style="width:100%" onclick="selectPhonUnit('3')"/>
+									</td>
+									<td style="padding:inherit; font:inherit;">
+										<input id="b_phon_u4" type="image" src='images/buttons/b_phon_u4.png'  style="width:100%;" onclick="selectPhonUnit('4')"/>
+									</td>
+									<td style="padding:inherit; font:inherit;">
+										<input id="b_phon_u5" type="image" src='images/buttons/b_phon_u5.png'  style="width:100%;" onclick="selectPhonUnit('5')"/>
+									</td>
+									<td style="padding:inherit; font:inherit;">
+										<input id="b_phon_u6" type="image" src='images/buttons/b_phon_u6.png'  style="width:100%;" onclick="selectPhonUnit('6')"/>
+									</td>
+								</tr>
+								<tr style="background:#7bd8e8; padding:0.2%;">
+									<td>
+										Phonics Unit <img src="images/labels/U1.png" style="width: 18%;"/>
+									</td>
+									<td>
+										Phonics Unit <img src="images/labels/U2.png" style="width: 18%"/>
+									</td>
+									<td>
+										Phonics Unit <img src="images/labels/U3.png" style="width: 18%"/>
+									</td>
+									<td>
+										Phonics Unit <img src="images/labels/U4.png" style="width: 18%"/>
+									</td>
+									<td>
+										Phonics Unit <img src="images/labels/U5.png" style="width: 18%"/>
+									</td>
+									<td>
+										Phonics Unit <img src="images/labels/U6.png" style="width: 18%"/>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
 					<tr>
+						<td colspan="6"><img id="spacerCont2" src="images/formatting/30clear_spacer.png" style="height:0px;" /></td>
+					</tr>
+					<tr id="vocSelect">
 						<td colspan="6">
-						<br />
+							<table style="table-layout:fixed; width:100%; border-spacing:0px; border:thick ridge #7bd8e8;">
+								<tr style="background:#7bd8e8; padding:0.2%; font: inherit">
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/actions.jpg' id="b_actions" style="width:94%; border:outset #f62;" onclick="selectCat('actions')"/>
+									</td>
+									<td style="padding:inherit; ">
+										<input type="image" src='images/buttons/animals.jpg' id="b_animals" style="width:100%" onclick="selectCat('animals')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/clothes.jpg' id="b_clothes" style="width:100%" onclick="selectCat('clothes')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/describing.jpg' id="b_describing" style="width:100%" onclick="selectCat('describing')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/food.jpg' id="b_food" style="width:100%" onclick="selectCat('food')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/free time.jpg' id="b_free time" style="width:100%" onclick="selectCat('free time')"/>
+									</td>
+								</tr>
+								<tr style="background:#7bd8e8; padding:0.2%; font: inherit">
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/occupations.jpg' id="b_occupations" style="width:100%" onclick="selectCat('occupations')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/body.jpg' id="b_body" style="width:100%" onclick="selectCat('body')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/places and transport.jpg' id="b_places and transport" style="width:100%" onclick="selectCat('places and transport')"/>
+									</td>
+										<td style="padding:inherit;">
+									<input type="image" src='images/buttons/school.jpg' id="b_school" style="width:100%" onclick="selectCat('school')"/>
+									</td>
+									<td style="padding:inherit;">
+										<input type="image" src='images/buttons/time.jpg' id="b_time" style="width:100%"  onclick="selectCat('time')"/>
+									</td>
+									<td style="padding:inherit; border-bottom:">
+
+									</td>
+								</tr>
+							</table>
+
+
 						</td>
-					</tr>
-					<tr style="background-color:#7bd8e8;">
-						<td colspan="6" style="text-align:center"> </td>
-					</tr>
-					<tr style="background-color:#7bd8e8; padding:inherit;">
-						<td style="padding:inherit;border-left: thick ridge #7bd8e8; border-top: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/actions.jpg' id="b_actions" style="width:94%; border:outset #f62;" onclick="selectCat('actions')"/>
-						</td>
-						<td style="padding:inherit; border-top: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/animals.jpg' id="b_animals" style="width:100%" onclick="selectCat('animals')"/>
-						</td>
-						<td style="padding:inherit; border-top: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/clothes.jpg' id="b_clothes" style="width:100%" onclick="selectCat('clothes')"/>
-						</td>
-						<td style="padding:inherit; border-top: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/describing.jpg' id="b_describing" style="width:100%" onclick="selectCat('describing')"/>
-						</td>
-						<td style="padding:inherit; border-top: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/food.jpg' id="b_food" style="width:100%" onclick="selectCat('food')"/>
-						</td>
-						<td style="padding:inherit;border-top: thick ridge #7bd8e8; border-right: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/free time.jpg' id="b_free time" style="width:100%" onclick="selectCat('free time')"/>
-						</td>
-					</tr>
-					<tr style="background-color:#7bd8e8; padding:inherit;">
-						<td style="padding:inherit; border-left: thick ridge #7bd8e8; border-bottom: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/occupations.jpg' id="b_occupations" style="width:100%" onclick="selectCat('occupations')"/>
-						</td>
-						<td style="padding:inherit; border-bottom: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/body.jpg' id="b_body" style="width:100%" onclick="selectCat('body')"/>
-						</td>
-						<td style="padding:inherit; border-bottom: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/places and transport.jpg' id="b_places and transport" style="width:100%" onclick="selectCat('places and transport')"/>
-						</td>
-						<td style="padding:inherit; border-bottom: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/school.jpg' id="b_school" style="width:100%" onclick="selectCat('school')"/>
-						</td>
-						<td style="padding:inherit; border-bottom: thick ridge #7bd8e8;">
-						<input type="image" src='images/buttons/time.jpg' id="b_time" style="width:100%"  onclick="selectCat('time')"/>
-						</td>
-						<td style="padding:inherit; border-bottom: thick ridge #7bd8e8; border-right: thick ridge #7bd8e8;"> </td>
 					</tr>
 					<tr>
 						<td>
 						<br />
 						</td>
 					</tr>
-					<tr>
+					<tr style="display: none">
 						<td colspan="6" style="text-align:center; font:inherit; border:thick ridge #7bd8e8">
 							<table id="dlTable" style="width:100%;  border:thick solid #7bd8e8; font:inherit; background:#7bd8e8">
 								<tr>
@@ -424,12 +481,14 @@
 			<img id="mainImage" src='images/vocab/titles/actions.jpg' alt='Loading. Please wait ...' style='border-style: none; margin-top: 0.5%; width:64%' ondragstart='return false;' />
 		</div>
 
-		<div id="phonDisplay" align="center" style="height:610px ; background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; font: 'Nunito', sans-serif; font-size:763%; display: none" >
-			&nbsp;<span style="font-size:40px;">Select a phonics unit, then click "Start".</span>&nbsp;
+		<div id="phonDisplay" align="center" style="height:610px ; background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; font: 'Nunito', sans-serif; font-size:300%; display: none" >
+			</br>Phonics Unit
+			<img src='images/labels/U1.png' />
+
 		</div>
 
-		<div style="background:white; clear:left; margin-bottom:1%">
-			<img src="images/formatting/250X20clear_spacer.png" style="width:30%;" />
+		<div style="background:white; clear:left; height:40px; margin-bottom: 1%">
+
 		</div>
 
 		<!--_____________ -->
