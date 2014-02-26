@@ -1,5 +1,4 @@
-var allCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
-
+var allCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "people", "places and transport", "body", "school", "time");
 var audArray = new Array("");
 var audDLRemaining;
 var audObj;
@@ -7,6 +6,7 @@ var audReady = new Array(false);
 var availCats = new Array("");
 var cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
 var countTime = 180;
+var currentBook = "";
 var currentCat = "actions";
 var currentLev = "P1";
 var currentPhonUnit="1";
@@ -43,11 +43,12 @@ var vSpecIndex;
 var fIndex;
 var eCompIndex;
 var iArray=new Array("m","s","p","t","");
-var vArray=new Array("a","i","o");
+var vArray=new Array("a","i","o","");
 var fArray=new Array("m","s","p","t","");
-var vSpecArray=new Array("e","i");
+var vSpecArray=new Array("e","i","");
 var eCompArray=new Array ("e","");
 var syll;
+var prevSyll;
 var tabSylls = new Array ("fuck", "pis", "cock", "tit");
 
 
@@ -83,11 +84,22 @@ if (!Array.prototype.indexOf) {
     };
   }
 
+function debug (l1,d1,l2,d2,l3,d3,l4,d4,l5,d5) {
+	for(i = 0; i < 10;i++){
+		if (typeof arguments[i] != "undefined"){
+			document.getElementById("debug"+i).innerHTML=arguments[i]+"&nbsp;";
+		}
+		else {
+			document.getElementById("debug"+i).innerHTML = "";
+		}
+	}
+}
+
 function init() {
 	initAudio();
 	resize();
-	selectLev("P1");
-
+	resetScore();
+	selectLev("K2");
 	var plImg1 = new Image();
 	plImg1.src = "images/vocab/titles/actions.jpg";
 	var plImg2 = new Image();
@@ -168,6 +180,7 @@ function audCtrls(aud, cont) {
 	if (window.Audio) {
 
 		if (cont == "play") {
+			aud.currentTime = 0;
 			aud.play();
 
 		} else if (cont == "pause") {
@@ -210,6 +223,7 @@ function categoryDiv(disp) {
 function newCount() {
 	finished = false;
 	stopCount = false;
+	tickTock="tick";
 	countDown();
 	function countDown() {
 		if (stopCount == false) {
@@ -287,7 +301,13 @@ function resetScore() {
 	document.getElementById("b_start").style.display = "block";
 
 	document.getElementById("yes-no").style.display = "none";
-	document.getElementById("mainImage").src = "images/vocab/titles/" + currentCat + ".jpg";
+	if (currentCat!="dot_and_Ben"){
+		document.getElementById("mainImage").src = "images/vocab/titles/" + currentCat + ".jpg";
+	}
+	else{
+		document.getElementById("mainImage").src = "images/vocab/titles/" + currentBook + ".jpg";
+	}
+
 	document.getElementById("phonDisplay").style.fontSize="300%";
 	document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+currentPhonUnit+".png' />";
 	document.getElementById("ch1").innerHTML = "";
@@ -314,7 +334,7 @@ function selectMode(mode) {
 		var prevMode = uMode;
 
 		document.getElementById("b_" + mode).style.width = "94%";
-		document.getElementById("b_" + mode).style.border = "outset #aa8b3f";
+		document.getElementById("b_" + mode).style.border = "outset #5bc8e8";
 		document.getElementById("b_" + prevMode).style.width = "100%";
 		document.getElementById("b_" + prevMode).style.border = "none";
 		uMode = mode;
@@ -324,8 +344,7 @@ function selectMode(mode) {
 		  	document.getElementById("imageDiv").style.display="block";
   			document.getElementById("phonDisplay").style.display="none";
   			document.getElementById("errDiv").style.display="block";
-  			document.getElementById("levels").style.display="table-row";
-  			document.getElementById("vocSelect").style.display="table-row";
+  			document.getElementById("vocSelect").style.display="table";
   			document.getElementById("phonUSelect").style.display="none";
   		}
 
@@ -348,9 +367,8 @@ function selectMode(mode) {
 		  	document.getElementById("choiceDev").style.display = "none";
   			document.getElementById("phonDisplay").style.display="block";
   			document.getElementById("errDiv").style.display="none";
-  			document.getElementById("levels").style.display="none";
   			document.getElementById("vocSelect").style.display="none";
-  			document.getElementById("phonUSelect").style.display="table-row";
+  			document.getElementById("phonUSelect").style.display="table";
 		}
 	}
 }
@@ -358,9 +376,9 @@ function selectMode(mode) {
 function selectPhonUnit(unit) {
 		if (unit != currentPhonUnit) {
 		var prevUnit = currentPhonUnit;
-
+			audCtrls(aclick, "play");
 			document.getElementById("b_phon_u" + unit).style.width = "94%";
-			document.getElementById("b_phon_u" + unit).style.border = "outset #aa8b3f";
+			document.getElementById("b_phon_u" + unit).style.border = "outset #5bc8e8";
 			document.getElementById("b_phon_u" + prevUnit).style.width = "100%";
 			document.getElementById("b_phon_u" + prevUnit).style.border = "none";
 
@@ -370,6 +388,7 @@ function selectPhonUnit(unit) {
 			document.getElementById("phonDisplay").style.fontSize = "300%";
 			document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+unit+".png' />";
 			setPhonicsArrays();
+			newSyllable("ex");
 			resetScore();
 		}
 		else {
@@ -379,54 +398,129 @@ function selectPhonUnit(unit) {
 	}
 }
 
-function iSet (setting) {
-	initC=setting;
+function iSet () {
+	if (initC=="all"){
+		document.getElementById("b_initC").src="images/buttons/b_new.png";
+		initC="new";
+	}
+	else if (initC=="new"){
+		document.getElementById("b_initC").src="images/buttons/b_none.png";
+		initC="none";
+	}
+	else if (initC=="none"){
+		document.getElementById("b_initC").src="images/buttons/b_all.png";
+		initC="all";
+	}
+	newSyllable("ex");
 }
 
-function vSet (setting) {
-	vowel=setting;
+function vSet () {
+	if (vowel=="all"){
+		document.getElementById("b_vowel").src="images/buttons/b_new.png";
+		vowel="new";
+	}
+	else if (vowel=="new"){
+		document.getElementById("b_vowel").src="images/buttons/b_none.png";
+		vowel="none";
+	}
+	else if (vowel=="none"){
+		document.getElementById("b_vowel").src="images/buttons/b_all.png";
+		vowel="all";
+	}
+	newSyllable("ex");
 }
 
-function fSet (setting) {
-	finalC=setting;
+function fSet () {
+	if (finalC=="all"){
+		document.getElementById("b_finalC").src="images/buttons/b_new.png";
+		finalC="new";
+	}
+	else if (finalC=="new"){
+		document.getElementById("b_finalC").src="images/buttons/b_none.png";
+		finalC="none";
+	}
+	else if (finalC=="none"){
+		document.getElementById("b_finalC").src="images/buttons/b_all.png";
+		finalC="all";
+	}
+	newSyllable("ex");
 }
+
 
 
 function selectLev(level) {
-	currentLev = level;
-	setVocArrays();
-	setTitle();
-	resetScore();
-	audCtrls(aswitch, "play");
-	preloadAudio();
-	preLoadImages();
-	monPreload();
 
-	for (var i = 0, len = allCats.length; i < len; i++) {
-		if (availCats.indexOf(allCats[i]) == -1) {
-			document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
-		} else {
-			document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+	if (level!=currentLev){
+
+		document.getElementById("b_" + level).style.width = "94%";
+		document.getElementById("b_" + level).style.border = "outset #5bc8e8";
+
+		document.getElementById("b_" + currentLev).style.width = "100%";
+		document.getElementById("b_" + currentLev).style.border = "none";
+		currentLev = level;
+		setVocArrays();
+		setTitle();
+		preloadAudio();
+		audCtrls(aswitch, "play");
+		preLoadImages();
+		monPreload();
+
+		for (var i = 0, len = allCats.length; i < len; i++) {
+			if (availCats.indexOf(allCats[i]) == -1) {
+				document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
+			} else {
+				document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+			}
 		}
-	}
-	if (availCats.indexOf(currentCat) == -1) {
-		selectCat(availCats[0]);
+		if (availCats.indexOf(currentCat) == -1) {
+			selectCat(availCats[0]);
+		}
 	}
 }
 
-function selectCat(category) {
 
+function setDotandBen(book) {
+
+	document.getElementById("b_" + book).style.width = "94%";
+	document.getElementById("b_" + book).style.border = "outset #5bc8e8";
+	audCtrls(aclick, "play");
+
+	if (currentCat=="dot_and_Ben") {
+		var prevBook=currentBook;
+		document.getElementById("b_" + prevBook).style.width = "100%";
+		document.getElementById("b_" + prevBook).style.border = "none";
+	}
+	else {
+		document.getElementById("b_" + currentCat).style.width = "100%";
+		document.getElementById("b_" + currentCat).style.border = "none";
+	}
+
+	currentBook = book;
+	currentCat="dot_and_Ben";
+	setVocArrays();
+}
+
+
+function selectCat(category) {
 	if ((availCats.indexOf(category) != -1) && category != currentCat) {
-		var prevCat = currentCat;
 		document.getElementById("b_" + category).style.width = "94%";
-		document.getElementById("b_" + category).style.border = "outset #f62";
-		document.getElementById("b_" + prevCat).style.width = "100%";
-		document.getElementById("b_" + prevCat).style.border = "none";
+		document.getElementById("b_" + category).style.border = "outset #5bc8e8";
+		audCtrls(aclick, "play");
+
+		if (currentCat!="dot_and_Ben") {
+			var prevCat = currentCat;
+			document.getElementById("b_" + prevCat).style.width = "100%";
+			document.getElementById("b_" + prevCat).style.border = "none";
+		}
+		else {
+			document.getElementById("b_" + currentBook).style.width = "100%";
+			document.getElementById("b_" + currentBook).style.border = "none";
+		}
+
 		currentCat = category;
 		setVocArrays();
 		setTitle();
 		resetScore();
-		audCtrls(aclick, "play");
 		preloadAudio();
 		preLoadImages();
 		monPreload();
@@ -481,8 +575,8 @@ function selectFB(mode) {
 }
 
 function setVocArrays() {
-	if (currentLev == "A2") {
-		availCats = new Array("actions", "animals", "clothes", "describing", "occupations", "school");
+	if (currentLev == "K2") {
+		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "occupations", "school");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "cook", "count", "cry", "cut", "drink", "eat", "hop", "jump", "listen", "look", "open", "run", "sing", "sit down", "sleep", "stand up", "stop", "swim", "walk");
@@ -503,8 +597,10 @@ function setVocArrays() {
 				vocArray = new Array("bag", "bin", "book", "chair", "door", "eraser", "fan", "pen", "pencil", "ruler", "table", "window");
 				break;
 		}
-	} else if (currentLev == "P1") {
-		availCats = new Array("actions", "animals", "clothes", "food", "occupations", "body", "school", "time");
+
+
+	} else if (currentLev == "P1" || currentLev == "P2") {
+		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "food", "occupations", "people", "body", "school", "time");
 
 		switch (currentCat) {
 			case "actions":
@@ -522,6 +618,9 @@ function setVocArrays() {
 			case "food":
 				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "mangoes", "milk", "orange", "papayas", "rice", "tea");
 				break;
+			case "people":
+				vocArray = new Array("brother", "daughter", "family", "father", "friend", "grandfather", "grandmother", "mother", "sister", "son", "uncle");
+				break;
 			case "occupations":
 				vocArray = new Array("dentist", "doctor", "farmer", "fisherman", "nurse", "policeman", "postman", "singer", "student", "teacher");
 				break;
@@ -532,8 +631,10 @@ function setVocArrays() {
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
 				break;
 		}
-	} else if (currentLev == "P4") {
-		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+
+
+	} else if (currentLev == "P3" || currentLev == "P4" || currentLev == "P5") {
+		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "food", "free time", "occupations", "people", "places and transport", "body", "school", "time");
 
 		switch (currentCat) {
 			case "actions":
@@ -560,6 +661,9 @@ function setVocArrays() {
 			case "occupations":
 				vocArray = new Array("barber", "butcher", "cook", "dentist", "doctor", "dressmaker", "farmer", "fisherman", "hairdresser", "merchants", "monk", "nurse", "policeman", "postman", "student", "taxi driver", "chef", "teacher");
 				break;
+			case "people":
+				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
+				break;
 			case "places and transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "behind", "between", "bicycle", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "in", "in front of", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "near", "next to", "on", "on foot", "on the left of", "on the right of", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "that", "this", "train", "truck", "tuk-tuk", "under", "van", "Vientiene", "Vietnam", "zoo");
 				break;
@@ -570,8 +674,10 @@ function setVocArrays() {
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
 				break;
 		}
-	} else if (currentLev == "all") {
-		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+
+
+	} else if (currentLev == "P6" || currentLev == "all") {
+		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "fly", "play", "cook", "drink", "listen", "sleep", "hop", "look", "read", "cry", "eat", "jump", "open");
@@ -607,8 +713,10 @@ function setVocArrays() {
 				vocArray = new Array("at night", "at noon", "Christmas", "in the afternoon", "in the evening", "in the morning", "Loi Krathong", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 				break;
 		}
+
+
 	} else if (currentLev == "scratchpad") {
-		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "fly", "play", "cook");
@@ -646,54 +754,72 @@ function setVocArrays() {
 				break;
 		}
 	}
+
+
+	if (currentCat == "dot_and_Ben") {
+		//alert(currentBook);
+		switch (currentBook) {
+			case "d_B_1":
+			//alert("d_B_1");
+				vocArray = new Array ("and", "bad", "bed", "Ben", "bus", "Dot", "fun", "has", "hop", "hot", "hut", "in", "in bed", "is", "not", "on", "pet", "sad", "sit", "sun", "the");
+				break;
+			case "d_B_2":
+			//alert("d_B_2");
+				vocArray = new Array ("and", "back", "bed", "Ben", "but", "can", "cat", "Dot", "duck", "has", "in", "in bed", "is", "it", "not", "of", "on", "sack", "sad", "sick", "sit", "the", "what");
+				break;
+			case "d_B_3":
+				vocArray = new Array ("and", "bad", "bag", "Ben", "big", "Bud", "bus", "can", "cat", "dog", "Dot", "duck", "fog", "gas", "gem", "guess", "Gus", "has", "hot", "hut", "in", "is", "it","Jack", "jam", "jog", "not", "on", "sack", "sit", "the", "what");
+				break;
+			case "d_B_4":
+				vocArray = new Array ("and", "at", "bag", "bake", "BAM", "Ben", "big", "Bud", "bus", "but", "cake", "can", "cane", "cat", "Doctor Zogue", "dog", "Dot", "duck", "feet", "fog", "gem", "guide", "Gus", "has", "hide", "his", "home", "hut", "I", "in", "into", "is", "it", "Jack", "Joe", "jog", "keep", "kick", "lake", "like", "magic", "man", "meet", "mice", "my", "name","nice", "nice to meet you", "not", "on", "pet", "pie", "sack", "sage", "see", "sit", "Sue", "take", "tap", "the", "to", "we", "you");
+				break;
+		}
+	}
 }
 
 
 function setPhonicsArrays () {
 		switch (currentPhonUnit) {
 			case "1":
-			iArray=["m","s","p","t",""];
-			vArray=["a","i","o"];
-			fArray=["m","s","p","t",""];
+			iArray= new Array ("m","s","p","t","");
+			vArray= new Array ("a","i","o","");
+			fArray= new Array ("m","s","p","t","");
 			break;
 		case "2":
-			iArray=["m","s","p","t","n","f","h",""];
-			vArray=["a","i","o","e","u"];
-			fArray=["m","s","p","t","n","f",""];
+			iArray= new Array ("m","s","p","t","n","f","h","");
+			vArray= new Array ("a","i","o","e","u","");
+			fArray= new Array ("m","s","p","t","n","f","");
 			break;
 		case "3":
-			iArray=["m","s","p","t","n","f","h","b","d","z",""];
-			vArray=["a","e","i","o","u"];
-			fArray=["m","s","p","t","n","f","b","d","z",""];
+			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","");
+			vArray= new Array ("a","e","i","o","u","");
+			fArray= new Array ("m","s","p","t","n","f","b","d","z","");
 			break;
 		case "4":
-			iArray=["m","s","p","t","n","f","h","b","d","z","c","k",""];
-			vArray=["a","e","i","o","u"];
-			fArray=["m","s","p","t","n","f","b","d","z","ck",""];
-			vSpecArray["e","i"];
+			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","");
+			vArray= new Array ("a","e","i","o","u","");
+			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","");
+			vSpecArray = new Array ("e","i","");
 			break;
 		case "5":
-			iArray=["m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu",""];
-			vArray=["a","e","i","o","u"];
-			fArray=["m","s","p","t","n","f","b","d","z","ck","g","j",""];
-			vSpecArray["e","i"];
+			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
+			vArray= new Array ("a","e","i","o","u","");
+			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","");
+			vSpecArray = new Array ("e","i","");
 			break;
 		case "6":
-			iArray=["m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu",""];
-			vArray=["a","e","i","o","u","ee"];
-			fArray=["m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu",""];
-			vSpecArray=["e","i","ee"];
+			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
+			vArray= new Array ("a","e","i","o","u","ee","");
+			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","");
+			vSpecArray= new Array ("e","i","ee","");
 			break;
 		case "7":
-			iArray=["m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu",""];
-			vArray=["a","e","i","o","u","ee"];
-			fArray=["m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk",""];
-			vSpecArray=["e","i","ee"];
-			//alert (vArray[5]);
+			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
+			vArray= new Array ("a","e","i","o","u","ee","");
+			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk","");
+			vSpecArray= new Array ("e","i","ee","");
 			break;
-
 		}
-
 }
 
 
@@ -971,22 +1097,18 @@ function upcmnErrs(vocItem) {
 		var errTx3 = "";
 		var errIm1 = cmnErrs[0][0];
 		var n = (cmnErrs[0][0]).indexOf("/") + 1;
-		var errTx1 = (cmnErrs[0][0]).slice(n);
-
-		//alert (errTx1)
+		var errTx1 = (cmnErrs[0][0]).slice(n)+" ("+cmnErrs[0][1]+")";
 
 		if (cmnErrs[1][0] != "") {
 			var errIm2 = cmnErrs[1][0];
 			n = (cmnErrs[1][0]).indexOf("/") + 1;
-			errTx2 = (cmnErrs[1][0]).slice(n);
-			//alert (errTx1 + "," + errTx2);
+			errTx2 = (cmnErrs[1][0]).slice(n)+" ("+cmnErrs[1][1]+")";
 		}
 
 		if (cmnErrs[2][0] != "") {
 			var errIm3 = cmnErrs[2][0];
 			var n = (cmnErrs[2][0]).indexOf("/") + 1;
-			errTx3 = (cmnErrs[2][0]).slice(n);
-			//alert (errTx1 + "," + errTx2 +"," +errTx3);
+			errTx3 = (cmnErrs[2][0]).slice(n)+" ("+cmnErrs[2][1]+")";
 		}
 		displayErrors(errIm1, errTx1, errIm2, errTx2, errIm3, errTx3);
 	}
@@ -1104,9 +1226,20 @@ function newSyllable(button) {
 		unit7();
 		break;
 	}
+
+	if (syll==prevSyll){
+		newSyllable();
+	}
 	tabooCheck();
-	document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
-	document.getElementById("phonDisplay").innerHTML = syll;
+	prevSyll=syll;
+	if (button=="ex"){
+		document.getElementById("phonExample").innerHTML = syll;
+	}
+	else{
+		document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+		document.getElementById("phonDisplay").innerHTML = syll;
+	}
+
 }
 
 
@@ -1126,15 +1259,18 @@ function setIndices (iLen, vLen, fLen, iNLen, vNLen, fNLen, vSLen) {
 	if (vowel=="all") {
 		vIndex=Math.floor(Math.random()*vLen);
 	}
-	else {
+	else if (vowel=="new"){
 		vIndex=Math.floor(Math.random()*vNLen+(vLen-vNLen));
+	}
+	else {
+		vIndex=vLen;
 	}
 
 	//set index of final consonant
-	if (initC=="all") {
+	if (finalC=="all") {
 		fIndex=Math.floor(Math.random()*fLen);
 	}
-	else if (initC=="new") {
+	else if (finalC=="new") {
 		fIndex=Math.floor(Math.random()*fNLen+(fLen-fNLen));
 	}
 	else {
@@ -1143,8 +1279,12 @@ function setIndices (iLen, vLen, fLen, iNLen, vNLen, fNLen, vSLen) {
 
 	//alert (vSLen);
 	//set index of "e" or "i" in case of "k" or "gu"
-	vSpecIndex=Math.floor(Math.random()*vSLen);
-
+	if (vowel!="none") {
+		vSpecIndex=Math.floor(Math.random()*vSLen);
+	}
+	else {
+		vSpecIndex=vSLen;
+	}
 	//set index of final "e" in compound vowels
 	if (vIndex==5) {
 		eCompIndex=1;
@@ -1174,7 +1314,6 @@ function tabooCheck() {
 		var igraph=iArray[iIndex];
 		var vgraph=vArray[vIndex];
 		var fgraph=fArray[fIndex];
-
 		syll=igraph.concat (vgraph,fgraph);
 	}
 
@@ -1211,7 +1350,6 @@ function tabooCheck() {
 		if (igraph=="k") {
 			vgraph=vSpecArray[vSpecIndex];
 		}
-
 		syll=igraph.concat (vgraph,fgraph);
 	}
 
