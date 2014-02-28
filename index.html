@@ -291,6 +291,9 @@
 							</div>
 							Phonics
 						</td>
+						<td>
+							<input id="b_options" type="image" src='images/buttons/options_button.png' style="width:100%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press('b_options2','down','100%')" onmouseup="b_press('b_options2','up','100%')" onmouseout="b_press('b_options2','out','100%')" onclick="optionsDiv('block')"/>
+						</td>
 					</tr>
 				</table>
 
@@ -609,6 +612,7 @@
 						</td>
 					</tr>
 				</table>
+
 				<img id="b_contentOK" onclick="categoryDiv('none')" onmousedown="b_press('b_contentOK','down','7%')" onmouseup="b_press('b_contentOK','up','7%')" onmouseout="b_press('b_contentOK','out','7%')"  src="images/buttons/OK.png" style="width:7%" />
 			</div>
 		</div>
@@ -706,45 +710,48 @@
 		<!-- Controls		 -->
 		<!--_____________ -->
 
-		<table border="0" align="center" style="width:97%;">
-			<tbody valign="baseline">
-				<tr>
-					<td style="width:7.15%;">
-					<input id="b_reset" type="image" src='images/buttons/reset_button.png' style="display:block; width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_reset','down','100%')" onmouseup="b_press('b_reset','up','100%')" onmouseout="b_press('b_reset','out','100%')" onclick="resetScore()"/>
+
+		<table border="0" style="width: 100%">
+			<tbody valign="baseline" align="center">
+				<tr style="height:100px">
+					<td style="width: 0.5%">
+						&nbsp;
 					</td>
-					<td style="width:32.7%;"><img src='images/formatting/1000X597clear_spacer.png' alt="Finished!" style="width:32%" />
+					<td style="width: 7.125%">
+						<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_reset','down','100%')" onmouseup="b_press('b_reset','up','100%')" onmouseout="b_press('b_reset','out','100%')" onclick="resetScore()" />
 					</td>
-					<td style="width:20.3%;">
-
-					<input id="b_start" type="image" src='images/buttons/start_button.png'	style="display:block; width:60.31%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_start','down','60.31%')" onmouseup="b_press('b_start','up','60.31%')" onmouseout="b_press('b_start','out','60.31%')" onclick="activity('start')"/>
-
-
-					<div style="display:block" id="finishedButton">
-						<img src='images/buttons/finished_button.png' alt="Finished!" style="width:100%" />
-					</div>
-
-
-					<div id="yes-no" style=" width:100%; border:gray; display:none; margin-left:auto; margin-right:auto">
-						<input type="image" style="float:left; width:38%;" src='images//buttons/no_button.png' id="noButton"	onmousedown="b_press('noButton','down','38%')" onmouseup="b_press('noButton','up','38%')" onmouseout="b_press('noButton','out','38%')" onclick="activity('no')"/>
-
-						<input id="yesButton" type="image" style="float:right; width:38%" src='images/buttons/yes_button.png' onmousedown="b_press('yesButton','down','38%')" onmouseup="b_press('yesButton','up','38%')" onmouseout="b_press('yesButton','out','38%')" onclick="activity('yes')"/>
-					</div>
-
-
-					<input id="b_replay" type="image" style="width:42.15%; display:none; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png'	onmousedown="b_press('b_replay','down','42.15%')" onmouseup="b_press('b_replay','up','42.15%')" onmouseout="b_press('b_replay','out','42.15%')" onclick="playVocab()" />
+					<td style="width:19.875%">
+						&nbsp;
 					</td>
-
-					<td> </td>
-
-					<td style="width:14%;">
-					<input id="b_content" type="image" src='images/buttons/content_button.png' style="display:block; width:100%; margin-left:auto; margin-right:auto"	onmousedown="b_press('b_content','down','100%')" onmouseup="b_press('b_content','up','100%')" onmouseout="b_press('b_content','out','100%')"	onclick="categoryDiv('block')" />
+					<td id="controls_central" style="width: 45%">
+						<img id="b_start" style="width: 27.2%" src="images/buttons/start_button.png" onmousedown="b_press('b_start','down','27.2%')" onmouseup="b_press('b_start','up','27.2%')" onmouseout="b_press('b_start','out','27.2%')" onclick="activity('start')" />
+						<img id="finishedButton" src='images/buttons/finished_button.png' alt="Finished!" style="width:45.14%; display: none" />
+						<img id="b_replay" style="width:19%; display:none; " src='images/buttons/replay_button.png'	onmousedown="b_press('b_replay','down','19%')" onmouseup="b_press('b_replay','up','19%')" onmouseout="b_press('b_replay','out','19%')" onclick="playVocab()" />
 					</td>
-					<td style="width:14%;">
-					<input id="b_options" type="image" src='images/buttons/options_button.png' style="width:100%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press('b_options','down','100%')" onmouseup="b_press('b_options','up','100%')" onmouseout="b_press('b_options','out','100%')" onclick="optionsDiv('block')"/>
+					<td id="no_cell" style="width:15%; display: none">
+						<img style="width:48.3%;" src='images//buttons/no_button.png' id="noButton"	onmousedown="b_press('noButton','down','48.3%')" onmouseup="b_press('noButton','up','48.3%')" onmouseout="b_press('noButton','out','48.3%')" onclick="activity('no')"/>
+					</td>
+					<td id="clear_cell" style="display:none; width:15%">
+						<img id="clearButton" src="images/buttons/clear.png" style="width: 65%" onmousedown="b_press('clearButton','down','65%')" onmouseup="b_press('clearButton','up','65%')" onmouseout="b_press('clearButton','out','65%')" onclick="activity('clear')" />
+					</td>
+					<td id="yes_cell" style="display:none; width:15%">
+						<img id="yesButton" style="width:48.3%" src='images/buttons/yes_button.png' onmousedown="b_press('yesButton','down','48.3%')" onmouseup="b_press('yesButton','up','48.3%')" onmouseout="b_press('yesButton','out','48.3%')" onclick="activity('yes')"/>
+					</td>
+					<td style="width:11.875%">
+						&nbsp;
+					</td>
+					<td style="width: 15.125%">
+						<img id="b_content" src="images/buttons/content_button.png" style="width:100%" onmousedown="b_press('b_content','down','100%')" onmouseup="b_press('b_content','up','100%')" onmouseout="b_press('b_content','out','100%')"	onclick="categoryDiv('block')"/>
+					</td>
+					<td style="0.5%">
+						&nbsp;
 					</td>
 				</tr>
 			</tbody>
 		</table>
+
+
+
 
 		<embed height="50" width="100" src="audio/klaxon_short.mp3" AUTOSTART="false" style="display:none;"> </embed>
 		<embed height="50" width="100" src="audio/clock_ticking_fast.mp3" AUTOSTART="false" AutoRewind="true" style="display:none;"> </embed>

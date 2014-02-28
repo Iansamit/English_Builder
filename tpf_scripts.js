@@ -256,8 +256,11 @@ function newCount() {
 				audCtrls(finAudio, "play");
 				finished = "nearly";
 				setTimeout(function() {
-					document.getElementById("yes-no").style.display = "none";
-					document.getElementById("finishedButton").style.display = "block";
+					document.getElementById("yes_cell").style.display = "none";
+					document.getElementById("no_cell").style.display = "none";
+					document.getElementById("clear_cell").style.display = "none";
+					document.getElementById("controls_central").style.display = "table-cell";
+					document.getElementById("finishedButton").style.display = "inline";
 					document.getElementById("b_replay").style.display = "none";
 					finished = true;
 				}, 5000);
@@ -300,9 +303,12 @@ function resetScore() {
 	document.getElementById("finishedButton").style.display = "none";
 	document.getElementById("b_replay").style.display = "none";
 	document.getElementById("imChoiceDev").style.display = "none";
-	document.getElementById("b_start").style.display = "block";
+	document.getElementById("b_start").style.display = "inline";
+	document.getElementById("controls_central").style.display = "table-cell";
+	document.getElementById("yes_cell").style.display = "none";
+	document.getElementById("no_cell").style.display = "none";
+	document.getElementById("clear_cell").style.display = "none";
 
-	document.getElementById("yes-no").style.display = "none";
 	if (randomCats) {
 		document.getElementById("mainImage").src = "images/vocab/titles/all.jpg";
 	}
@@ -1064,8 +1070,11 @@ function chAnswer(ch) {
 			feedback(ch, answer);
 		} else if (finished == "nearly") {
 			finished = true;
-			document.getElementById("yes-no").style.display = "none";
-			document.getElementById("finishedButton").style.display = "block";
+			document.getElementById("yes_cell").style.display = "none";
+			document.getElementById("no_cell").style.display = "none";
+			document.getElementById("clear_cell").style.display = "none";
+			document.getElementById("finishedButton").style.display = "inline";
+			document.getElementById("controls_central").style.display = "table-cell";
 			document.getElementById("b_replay").style.display = "none";
 			if (answer == RImg) {
 				points++;
@@ -1245,9 +1254,17 @@ function newSyllable(button) {
 		document.getElementById("b_start").style.display = "none";
 		document.getElementById("optDiv").style.display = "none";
 		document.getElementById("contentSelect").style.display = "none";
-		document.getElementById("yes-no").style.display = "block";
+		document.getElementById("yes_cell").style.display = "table-cell";
+		document.getElementById("no_cell").style.display = "table-cell";
+		document.getElementById("clear_cell").style.display = "table-cell";
+		document.getElementById("controls_central").style.display = "none";
+
 	}
 	else if (button == "yes") {
+		points++;
+	}
+	else if (button == "clear") {
+		points++;
 		points++;
 	}
 	else if (button == "no") {
@@ -1508,18 +1525,27 @@ function newImage(button) {
 		document.getElementById("optDiv").style.display = "none";
 		document.getElementById("contentSelect").style.display = "none";
 		if (uMode == "sp_teacher") {
-			document.getElementById("yes-no").style.display = "block";
+			document.getElementById("yes_cell").style.display = "table-cell";
+			document.getElementById("no_cell").style.display = "table-cell";
+			document.getElementById("clear_cell").style.display = "table-cell";
+			document.getElementById("controls_central").style.display = "none";
 		}
 		if (uMode == "r_1word4pic" || uMode == "l_4pic") {
 			document.getElementById("imChoiceDev").style.display = "inline";
 			document.getElementById("mainImage").src = "images/formatting/1000X597clear_spacer.png";
 		}
 		if (uMode == "l_4pic") {
-			document.getElementById("b_replay").style.display = "block";
+			document.getElementById("b_replay").style.display = "inline";
 		}
-	} else if (button == "yes") {
+	}
+	else if (button == "yes") {
 		points++;
-	} else if (button == "no") {
+	}
+	else if (button == "clear") {
+		points++;
+		points++;
+	}
+	else if (button == "no") {
 		var answer = vocArray[pImgInd];
 		feedback(0, answer);
 	}
