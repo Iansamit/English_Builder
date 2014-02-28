@@ -28,6 +28,7 @@ var penaltyTic;
 var penaltyTime;
 var pImgInd;
 var points = 0;
+var randomCats=true;
 var recErrIm = new Array("", "", "");
 var recErrTx = new Array("", "", "");
 var stopCount = false;
@@ -96,10 +97,10 @@ function debug (l1,d1,l2,d2,l3,d3,l4,d4,l5,d5) {
 }
 
 function init() {
+	window.ondragstart=function(){return false;};
 	initAudio();
 	resize();
 	resetScore();
-	selectLev("K2");
 	var plImg1 = new Image();
 	plImg1.src = "images/vocab/titles/actions.jpg";
 	var plImg2 = new Image();
@@ -122,6 +123,7 @@ function init() {
 	plImg10.src = "images/vocab/titles/time.jpg";
 	var plImg11 = new Image();
 	plImg11.src = "images/vocab/titles/clothes.jpg";
+	setTimeout(function(){selectLev("K2");},500);
 }
 
 
@@ -301,7 +303,10 @@ function resetScore() {
 	document.getElementById("b_start").style.display = "block";
 
 	document.getElementById("yes-no").style.display = "none";
-	if (currentCat!="dot_and_Ben"){
+	if (randomCats) {
+		document.getElementById("mainImage").src = "images/vocab/titles/all.jpg";
+	}
+	else if (currentCat!="dot_and_Ben"){
 		document.getElementById("mainImage").src = "images/vocab/titles/" + currentCat + ".jpg";
 	}
 	else{
@@ -334,9 +339,11 @@ function selectMode(mode) {
 		var prevMode = uMode;
 
 		document.getElementById("b_" + mode).style.width = "94%";
-		document.getElementById("b_" + mode).style.border = "outset #5bc8e8";
+		document.getElementById("b_" + mode).style.border = "outset";
+		document.getElementById("on_" + mode).style.display = "inline";
 		document.getElementById("b_" + prevMode).style.width = "100%";
 		document.getElementById("b_" + prevMode).style.border = "none";
+		document.getElementById("on_" + prevMode).style.display = "none";
 		uMode = mode;
 		audCtrls(aclick, "play");
 
@@ -378,9 +385,11 @@ function selectPhonUnit(unit) {
 		var prevUnit = currentPhonUnit;
 			audCtrls(aclick, "play");
 			document.getElementById("b_phon_u" + unit).style.width = "94%";
-			document.getElementById("b_phon_u" + unit).style.border = "outset #5bc8e8";
+			document.getElementById("b_phon_u" + unit).style.border = "outset";
+			document.getElementById("on_phon_u" + unit).style.display = "inline";
 			document.getElementById("b_phon_u" + prevUnit).style.width = "100%";
 			document.getElementById("b_phon_u" + prevUnit).style.border = "none";
+			document.getElementById("on_phon_u" + prevUnit).style.display = "none";
 
 
 		if (parseInt(unit) < 8) {
@@ -453,10 +462,11 @@ function selectLev(level) {
 	if (level!=currentLev){
 
 		document.getElementById("b_" + level).style.width = "94%";
-		document.getElementById("b_" + level).style.border = "outset #5bc8e8";
-
+		document.getElementById("b_" + level).style.border = "outset";
+		document.getElementById("on_" + level).style.display = "inline";
 		document.getElementById("b_" + currentLev).style.width = "100%";
 		document.getElementById("b_" + currentLev).style.border = "none";
+		document.getElementById("on_" + currentLev).style.display = "none";
 		currentLev = level;
 		setVocArrays();
 		setTitle();
@@ -473,26 +483,33 @@ function selectLev(level) {
 			}
 		}
 		if (availCats.indexOf(currentCat) == -1) {
-			selectCat(availCats[0]);
+			selectCat("all");
 		}
 	}
 }
 
 
-function setDotandBen(book) {
-
+function selectDotandBen(book) {
 	document.getElementById("b_" + book).style.width = "94%";
-	document.getElementById("b_" + book).style.border = "outset #5bc8e8";
+	document.getElementById("b_" + book).style.border = "outset";
+	document.getElementById("on_" + book).style.display = "inline";
 	audCtrls(aclick, "play");
 
 	if (currentCat=="dot_and_Ben") {
 		var prevBook=currentBook;
 		document.getElementById("b_" + prevBook).style.width = "100%";
 		document.getElementById("b_" + prevBook).style.border = "none";
+		document.getElementById("on_" + prevBook).style.display = "none";
+
 	}
 	else {
 		document.getElementById("b_" + currentCat).style.width = "100%";
 		document.getElementById("b_" + currentCat).style.border = "none";
+		document.getElementById("on_" + currentCat).style.display = "none";
+		document.getElementById("b_all").style.width = "100%";
+		document.getElementById("b_all").style.border = "none";
+		document.getElementById("on_all").style.display = "none";
+		randomCats=false;
 	}
 
 	currentBook = book;
@@ -502,28 +519,54 @@ function setDotandBen(book) {
 
 
 function selectCat(category) {
-	if ((availCats.indexOf(category) != -1) && category != currentCat) {
-		document.getElementById("b_" + category).style.width = "94%";
-		document.getElementById("b_" + category).style.border = "outset #5bc8e8";
+	if (category=="all"){
+		randomCats=true;
+		resetScore();
 		audCtrls(aclick, "play");
-
+		document.getElementById("b_all").style.width = "94%";
+		document.getElementById("b_all").style.border = "outset";
+		document.getElementById("on_all").style.display = "inline";
 		if (currentCat!="dot_and_Ben") {
-			var prevCat = currentCat;
-			document.getElementById("b_" + prevCat).style.width = "100%";
-			document.getElementById("b_" + prevCat).style.border = "none";
+			document.getElementById("b_" + currentCat).style.width = "100%";
+			document.getElementById("b_" + currentCat).style.border = "none";
+			document.getElementById("on_" + currentCat).style.display = "none";
 		}
 		else {
 			document.getElementById("b_" + currentBook).style.width = "100%";
 			document.getElementById("b_" + currentBook).style.border = "none";
+			document.getElementById("on_" + currentBook).style.display = "none";
 		}
-
-		currentCat = category;
-		setVocArrays();
-		setTitle();
-		resetScore();
-		preloadAudio();
-		preLoadImages();
-		monPreload();
+	}
+	else {
+		document.getElementById("b_all").style.width = "100%";
+		document.getElementById("b_all").style.border = "none";
+		document.getElementById("on_all").style.display = "none";
+		if ((availCats.indexOf(category) != -1) && (category != currentCat || randomCats==true)) {
+			audCtrls(aclick, "play");
+			document.getElementById("b_" + category).style.width = "94%";
+			document.getElementById("b_" + category).style.border = "outset";
+			document.getElementById("on_" + category).style.display = "inline";
+			if (randomCats==false){
+				if (currentCat!="dot_and_Ben") {
+					document.getElementById("b_" + currentCat).style.width = "100%";
+					document.getElementById("b_" + currentCat).style.border = "none";
+					document.getElementById("on_" + currentCat).style.display = "none";
+				}
+				else {
+					document.getElementById("b_" + currentBook).style.width = "100%";
+					document.getElementById("b_" + currentBook).style.border = "none";
+					document.getElementById("on_" + currentBook).style.display = "none";
+				}
+			}
+			randomCats=false;
+			currentCat = category;
+			setVocArrays();
+			setTitle();
+			resetScore();
+			preloadAudio();
+			preLoadImages();
+			monPreload();
+		}
 	}
 }
 
@@ -576,7 +619,7 @@ function selectFB(mode) {
 
 function setVocArrays() {
 	if (currentLev == "K2") {
-		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "occupations", "school");
+		availCats = new Array("actions", "animals", "body", "clothes", "describing", "food", "occupations", "places and transport", "school", "time");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "cook", "count", "cry", "cut", "drink", "eat", "hop", "jump", "listen", "look", "open", "run", "sing", "sit down", "sleep", "stand up", "stop", "swim", "walk");
@@ -584,23 +627,35 @@ function setVocArrays() {
 			case "animals":
 				vocArray = new Array("ant", "bat", "bird", "cat", "cow", "dog", "duck", "elephant", "fish", "horse", "lion", "monkey", "pig", "rabbit", "snake", "tiger", "zebra");
 				break;
+			case "body":
+				vocArray = new Array ("arm", "ears", "eyes", "face", "finger", "foot", "hair", "hand", "head", "knee", "leg", "mouth", "nose");
+				break;
 			case "clothes":
 				vocArray = new Array("belt", "cap", "dress", "glasses", "gloves", "hat", "jeans", "ring", "shirt", "shoes", "shorts", "skirt", "socks", "t-shirt");
 				break;
 			case "describing":
-				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "curly hair", "fast car", "good food", "good music", "happy student", "happy teacher", "long hair", "new car", "new house", "old car", "old house", "old man", "old woman", "sad student", "sad teacher", "short girl", "short hair", "slow car", "small dog", "small eyes", "straight hair", "tall girl", "young man", "young woman");
+				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "curly hair", "fast car", "good food", "good music", "happy student", "happy teacher", "long hair", "new car", "new home", "old car", "old home", "old man", "old woman", "sad student", "sad teacher", "short girl", "short hair", "slow car", "small dog", "small eyes", "straight hair", "tall girl", "young man", "young woman");
+				break;
+			case "food":
+				vocArray = new Array("apple", "banana", "cake", "candy", "carrots", "durian", "egg", "jam", "mangoes", "milk", "noodles", "orange", "papayas", "pineapple", "rambutans", "rice", "soup", "tea", "watermelon");
 				break;
 			case "occupations":
 				vocArray = new Array("barber", "butcher", "cook", "dentist", "doctor", "farmer", "fisherman", "monk", "nurse", "policeman", "student", "teacher");
 				break;
+			case "places and transport":
+				vocArray = new Array ("beach", "bicycle", "boat", "bus", "car", "farm", "home", "market", "on foot", "plane", "school", "shop", "temple", "train", "van", "zoo");
+				break;
 			case "school":
 				vocArray = new Array("bag", "bin", "book", "chair", "door", "eraser", "fan", "pen", "pencil", "ruler", "table", "window");
+				break;
+			case "time":
+				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
 				break;
 		}
 
 
 	} else if (currentLev == "P1" || currentLev == "P2") {
-		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "food", "occupations", "people", "body", "school", "time");
+		availCats = new Array("actions", "animals", "clothes", "food", "occupations", "people", "body", "school", "time");
 
 		switch (currentCat) {
 			case "actions":
@@ -634,7 +689,7 @@ function setVocArrays() {
 
 
 	} else if (currentLev == "P3" || currentLev == "P4" || currentLev == "P5") {
-		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "food", "free time", "occupations", "people", "places and transport", "body", "school", "time");
+		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "people", "places and transport", "body", "school", "time");
 
 		switch (currentCat) {
 			case "actions":
@@ -677,16 +732,16 @@ function setVocArrays() {
 
 
 	} else if (currentLev == "P6" || currentLev == "all") {
-		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
 		switch (currentCat) {
 			case "actions":
-				vocArray = new Array("close", "fly", "play", "cook", "drink", "listen", "sleep", "hop", "look", "read", "cry", "eat", "jump", "open");
+				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "drive", "eat", "fly", "go", "guess", "hop", "jump", "leave", "like", "listen", "look", "open", "paint", "play", "point", "read", "ride", "run", "say", "shake", "sing", "sit down", "sit", "skip", "sleep", "smile", "speak", "stand", "stand up", "stop", "swim", "talk", "think", "walk", "write");
 				break;
 			case "animals":
 				vocArray = new Array("animals", "ant", "bat", "bear", "bee", "bird", "buffalo", "butterfly", "calf", "cat", "cheetah", "chicken", "chick", "cow", "crab", "crocodile", "deer", "dog", "dolphin", "duck", "duckling", "elephant", "fish", "fly", "fox", "frog", "gecko", "geese", "giraffe", "goat", "goose", "grasshopper", "hen", "hippopotamus", "horse", "jellyfish", "kangaroo", "kitten", "lamb", "lion", "meow", "monkey", "moo", "mosquito", "mouse", "neigh", "octopus", "oink", "panda", "parrot", "peacock", "pig", "piglet", "quack", "rabbit", "rat", "rhinoceros", "seal", "shark", "sheep", "snail", "snake", "spider", "squirrel", "starfish", "tiger", "turtle", "whale", "woof", "zebra");
 				break;
 			case "body":
-				vocArray = new Array("arm", "fingers", "head", "legs", "nose", "toe", "arms", "eyes", "foot", "mouth", "shoulder", "toes", "face", "hair", "shoulders", "ears", "hand", "knee", "finger", "hands", "leg", "neck");
+				vocArray = new Array("arm", "arms", "back", "body", "bone", "chest", "chin", "ear", "ears", "eybrows", "eye", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "leg", "legs", "mouth", "nail", "nails", "neck", "nose", "shoulder", "shoulders", "teeth", "thumb", "toe", "toes", "tooth");
 				break;
 			case "clothes":
 				vocArray = new Array("bathing suit", "belt", "blouse", "cap", "checked", "dress", "earrings", "flowered", "glasses", "gloves", "handbag", "hat", "jacket", "jeans", "necklace", "nightdress", "plain", "pyjamas", "raincoat", "ring", "rings", "scarf", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "spotted", "striped", "sweater", "t-shirt", "tie", "trainers", "trousers", "underwear", "wallet", "watch", "wig", "zip");
@@ -695,7 +750,7 @@ function setVocArrays() {
 				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "black bag", "black shirt", "curly hair", "fast car", "good food", "good music", "happy student", "happy teacher", "long hair", "narrow road", "new car", "new house", "old car", "old house", "old man", "old woman", "pink bag", "pink shirt", "pretty girl", "red bag", "red shirt", "sad student", "sad teacher", "short girl", "short hair", "slow car", "small dog", "small eyes", "straight hair", "tall girl", "white shirt", "wide road", "young man", "young woman");
 				break;
 			case "food":
-				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "mangoes", "milk", "orange", "papayas", "rice", "tea");
+				vocArray = new Array("apple", "banana", "beans", "beef", "bread", "breakfast", "butter", "cabbage", "cake", "candy", "carrots", "cheese", "chicken", "chilli", "chocolate", "coconuts", "coffee", "coke", "cookies", "corn", "cucumber", "curry", "durian", "egg", "eggplant", "fish", "food", "fried chicken", "fried egg", "fried fish", "fried rice", "fruit", "garlic", "grapes", "guava", "hamburger", "hot dog", "ice cream", "iced coffee", "iced tea", "ice", "jam", "juice", "lemons", "limes", "lollipop", "long beans", "lunch", "mangoes", "mangosteens", "milk", "noodles", "oil", "onion", "orange", "papayas", "pineapple", "pizza", "pomelo", "pork", "pumpkin", "rambutans", "rice", "rose apple", "salad", "salt", "sandwich", "shrimp", "soda", "soft drinks", "soup", "strawberries", "sugar", "sushi", "tea", "tomato", "vinegar", "water", "watermelon", "wine", "yoghurt");
 				break;
 			case "free time":
 				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "do jisaw puzzles", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "judo", "karate", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
@@ -707,7 +762,7 @@ function setVocArrays() {
 				vocArray = new Array("art", "backpack", "bag", "basket", "bell", "bin", "blackboard", "book", "bookshelf", "bottle", "box", "broom", "calculator", "calendar", "can", "canteen", "chair", "chalk", "classroom", "clock", "coloured pencils", "computer room", "computer", "crayons", "desk", "door", "eraser", "fan", "floor", "flower", "globe", "glue", "homework", "ink", "key", "library", "lock", "lunchbox", "map", "mat", "music", "music room", "notebook", "paper", "PE", "pen", "pencil", "pencil case", "pencil sharpener", "playground", "room", "ruler", "school", "science", "scissors", "social studies", "table", "toilet", "umbrella", "violin", "wall", "waste paper basket", "whiteboard", "window");
 				break;
 			case "occupations":
-				vocArray = new Array("barber", "boxer", "bus driver", "carpenter", "dancer", "dentist", "fisherman", "fruit seller", "gardener", "policeman", "postman", "singer", "soldier", "vet");
+				vocArray = new Array("actor", "actress", "barber", "boxer", "bus driver", "butcher", "carpenter", "chef", "cook", "dancer", "dentist", "doctor", "dressmaker", "farmer", "fisherman", "fruit seller", "gardener", "guide", "hairdresser", "home-maker", "librarian", "merchants", "monk", "nurse", "policeman", "postman", "sailor", "secretary", "singer", "soldier", "student", "taxi driver", "teacher", "vet", "waiter", "waitress");
 				break;
 			case "time":
 				vocArray = new Array("at night", "at noon", "Christmas", "in the afternoon", "in the evening", "in the morning", "Loi Krathong", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
@@ -716,7 +771,7 @@ function setVocArrays() {
 
 
 	} else if (currentLev == "scratchpad") {
-		availCats = new Array("actions", "animals", "d_and_B_4", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "fly", "play", "cook");
@@ -757,14 +812,11 @@ function setVocArrays() {
 
 
 	if (currentCat == "dot_and_Ben") {
-		//alert(currentBook);
 		switch (currentBook) {
 			case "d_B_1":
-			//alert("d_B_1");
 				vocArray = new Array ("and", "bad", "bed", "Ben", "bus", "Dot", "fun", "has", "hop", "hot", "hut", "in", "in bed", "is", "not", "on", "pet", "sad", "sit", "sun", "the");
 				break;
 			case "d_B_2":
-			//alert("d_B_2");
 				vocArray = new Array ("and", "back", "bed", "Ben", "but", "can", "cat", "Dot", "duck", "has", "in", "in bed", "is", "it", "not", "of", "on", "sack", "sad", "sick", "sit", "the", "what");
 				break;
 			case "d_B_3":
@@ -1442,6 +1494,12 @@ function tabooCheck() {
 		syll=igraph.concat (vgraph,fgraph,eCompGraph);
 	}
 
+function selectRandomCat(){
+	var catInd = Math.floor(Math.random() * availCats.length);
+	currentCat=availCats[catInd];
+	setVocArrays();
+}
+
 
 function newImage(button) {
 	if (button == "start") {
@@ -1464,9 +1522,12 @@ function newImage(button) {
 	} else if (button == "no") {
 		var answer = vocArray[pImgInd];
 		feedback(0, answer);
-
 	}
 	document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+
+	if (randomCats){
+		selectRandomCat();
+	}
 
 	var imgInd = Math.floor(Math.random() * vocArray.length);
 	if (imgInd == pImgInd) {
