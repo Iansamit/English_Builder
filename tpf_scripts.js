@@ -6,6 +6,7 @@ var audReady = new Array(false);
 var availCats = new Array("");
 var cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
 var countTime = 180;
+var countSet = 3;
 var currentBook = "";
 var currentCat = "actions";
 var currentLev = "P1";
@@ -129,9 +130,14 @@ function init() {
 
 function resize() {
 	var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	var h = Math.floor((w/1600)*780);
 
 	var bodFontsize = Math.floor((w / 1600) * 60);
 	document.body.style.cssText = "background: none repeat scroll 0% 0% rgb(69, 62, 42); font: " + bodFontsize + "px 'Nunito',sans-serif;";
+
+	document.getElementById("outerDiv").style.width = w+"px";
+	document.getElementById("outerDiv").style.height = h+"px";
+	//debug (":",w,"h:",h);
 
 	var x = Math.floor(w * 0.28 * 597 / 1000) + "px";
 	document.getElementById("fbTxt1").style.height = x;
@@ -145,12 +151,12 @@ function resize() {
 	document.getElementById("dLProgBarAud").style.height = y;
 	document.getElementById("dLProgBarAud_end").style.height = y;
 
-	var z = Math.floor((w / 1600) * 35) + "px";
-	document.getElementById("spacer").style.height = z;
+	//var z = Math.floor((w / 1600) * 35) + "px";
+	//document.getElementById("spacer").style.height = z;
 
-	var mainDH = Math.floor((w / 1600) * 610) + "px";
-	document.getElementById("imageDiv").style.height = mainDH;
-	document.getElementById("phonDisplay").style.height = mainDH;
+	//var mainDH = Math.floor((w / 1600) * 610) + "px";
+	//document.getElementById("imageDiv").style.height = mainDH;
+	//document.getElementById("phonDisplay").style.height = mainDH;
 
 }
 
@@ -211,9 +217,19 @@ function chFeature() {
 }
 
 function optionsDiv(disp) {
-	resetScore();
 	document.getElementById("optDiv").style.display = disp;
-	document.getElementById("contentSelect").style.display = "none";
+
+	if (disp=="block") {
+		document.getElementById("phonUSelect").style.display = "none";
+		document.getElementById("vocSelect").style.display = "none";
+	}
+	else if (uMode=="r_phonics") {
+		document.getElementById("phonUSelect").style.display = "table";
+	}
+	else {
+		document.getElementById("vocSelect").style.display = "table";
+	}
+
 }
 
 function categoryDiv(disp) {
@@ -277,12 +293,14 @@ function leadZero(i) {
 	return i;
 }
 
-function setCountDown() {
-	countTime = parseInt(cDSelect.value);
+function setCountDown(min) {
+	document.getElementById("cDS"+countSet).className = "cDSelect";
+	countSet = min;
+	countTime = min*60;
 	var initMin = Math.floor(countTime / 60);
-	;
 	initMin = leadZero(initMin);
-	document.getElementById('timer').innerHTML = "&nbsp;" + initMin + ":00" + "&nbsp;";
+	document.getElementById('timer').innerHTML = initMin + ":00";
+	document.getElementById("cDS"+min).className = "cDSelected";
 }
 
 function resetScore() {
@@ -290,16 +308,15 @@ function resetScore() {
 	points = 0;
 	stopCount = true;
 	finished = true;
-	setTimeout(function() {
-	}, 100);
+
 	audCtrls(tickFast, "pause");
 	setTimeout(function() {
 		audCtrls(tickFast, "rewind");
 	}, 100);
-	setCountDown();
 
+	setCountDown(countSet);
 	document.getElementById("timer").style.color = "#fff";
-	document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+	document.getElementById("score").innerHTML = "Score: " + points;
 	document.getElementById("finishedButton").style.display = "none";
 	document.getElementById("b_replay").style.display = "none";
 	document.getElementById("imChoiceDev").style.display = "none";
@@ -350,6 +367,7 @@ function selectMode(mode) {
 		document.getElementById("b_" + prevMode).style.width = "100%";
 		document.getElementById("b_" + prevMode).style.border = "none";
 		document.getElementById("on_" + prevMode).style.display = "none";
+		document.getElementById("optDiv").style.display = "none";
 		uMode = mode;
 		audCtrls(aclick, "play");
 
@@ -618,8 +636,12 @@ function selectFB(mode) {
 	fbMode = mode;
 	if (mode == "recent") {
 		document.getElementById("errTitle").innerHTML = "Recent Errors";
+		document.getElementById("fbRecent").className="fBSelected";
+		document.getElementById("fbCommon").className="fBSelect";
 	} else {
 		document.getElementById("errTitle").innerHTML = "Common Errors";
+		document.getElementById("fbRecent").className="fBSelect";
+		document.getElementById("fbCommon").className="fBSelected";
 	}
 }
 
@@ -1078,7 +1100,7 @@ function chAnswer(ch) {
 			document.getElementById("b_replay").style.display = "none";
 			if (answer == RImg) {
 				points++;
-				document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+				document.getElementById("score").innerHTML = "Score: " + points;
 			}
 		}
 	}
@@ -1305,7 +1327,7 @@ function newSyllable(button) {
 		document.getElementById("phonExample").innerHTML = syll;
 	}
 	else{
-		document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+		document.getElementById("score").innerHTML = "Score: " + points;
 		document.getElementById("phonDisplay").innerHTML = syll;
 	}
 
@@ -1549,7 +1571,7 @@ function newImage(button) {
 		var answer = vocArray[pImgInd];
 		feedback(0, answer);
 	}
-	document.getElementById("score").innerHTML = "&nbsp;Score: " + points + "&nbsp;";
+	document.getElementById("score").innerHTML = "Score: " + points;
 
 	if (randomCats){
 		selectRandomCat();

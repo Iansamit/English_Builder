@@ -438,6 +438,25 @@ input[type="image"]:-moz-focusring {outline:none;}
   text-align:center;
   }
 
+.cDSelect td{
+ 	 background-color : #7bd8e8;
+ 	 display:block;
+ 	 border: ridge #7bd8e8;
+ 	 cursor: pointer;
+ }
+
+ .cDSelect td:hover{
+ 	 background-color : #000;
+ 	 color : #fff;
+ }
+
+  .cDSelected td{
+ 	 background-color : #000;
+ 	 color : #fff;
+ 	 border: ridge #7bd8e8;
+ 	 cursor: pointer;
+ }
+
 .dlTitle {
   border-bottom: 1px solid #00cccc;
   background-color : #ffffff;
@@ -635,6 +654,25 @@ input[type="image"]:-moz-focusring {outline:none;}
   color:#336633;
   display:block;
   }
+
+ .fBSelect td{
+ 	 background-color : #7bd8e8;
+ 	 display:block;
+ 	 border: ridge #7bd8e8;
+ 	 cursor: pointer;
+ }
+
+  .fBSelect td:hover{
+ 	 background-color : #000;
+ 	 color : #f60;
+ }
+
+   .fBSelected td{
+ 	 background-color : #000;
+ 	 color : #f60;
+ 	 border: ridge #7bd8e8;
+ 	 cursor: pointer;
+ }
 
 .flag {
   width:27px;
