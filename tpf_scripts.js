@@ -137,7 +137,6 @@ function resize() {
 
 	document.getElementById("outerDiv").style.width = w+"px";
 	document.getElementById("outerDiv").style.height = h+"px";
-	//debug (":",w,"h:",h);
 
 	var x = Math.floor(w * 0.28 * 597 / 1000) + "px";
 	document.getElementById("fbTxt1").style.height = x;
@@ -151,13 +150,9 @@ function resize() {
 	document.getElementById("dLProgBarAud").style.height = y;
 	document.getElementById("dLProgBarAud_end").style.height = y;
 
-	//var z = Math.floor((w / 1600) * 35) + "px";
-	//document.getElementById("spacer").style.height = z;
-
-	//var mainDH = Math.floor((w / 1600) * 610) + "px";
-	//document.getElementById("imageDiv").style.height = mainDH;
-	//document.getElementById("phonDisplay").style.height = mainDH;
-
+	var z = Math.floor((w / 1600)*665) + "px";
+	document.getElementById("contentInner").style.height = z;
+	debug("z:",z)
 }
 
 function initAudio() {
