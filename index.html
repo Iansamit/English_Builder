@@ -7,7 +7,7 @@
 		Remove this if you use the .htaccess -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-		<title>HTML</title>
+		<title>Teacher Plus English Builder</title>
 		<meta name="description" content="">
 		<meta name="author" content="Ian Smith">
 
@@ -33,7 +33,7 @@
 
 	</head>
 
-	<body style="background: #453e2a; font:60px 'Nunito', sans-serif; margin: 0px" onload="init()" onresize="resize()">
+	<body style="background: #453e2a; font:60px 'Nunito', sans-serif; margin: 0px" onload="init()" onresize="resize()" oncontextmenu="return false">
 
 		<div id="debugWin" style="position: absolute; z-index: 500; right:0; top:30%; background-color: #eee; display:none;">
 			<table border="0" style="width: 300px; font: 16pt Arial, Helvetica, sans-serif; border-collapse: collapse">
@@ -97,69 +97,88 @@
 					</td>
 				</tr>
 			</table>
-	</div>
+		</div>
 
 		<div id="outerDiv" style="position: absolute; width: 1600px; height:780px; background: none">
 
-			<!-- ==============-->
-			<!-- Left Pane    -->
-			<!-- ============= -->
-			<div style="position: absolute; z-index: 5; margin-left: 1%; top:1%; width: 13%; height:70%;">
-				<div id="timer" align="center" style="width: 90%; height: 15%; margin-left: auto; margin-right: auto; font: 100% 'Nunito', sans-serif; border-style:ridge; background-color:#000; color:#fff">
-					03:00
-				</div>
-				<div style="height: 1.86%;"> <!-- spacer -->
+		<div id="ruler" style="position:absolute; top:1%; width: 100%; background:yellow; display: none">
+			&nbsp;
+		</div>
 
-				</div>
-					<div id="errDiv" align="right" style="width:100%; background:#f60; border:ridge #e40;">
-					<div id="errTitle" align="center" style="font-size:40%; font-weight:bold; color:#f60; background:#000">
-						Common Errors
-					</div>
-					<table summary="Table for feedback - recent or common errors." >
-						<tr>
-							<td id="fBIm0" align="left" style="font-family:'Nunito', sans-serif; font-weight:bold; font-size:42%;"> </td>
-						</tr>
-						<tr>
-							<td id="fBIm1" align="left" style="font-family:'Nunito', sans-serif; font-weight:bold; font-size:42%;"> </td>
-						</tr>
-						<tr>
-							<td id="fBIm2" align="left" style="font-family:'Nunito', sans-serif; font-weight:bold; font-size:42%;"> </td>
-						</tr>
-					</table>
-				</div>
+		<!-- =============-->
+		<!-- Left Pane    -->
+		<!-- ============ -->
+		<div style="position: absolute; z-index: 5; margin-left: 1%; top:1%; width: 15%; height:70%;">
+			<div id="timer" align="center" style="width: 90%; height: 15%; margin-left: auto; margin-right: auto; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; background-color:#000; color:#fff">
+				03:00
 			</div>
+			<div style="height: 1.86%;"> <!-- spacer -->
 
-			<!-- ============== -->
-			<!-- Right Panel	-->
-			<!-- ============== -->
-			<div id="score" style="position: absolute; right: 1%; top: 1%; z-index: 5; height: 10.5%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border-style:ridge;">
-				Score: 0
 			</div>
-
-			<!--_____________ -->
-			<!-- Word Choice  -->
-			<!--_____________ -->
-			<div id="choiceDev" style="position: absolute; top:13.7%; right: 1%; z-index: 5; width: 18%; height: 60%; background-color:#000; border-style:ridge; display:none;"  >
-				<table border="0" summary="multiple choice words." align="center" style="table-layout:fixed; background:#000; padding: 1%" >
-					<tbody>
-						<tr>
-							<td style="color:#fff; font: 40% 'Nunito', sans-serif; text-align:center;">Click on the word that matches the picture:</td>
-						</tr>
-						<tr>
-							<td id="ch1" style="font: 65% 'Nunito', sans-serif;"> </td>
-						</tr>
-						<tr>
-							<td id="ch2" style="font: 65% 'Nunito', sans-serif;"> </td>
-						</tr>
-						<tr>
-							<td id="ch3" style="font: 65% 'Nunito', sans-serif;"> </td>
-						</tr>
-						<tr>
-							<td id="ch4" style="font: 65% 'Nunito', sans-serif;"> </td>
-						</tr>
-					</tbody>
+				<div id="errDiv" align="right" style="width:100%; background:#f60; border:0.1em ridge #e40;">
+				<div id="errTitle" align="center" style="font-size:40%; font-weight:bold; color:#f60; background:#000">
+					Common Errors
+				</div>
+				<table summary="Table for feedback - recent or common errors."  style="border-collapse: collapse">
+					<tr>
+						<td id="errCell0" align="center" style="font-family:'Nunito', sans-serif; font-size:38%; display: none">
+							<img id="errImg0" style="border:0.17em ridge #e40; width:80%; margin-top:5%; margin-bottom:-4%;" ondragstart="return false;" src="images/formatting/1000X597clear_spacer.png" />
+							<div id="errTxt0" style="display:block">
+								&nbsp;
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td id="errCell1" align="center" style="font-family:'Nunito', sans-serif; font-size:38%; display: none">
+							<img id="errImg1" style="border:0.17em ridge #e40; width:80%; margin-top:5%; margin-bottom:-4%;" ondragstart="return false;" src="images/formatting/1000X597clear_spacer.png" />
+							<div id="errTxt1" style="display:block">
+								&nbsp;
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td id="errCell2" align="center" style="font-family:'Nunito', sans-serif; font-size:38%; display: none">
+							<img id="errImg2" style="border:0.17em ridge #e40; width:80%; margin-top:5%; margin-bottom:-4%;" ondragstart="return false;" src="images/formatting/1000X597clear_spacer.png" />
+							<div id="errTxt2" style="display:block">
+								&nbsp;
+							</div>
+						</td>
+					</tr>
 				</table>
 			</div>
+		</div>
+
+		<!-- ============== -->
+		<!-- Right Panel	-->
+		<!-- ============== -->
+		<div id="score" style="position: absolute; right: 1%; top: 1%; z-index: 5; height: 10.5%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393;">
+			Score: 0
+		</div>
+
+		<!--_____________ -->
+		<!-- Word Choice  -->
+		<!--_____________ -->
+		<div id="choiceDev" style="position: absolute; top:14.3%; right: 1%; z-index: 5; width: 18%; height: 67%; background-color:#000; border:0.1em ridge #393; display:none;"  >
+			<table border="0" summary="multiple choice words." align="center" style="table-layout:fixed; background:#000; padding: 1%" >
+				<tbody>
+					<tr>
+						<td style="color:#fff; font: 40% 'Nunito', sans-serif; text-align:center;">Click on the word that matches the picture:</td>
+					</tr>
+					<tr>
+						<td id="ch1" style="font: 65% 'Nunito', sans-serif;"> </td>
+					</tr>
+					<tr>
+						<td id="ch2" style="font: 65% 'Nunito', sans-serif;"> </td>
+					</tr>
+					<tr>
+						<td id="ch3" style="font: 65% 'Nunito', sans-serif;"> </td>
+					</tr>
+					<tr>
+						<td id="ch4" style="font: 65% 'Nunito', sans-serif;"> </td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
 
 
@@ -666,69 +685,71 @@
 			<!-- ============== -->
 
 
-			<div id="imChoiceDev" align="center" style="border:none; position: absolute; z-index:2; width:100%; display:none;"	>
-				<div style="float:right; border:none; width:5%;">
-					&nbsp;
-				</div>
+			<div id="imChoiceDev" align="left" style="border:none; position: absolute; z-index:2; top:0.7%; width:100%; display:none;"	>
 
-				<table style="table-layout:fixed; width:58%; border:none; font:150% 'Nunito', sans-serif;"  >
+				<table border="0" style="table-layout:fixed; margin-left: 18%; width:62%; border:none; font:bold 110% 'Nunito', sans-serif;"  >
 					<tbody>
 						<tr>
-							<td colspan="2" style="font:inherit"><div style="width:85%; margin-left:auto; margin-right:auto; text-align:center; background:black; border:ridge; color:white; font:65% 'Nunito', sans-serif;" id="vocdisplay">
+							<td colspan="2" style="font:inherit"><div style="width:85%; margin-left:auto; margin-right:auto; margin-bottom: 0.2em; text-align:center; background:black; border:0.13em ridge #393; color:white; font:75% 'Nunito', sans-serif;" id="vocdisplay">
 								</div>
 							</td>
 						</tr>
 						<tr>
-							<td onclick="chAnswer(0)" style="width:inherit; font:inherit;">
-							<div>
-								<img id="fbHi1" src='images/formatting/mistake.png' style='position:absolute; z-index:-1; width:28%; border:ridge red; display:none'  />
-								<img id="imCh1" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style='position:absolute; z-index:-2; width:28%; border:ridge black'  />
-							</div>
-							<table border="0" style="table-layout:fixed; width:100%; text-align:center; font:inherit">
-								<tbody>
-									<tr >
-										<td id="fbTxt1" style="font:inherit;"> </td>
-									</tr>
-								</tbody>
-							</table></td>
-							<td onclick="chAnswer(1)" style="width:inherit; font:inherit;">
-							<div>
-								<img id="fbHi2" src='images/formatting/mistake.png' style='position:absolute; z-index:-1; width:28%; border:ridge red; display:none'  />
-								<img id="imCh2" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style='position:absolute; z-index:-2; width:28%; border:ridge black'  />
-							</div>
-							<table border="0" style="table-layout:fixed; width:100%; text-align:center; font:inherit">
-								<tbody>
-									<tr >
-										<td id="fbTxt2" style="font:inherit;"> </td>
-									</tr>
-								</tbody>
-							</table></td>
+							<td id="cellCh1" onclick="chAnswer(0)" oncontextmenu="chAnswer(0)" style="width:inherit; font:inherit;">
+								<div style="position:relative">
+									<img id="fbHi1" align="center" src='images/formatting/mistake.png' style='position:absolute; z-index:-1; right:0.1em; width:85%; border:0.1em ridge #f60; display:none'  />
+									<img id="imCh1" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style="position:absolute; z-index:-2; right:0.1em; width:85%; border:0.1em ridge #393;"  />
+								</div>
+								<table border="0" style="table-layout:fixed; width:87%; text-align:center; font:inherit; margin-left: 0.8em; margin-bottom: 0.25em;">
+									<tbody>
+										<tr >
+											<td id="fbTxt1" style="font:inherit;"> </td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+							<td id="cellCh2" onclick="chAnswer(1)" oncontextmenu="chAnswer(1)" style="width:inherit; font:inherit;">
+								<div style="position:relative">
+									<img id="fbHi2" src='images/formatting/mistake.png' style="position:absolute; z-index:-1;  left: 0.1em; width:85%; border:0.1em ridge #f60"  />
+									<img id="imCh2" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style="position:absolute; z-index:-2; left: 0.1em; width:85%; border:0.1em ridge #393;"  />
+								</div>
+								<table border="0" style="table-layout:fixed; width:87%; text-align:center; font:inherit; margin-left: 0.1em; margin-bottom: 0.25em;">
+									<tbody>
+										<tr >
+											<td id="fbTxt2" style="font:inherit;"> </td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
 						</tr>
 						<tr>
-							<td onclick="chAnswer(2)" style="width:inherit; font:inherit;">
-							<div>
-								<img	id="fbHi3" src='images/formatting/mistake.png' style='position:absolute; z-index:-1; width:28%; border:ridge red; display:none'  />
-								<img id="imCh3" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style='position:absolute; z-index:-2; width:28%; border:ridge black'  />
-							</div>
-							<table border="0" style="table-layout:fixed; width:100%; text-align:center; font:inherit">
-								<tbody>
-									<tr >
-										<td id="fbTxt3" style="font:inherit;"> </td>
-									</tr>
-								</tbody>
-							</table></td>
-							<td onclick="chAnswer(3)" style="width:inherit; font:inherit;">
-							<div>
-								<img	id="fbHi4" src='images/formatting/mistake.png' style='position:absolute; z-index:-1; width:28%; border:ridge red; display:none'  />
-								<img id="imCh4" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style='position:absolute; z-index:-2; width:28%; border:ridge black'  />
-							</div>
-							<table border="0" style="table-layout:fixed; width:100%; text-align:center; font:inherit">
-								<tbody>
-									<tr >
-										<td id="fbTxt4" style="font:inherit; "> </td>
-									</tr>
-								</tbody>
-							</table>
+							<td id="cellCh3" onclick="chAnswer(2)" oncontextmenu="chAnswer(2)" style="width:inherit; font:inherit;">
+								<div style="position: relative;">
+									<img	id="fbHi3" src='images/formatting/mistake.png' style="position:absolute; z-index:-1; right: 0.1em; width:85%; border:0.1em ridge #f60; display:none"  />
+									<img id="imCh3" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style="position:absolute; z-index:-2; right: 0.1em; width:85%; border:0.1em ridge #393;"  />
+								</div>
+								<table border="0" style="table-layout:fixed; width:87%; text-align:center; font:inherit; margin-left: 0.8em;">
+									<tbody>
+										<tr>
+											<td id="fbTxt3" style="font:inherit;">
+
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+							<td id="cellCh4" onclick="chAnswer(3)" oncontextmenu="chAnswer(3)" style="width:inherit; font:inherit;">
+								<div style="position: relative;">
+									<img	id="fbHi4" src='images/formatting/mistake.png' style="position:absolute; z-index:-1;  left: 0.1em; width:85%; border:0.1em ridge #f60"  />
+									<img id="imCh4" src='images/formatting/1000X597clear_spacer.png' alt='Loading. Please wait ...' style="position:absolute; z-index:-2; left: 0.1em; width:85%; border:0.1em ridge #393;"  />
+								</div>
+								<table border="0" style="table-layout:fixed; width:87%; text-align:center; font:inherit; margin-left: 0.1em;">
+									<tbody>
+										<tr >
+											<td id="fbTxt4" style="font:inherit; "> </td>
+										</tr>
+									</tbody>
+								</table>
 							</td>
 						</tr>
 					</tbody>

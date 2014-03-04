@@ -138,7 +138,7 @@ function resize() {
 	document.getElementById("outerDiv").style.width = w+"px";
 	document.getElementById("outerDiv").style.height = h+"px";
 
-	var x = Math.floor(w * 0.28 * 597 / 1000) + "px";
+	var x = Math.floor(w * 0.26 * 597 / 1000) + "px";
 	document.getElementById("fbTxt1").style.height = x;
 	document.getElementById("fbTxt2").style.height = x;
 	document.getElementById("fbTxt3").style.height = x;
@@ -152,7 +152,6 @@ function resize() {
 
 	var z = Math.floor((w / 1600)*665) + "px";
 	document.getElementById("contentInner").style.height = z;
-	debug("z:",z)
 }
 
 function initAudio() {
@@ -633,10 +632,12 @@ function selectFB(mode) {
 		document.getElementById("errTitle").innerHTML = "Recent Errors";
 		document.getElementById("fbRecent").className="fBSelected";
 		document.getElementById("fbCommon").className="fBSelect";
+		recentErrors("");
 	} else {
 		document.getElementById("errTitle").innerHTML = "Common Errors";
 		document.getElementById("fbRecent").className="fBSelect";
 		document.getElementById("fbCommon").className="fBSelected";
+		upcmnErrs("");
 	}
 }
 
@@ -712,38 +713,32 @@ function setVocArrays() {
 
 
 	} else if (currentLev == "P3" || currentLev == "P4" || currentLev == "P5") {
-		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "people", "places and transport", "body", "school", "time");
+		availCats = new Array("actions", "animals", "describing", "food", "free time", "occupations", "people", "body", "school", "time");
 
 		switch (currentCat) {
 			case "actions":
-				vocArray = new Array("close", "come", "cook", "count", "cut", "drink", "drive", "eat", "go", "jump", "like", "listen", "look", "open", "play", "read", "ride", "run", "say", "sing", "sit down", "sleep", "smile", "stand up", "stop", "swim", "walk", "write");
+				vocArray = new Array("close", "come", "cook", "count", "cut", "drink", "drive", "eat", "give", "go", "jump", "like", "listen", "look", "open", "play", "read", "ride", "run", "say", "sing", "sit down", "sleep", "smile", "stand up", "stop", "swim", "walk", "write");
 				break;
 			case "animals":
-				vocArray = new Array("animals", "ant", "bat", "bear", "bee", "bird", "buffalo", "cat", "chicken", "cow", "crab", "deer", "dog", "duck", "elephant", "fish", "fly", "frog", "goat", "hen", "horse", "kangaroo", "lion", "monkey", "mouse", "panda", "pig", "rabbit", "rat", "shark", "sheep", "snake", "tiger", "whale", "zebra");
-				break;
-			case "clothes":
-				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jacket", "jeans", "pyjamas", "ring", "shirt", "shoes", "shorts", "skirt", "socks", "sweater", "bathing suit", "t-shirt", "watch");
+				vocArray = new Array("animals", "ant", "bat", "bear", "bee", "bird", "buffalo", "cat", "chicken", "cow", "dog", "duck", "elephant", "fish", "horse", "lion", "monkey", "mouse", "panda", "pig", "rabbit", "rat", "snake", "tiger", "zebra");
 				break;
 			case "body":
 				vocArray = new Array("arm", "arms", "back", "body", "ear", "ears", "eye", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "knee", "leg", "legs", "mouth", "neck", "nose", "shoulder", "shoulders", "teeth", "toe", "toes", "tooth");
 				break;
 			case "describing":
-				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "black bag", "black shirt", "curly hair", "fast car", "good food", "good music", "happy student", "happy teacher", "long hair", "narrow road", "new car", "new house", "old car", "old house", "old man", "old woman", "pink bag", "pink shirt", "pretty girl", "red bag", "red shirt", "sad student", "sad teacher", "short girl", "short hair", "slow car", "small dog", "small eyes", "straight hair", "tall girl", "white shirt", "wide road", "young man", "young woman");
+				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "fast car", "good music", "happy student", "new car", "new house", "old car", "old house", "old man", "old woman", "short girl", "slow car", "small dog", "small eyes", "tall girl", "young man", "young woman");
 				break;
 			case "food":
-				vocArray = new Array("apple", "banana", "cake", "candy", "carrots", "durian", "egg", "jam", "mangoes", "milk", "noodles", "orange", "papayas", "pineapple", "rambutans", "rice", "soup", "tea", "watermelon");
+				vocArray = new Array("apple", "banana", "cake", "candy", "carrots", "durian", "egg", "jam", "mangoes", "mangosteens", "milk", "noodles", "orange", "papayas", "pineapple", "rambutans", "rice", "soup", "tea", "watermelon");
 				break;
 			case "free time":
 				vocArray = new Array("collect stamps", "cook", "dance", "go camping", "go fishing", "go horse riding", "go shopping", "listen to music", "paint", "play computer games", "play football", "play games", "read comic books", "read", "ride a bike", "sing", "watch TV");
 				break;
 			case "occupations":
-				vocArray = new Array("barber", "butcher", "cook", "dentist", "doctor", "dressmaker", "farmer", "fisherman", "hairdresser", "merchants", "monk", "nurse", "policeman", "postman", "student", "taxi driver", "chef", "teacher");
+				vocArray = new Array("barber", "butcher", "chef", "cook", "dentist", "doctor", "dressmaker", "farmer", "fisherman", "hairdresser", "merchants", "monk", "nurse", "policeman", "postman", "student", "taxi driver", "teacher");
 				break;
 			case "people":
-				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
-				break;
-			case "places and transport":
-				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "behind", "between", "bicycle", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "in", "in front of", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "near", "next to", "on", "on foot", "on the left of", "on the right of", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "that", "this", "train", "truck", "tuk-tuk", "under", "van", "Vientiene", "Vietnam", "zoo");
+				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl",  "grandfather", "grandmother", "king", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
 				break;
 			case "school":
 				vocArray = new Array("backpack", "bin", "book", "broom", "chair", "clock", "classroom", "desk", "eraser", "pen", "pencil", "scissors", "table");
@@ -776,7 +771,7 @@ function setVocArrays() {
 				vocArray = new Array("apple", "banana", "beans", "beef", "bread", "breakfast", "butter", "cabbage", "cake", "candy", "carrots", "cheese", "chicken", "chilli", "chocolate", "coconuts", "coffee", "coke", "cookies", "corn", "cucumber", "curry", "durian", "egg", "eggplant", "fish", "food", "fried chicken", "fried egg", "fried fish", "fried rice", "fruit", "garlic", "grapes", "guava", "hamburger", "hot dog", "ice cream", "iced coffee", "iced tea", "ice", "jam", "juice", "lemons", "limes", "lollipop", "long beans", "lunch", "mangoes", "mangosteens", "milk", "noodles", "oil", "onion", "orange", "papayas", "pineapple", "pizza", "pomelo", "pork", "pumpkin", "rambutans", "rice", "rose apple", "salad", "salt", "sandwich", "shrimp", "soda", "soft drinks", "soup", "strawberries", "sugar", "sushi", "tea", "tomato", "vinegar", "water", "watermelon", "wine", "yoghurt");
 				break;
 			case "free time":
-				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "do jisaw puzzles", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "judo", "karate", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
+				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "do jigsaw puzzles", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "judo", "karate", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
 				break;
 			case "places and transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "behind", "between", "bicycle", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "in", "in front of", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "near", "next to", "on", "on foot", "on the left of", "on the right of", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "that", "this", "train", "truck", "tuk-tuk", "under", "van", "Vientiene", "Vietnam", "zoo");
@@ -815,7 +810,7 @@ function setVocArrays() {
 				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "mangoes", "milk", "orange", "papayas", "rice", "tea");
 				break;
 			case "free time":
-				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "do jisaw puzzles", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "judo", "karate", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
+				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "do jigsaw puzzles", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "judo", "karate", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
 				break;
 			case "places and transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "behind", "between", "bicycle", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "in", "in front of", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "near", "next to", "on", "on foot", "on the left of", "on the right of", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "that", "this", "train", "truck", "tuk-tuk", "under", "van", "Vientiene", "Vietnam", "zoo");
@@ -1060,6 +1055,11 @@ function choices(imgInd) {
 		document.getElementById("fbTxt2").innerHTML = "";
 		document.getElementById("fbTxt3").innerHTML = "";
 		document.getElementById("fbTxt4").innerHTML = "";
+
+		document.getElementById("cellCh1").onclick = function () { chAnswer(0); };
+		document.getElementById("cellCh2").onclick = function () { chAnswer(1); };
+		document.getElementById("cellCh3").onclick = function () { chAnswer(2); };
+		document.getElementById("cellCh4").onclick = function () { chAnswer(3); };
 	}
 
 	if (uMode == "r_1word4pic") {
@@ -1078,6 +1078,7 @@ function playVocab() {
 }
 
 function chAnswer(ch) {
+
 	if (finished != true) {
 		var aIndex = inds[ch];
 		var answer = vocArray[aIndex];
@@ -1107,9 +1108,11 @@ function feedback(ch, answer) {
 	if (uMode == "r_1word4pic" || uMode == "l_4pic") {
 		var fBHi = "fbHi" + (ch + 1);
 		var fbTxt = "fbTxt" + (ch + 1);
+		var fbCell = "cellCh" + (ch + 1);
 
 		document.getElementById(fBHi).style.display = "inline";
 		document.getElementById(fbTxt).innerHTML = answer;
+		document.getElementById(fbCell).onclick = "";
 
 	}
 
@@ -1153,22 +1156,25 @@ function feedback(ch, answer) {
 }
 
 function upcmnErrs(vocItem) {
-	vocItem = currentCat + "/" + vocItem;
-	if (cmnErrs [0][0] == "") {
-		cmnErrs[0] = [vocItem, 1];
-	} else {
-		var vocOnly = new Array("");
-		for (var i = 0; i < cmnErrs.length; i++) {
-			vocOnly[i] = cmnErrs[i][0];
-		}
-		var ind = vocOnly.indexOf(vocItem);
-		if (ind == -1) {
-			cmnErrs.push([vocItem, 1]);
+	if (vocItem!="") {
+		vocItem = currentCat + "/" + vocItem;
+		if (cmnErrs [0][0] == "") {
+			cmnErrs[0] = [vocItem, 1];
 		} else {
-			cmnErrs[ind][1]++;
+			var vocOnly = new Array("");
+			for (var i = 0; i < cmnErrs.length; i++) {
+				vocOnly[i] = cmnErrs[i][0];
+			}
+			var ind = vocOnly.indexOf(vocItem);
+			if (ind == -1) {
+				cmnErrs.push([vocItem, 1]);
+			} else {
+				cmnErrs[ind][1]++;
+			}
+			sortCmnErrs();
 		}
-		sortCmnErrs();
 	}
+
 
 	if (fbMode == "common") {
 		var errTx2 = "";
@@ -1216,19 +1222,20 @@ function upcmnErrs(vocItem) {
 }
 
 function recentErrors(answer) {
+	if (answer!=""){
+		recErrIm[2] = recErrIm[1];
+		recErrTx[2] = recErrTx[1];
 
-	recErrIm[2] = recErrIm[1];
-	recErrTx[2] = recErrTx[1];
+		recErrIm[1] = recErrIm[0];
+		recErrTx[1] = recErrTx[0];
 
-	recErrIm[1] = recErrIm[0];
-	recErrTx[1] = recErrTx[0];
+		recErrIm[0] = currentCat + "/" + answer;
+		recErrTx[0] = answer;
+	}
 
-	recErrIm[0] = currentCat + "/" + answer;
-	recErrTx[0] = answer;
-
-	if (fbMode == "recent") {
+		if (fbMode == "recent") {
 		var errIm1 = recErrIm[0];
-		var errTx1 = answer;
+		var errTx1 = recErrTx[0];
 		var errIm2 = recErrIm[1];
 		var errTx2 = recErrTx[1];
 		var errIm3 = recErrIm[2];
@@ -1245,13 +1252,19 @@ function recentErrors(answer) {
 
 function displayErrors(errIm1, errTx1, errIm2, errTx2, errIm3, errTx3) {
 
-	document.getElementById("fBIm0").innerHTML = "<div align='center' style='border: ridge red;'><img src='images/vocab/" + errIm1 + ".jpg' alt='Loading - please wait.' style='width:100%' ondragstart='return false;' /><br />" + errTx1 + "</div>";
+	document.getElementById("errCell0").style.display = "table-cell";
+	document.getElementById("errImg0").src = "images/vocab/" + errIm1 + ".jpg";
+	document.getElementById("errTxt0").innerHTML = errTx1;
 
 	if (errTx2 != "") {
-		document.getElementById("fBIm1").innerHTML = "<div align='center' style='border: ridge red;'><img src='images/vocab/" + errIm2 + ".jpg' alt='Loading - please wait.' style='width:100%' ondragstart='return false;' /><br />" + errTx2 + "</div>";
+		document.getElementById("errCell1").style.display = "table-cell";
+		document.getElementById("errImg1").src = "images/vocab/" + errIm2 + ".jpg";
+		document.getElementById("errTxt1").innerHTML = errTx2;
 	}
 	if (errTx3 != "") {
-		document.getElementById("fBIm2").innerHTML = "<div align='center' style='border: ridge red;'><img src='images/vocab/" + errIm3 + ".jpg' alt='Loading - please wait.' style='width:100%' ondragstart='return false;' /><br />" + errTx3 + "</div>";
+		document.getElementById("errCell2").style.display = "table-cell";
+		document.getElementById("errImg2").src = "images/vocab/" + errIm3 + ".jpg";
+		document.getElementById("errTxt2").innerHTML = errTx3;
 	}
 }
 
