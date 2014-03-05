@@ -69,27 +69,30 @@ input[type="image"]:-moz-focusring {outline:none;}
 
 /* ID Styles */
 
-#choiceDev a {
-  font-weight:bold;
-  text-align:center;
-  color: #000;
-  text-decoration: none;
-  display:block;
-  background: #fff;
+.choiceCell {
+	font:bold 65% 'Nunito',sans-serif;
+	text-align:center;
+	color: #000;
+	display: block;
+	background: #fff;
+	border: 0.1em ridge #393;
+	cursor: pointer;
   }
 
-#choiceDev a:hover {
+.choiceCell div:hover {
   background: #339933;
+  display: block;
   color:#ff6600;
 }
 
-.choiceDevFeedback {
-  font-weight:bold;
-  text-align:center;
-  color: #000;
-  text-decoration: none;
-  display:block;
-  background: #f60;
+.choiceCellFB {
+	font:bold 65% 'Nunito',sans-serif;
+	text-align:center;
+	color: #000;
+	display: block;
+	background: #f60;
+	border: 0.1em ridge #f60;
+	cursor: pointer;
   }
 
 #taglineEn {

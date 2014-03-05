@@ -1,8 +1,9 @@
 var allCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "people", "places and transport", "body", "school", "time");
 var audArray = new Array("");
 var audDLRemaining;
-var audObj;
+var audObj = new Audio ("");
 var audReady = new Array(false);
+var availAudCats = new Array ("");
 var availCats = new Array("");
 var cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
 var countTime = 180;
@@ -313,7 +314,7 @@ function resetScore() {
 	document.getElementById("score").innerHTML = "Score: " + points;
 	document.getElementById("finishedButton").style.display = "none";
 	document.getElementById("b_replay").style.display = "none";
-	document.getElementById("imChoiceDev").style.display = "none";
+	document.getElementById("imChoiceDiv").style.display = "none";
 	document.getElementById("b_start").style.display = "inline";
 	document.getElementById("controls_central").style.display = "table-cell";
 	document.getElementById("yes_cell").style.display = "none";
@@ -332,10 +333,10 @@ function resetScore() {
 
 	document.getElementById("phonDisplay").style.fontSize="300%";
 	document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+currentPhonUnit+".png' />";
-	document.getElementById("ch1").innerHTML = "";
-	document.getElementById("ch2").innerHTML = "";
-	document.getElementById("ch3").innerHTML = "";
-	document.getElementById("ch4").innerHTML = "";
+	document.getElementById("ch1").style.display = "none";
+	document.getElementById("ch2").style.display = "none";
+	document.getElementById("ch3").style.display = "none";
+	document.getElementById("ch4").style.display = "none";
 }
 
 function b_press(b, dir, origw) {
@@ -351,52 +352,7 @@ function b_press(b, dir, origw) {
 }
 
 
-function selectMode(mode) {
-	if (mode != uMode) {
-		var prevMode = uMode;
 
-		document.getElementById("b_" + mode).style.width = "94%";
-		document.getElementById("b_" + mode).style.border = "outset";
-		document.getElementById("on_" + mode).style.display = "inline";
-		document.getElementById("b_" + prevMode).style.width = "100%";
-		document.getElementById("b_" + prevMode).style.border = "none";
-		document.getElementById("on_" + prevMode).style.display = "none";
-		document.getElementById("optDiv").style.display = "none";
-		uMode = mode;
-		audCtrls(aclick, "play");
-
-		if (mode!="r_phonics"){
-		  	document.getElementById("imageDiv").style.display="block";
-  			document.getElementById("phonDisplay").style.display="none";
-  			document.getElementById("errDiv").style.display="block";
-  			document.getElementById("vocSelect").style.display="table";
-  			document.getElementById("phonUSelect").style.display="none";
-  		}
-
-		if (mode == "r_1pic4word") {
-			document.getElementById("choiceDev").style.display = "block";
-		}
-		else if (mode == "r_1word4pic") {
-			document.getElementById("choiceDev").style.display = "none";
-			document.getElementById("vocdisplay").style.display = "block";
-		}
-		else if (mode == "sp_teacher") {
-			document.getElementById("choiceDev").style.display = "none";
-		}
-		else if (mode == "l_4pic") {
-			document.getElementById("choiceDev").style.display = "none";
-			document.getElementById("vocdisplay").style.display = "none";
-		}
-		else if (mode=="r_phonics"){
-		  	document.getElementById("imageDiv").style.display="none";
-		  	document.getElementById("choiceDev").style.display = "none";
-  			document.getElementById("phonDisplay").style.display="block";
-  			document.getElementById("errDiv").style.display="none";
-  			document.getElementById("vocSelect").style.display="none";
-  			document.getElementById("phonUSelect").style.display="table";
-		}
-	}
-}
 
 function selectPhonUnit(unit) {
 		if (unit != currentPhonUnit) {
@@ -473,7 +429,70 @@ function fSet () {
 	newSyllable("ex");
 }
 
+function selectMode(mode) {
+	if (mode != uMode) {
+		var prevMode = uMode;
 
+		audCtrls(aclick, "play");
+		document.getElementById("b_" + mode).style.width = "94%";
+		document.getElementById("b_" + mode).style.border = "outset";
+		document.getElementById("on_" + mode).style.display = "inline";
+		document.getElementById("b_" + prevMode).style.width = "100%";
+		document.getElementById("b_" + prevMode).style.border = "none";
+		document.getElementById("on_" + prevMode).style.display = "none";
+		document.getElementById("optDiv").style.display = "none";
+		uMode = mode;
+
+		for (var i = 0, len = allCats.length; i < len; i++) {
+			if (uMode!="l_4pic"){
+				if (availCats.indexOf(allCats[i]) == -1) {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
+				} else {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+				}
+			}
+			else{
+				if (availAudCats.indexOf(allCats[i]) == -1) {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
+				}
+				else {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+				}
+			}
+		}
+
+		if (mode!="r_phonics"){
+		  	document.getElementById("imageDiv").style.display="block";
+  			document.getElementById("phonDisplay").style.display="none";
+  			document.getElementById("errDiv").style.display="block";
+  			document.getElementById("vocSelect").style.display="table";
+  			document.getElementById("phonUSelect").style.display="none";
+  		}
+
+		if (mode == "r_1pic4word") {
+			document.getElementById("choiceDiv").style.display = "block";
+		}
+		else if (mode == "r_1word4pic") {
+			document.getElementById("choiceDiv").style.display = "none";
+			document.getElementById("vocdisplay").style.display = "block";
+		}
+		else if (mode == "sp_teacher") {
+			document.getElementById("choiceDiv").style.display = "none";
+		}
+		else if (mode == "l_4pic") {
+			document.getElementById("choiceDiv").style.display = "none";
+			document.getElementById("vocdisplay").style.display = "none";
+		}
+		else if (mode=="r_phonics"){
+		  	document.getElementById("imageDiv").style.display="none";
+		  	document.getElementById("choiceDiv").style.display = "none";
+  			document.getElementById("phonDisplay").style.display="block";
+  			document.getElementById("errDiv").style.display="none";
+  			document.getElementById("vocSelect").style.display="none";
+  			document.getElementById("phonUSelect").style.display="table";
+		}
+	}
+}
 
 function selectLev(level) {
 
@@ -494,10 +513,20 @@ function selectLev(level) {
 		monPreload();
 
 		for (var i = 0, len = allCats.length; i < len; i++) {
-			if (availCats.indexOf(allCats[i]) == -1) {
-				document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
-			} else {
-				document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+			if (uMode!="l_4pic"){
+				if (availCats.indexOf(allCats[i]) == -1) {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
+				} else {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+				}
+			}
+			else{
+				if (availAudCats.indexOf(allCats[i]) == -1) {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + "_g.jpg";
+				}
+				else {
+					document.getElementById("b_" + allCats[i]).src = "images/buttons/" + allCats[i] + ".jpg";
+				}
 			}
 		}
 		if (availCats.indexOf(currentCat) == -1) {
@@ -644,6 +673,7 @@ function selectFB(mode) {
 function setVocArrays() {
 	if (currentLev == "K2") {
 		availCats = new Array("actions", "animals", "body", "clothes", "describing", "food", "occupations", "places and transport", "school", "time");
+		availAudCats = new Array ("animals", "occupations");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "cook", "count", "cry", "cut", "drink", "eat", "hop", "jump", "listen", "look", "open", "run", "sing", "sit down", "sleep", "stand up", "stop", "swim", "walk");
@@ -680,6 +710,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "P1" || currentLev == "P2") {
 		availCats = new Array("actions", "animals", "clothes", "food", "occupations", "people", "body", "school", "time");
+		availAudCats = new Array ("animals", "occupations");
 
 		switch (currentCat) {
 			case "actions":
@@ -714,6 +745,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "P3" || currentLev == "P4" || currentLev == "P5") {
 		availCats = new Array("actions", "animals", "describing", "food", "free time", "occupations", "people", "body", "school", "time");
+		availAudCats = new Array ("animals", "occupations");
 
 		switch (currentCat) {
 			case "actions":
@@ -751,6 +783,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "P6" || currentLev == "all") {
 		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+		availAudCats = new Array ("animals", "occupations");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "drive", "eat", "fly", "go", "guess", "hop", "jump", "leave", "like", "listen", "look", "open", "paint", "play", "point", "read", "ride", "run", "say", "shake", "sing", "sit down", "sit", "skip", "sleep", "smile", "speak", "stand", "stand up", "stop", "swim", "talk", "think", "walk", "write");
@@ -790,6 +823,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "scratchpad") {
 		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
+		availAudCats = new Array ("animals", "occupations");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "fly", "play", "cook");
@@ -1036,10 +1070,25 @@ function choices(imgInd) {
 	var choice4 = vocArray[inds[3]];
 
 	if (uMode == "r_1pic4word") {
-		document.getElementById("ch1").innerHTML = "<a href='javascript:chAnswer(0);'>" + choice1 + "</a>";
-		document.getElementById("ch2").innerHTML = "<a href='javascript:chAnswer(1);'>" + choice2 + "</a>";
-		document.getElementById("ch3").innerHTML = "<a href='javascript:chAnswer(2);'>" + choice3 + "</a>";
-		document.getElementById("ch4").innerHTML = "<a href='javascript:chAnswer(3);'>" + choice4 + "</a>";
+		document.getElementById("ch1").innerHTML = "<div>"+choice1+"</div>";
+		document.getElementById("ch2").innerHTML = "<div>"+choice2+"</div>";
+		document.getElementById("ch3").innerHTML = "<div>"+choice3+"</div>";
+		document.getElementById("ch4").innerHTML = "<div>"+choice4+"</div>";
+
+		document.getElementById("ch1").className = "choiceCell";
+		document.getElementById("ch2").className = "choiceCell";
+		document.getElementById("ch3").className = "choiceCell";
+		document.getElementById("ch4").className = "choiceCell";
+
+		document.getElementById("ch1").onclick = function () { chAnswer(0); };
+		document.getElementById("ch1").oncontextmenu = function () { chAnswer(0); };
+		document.getElementById("ch2").onclick = function () { chAnswer(1); };
+		document.getElementById("ch2").oncontextmenu = function () { chAnswer(1); };
+		document.getElementById("ch3").onclick = function () { chAnswer(2); };
+		document.getElementById("ch3").oncontextmenu = function () { chAnswer(2); };
+		document.getElementById("ch4").onclick = function () { chAnswer(3); };
+		document.getElementById("ch4").oncontextmenu = function () { chAnswer(3); };
+
 	} else if (uMode == "r_1word4pic" || uMode == "l_4pic") {
 		document.getElementById("imCh1").src = "images/vocab/" + currentCat + "/" + choice1 + ".jpg";
 		document.getElementById("imCh2").src = "images/vocab/" + currentCat + "/" + choice2 + ".jpg";
@@ -1057,16 +1106,20 @@ function choices(imgInd) {
 		document.getElementById("fbTxt4").innerHTML = "";
 
 		document.getElementById("cellCh1").onclick = function () { chAnswer(0); };
+		document.getElementById("cellCh1").oncontextmenu = function () { chAnswer(0); };
 		document.getElementById("cellCh2").onclick = function () { chAnswer(1); };
+		document.getElementById("cellCh2").oncontextmenu = function () { chAnswer(1); };
 		document.getElementById("cellCh3").onclick = function () { chAnswer(2); };
+		document.getElementById("cellCh3").oncontextmenu = function () { chAnswer(2); };
 		document.getElementById("cellCh4").onclick = function () { chAnswer(3); };
+		document.getElementById("cellCh4").oncontextmenu = function () { chAnswer(3); };
 	}
 
 	if (uMode == "r_1word4pic") {
 		document.getElementById("vocdisplay").innerHTML = vocArray[imgInd];
 	} else if (uMode == "l_4pic") {
-		audObj = audArray[imgInd];
-		audArray[imgInd].play();
+		audObj.src = "audio/vocab/"+currentCat+"/"+vocArray[imgInd]+".mp3";
+		audObj.play();
 	} else if (uMode == "r_1word4pic") {
 	}
 }
@@ -1113,12 +1166,15 @@ function feedback(ch, answer) {
 		document.getElementById(fBHi).style.display = "inline";
 		document.getElementById(fbTxt).innerHTML = answer;
 		document.getElementById(fbCell).onclick = "";
+		document.getElementById(fbCell).oncontextmenu = "";
 
 	}
 
 	if (uMode == "r_1pic4word") {
 		var fBDiv = "ch" + (ch + 1);
-		document.getElementById(fBDiv).innerHTML = "<span class='choiceDevFeedback'>" + answer + "</span>";
+		document.getElementById(fBDiv).className = "choiceCellFB";
+		document.getElementById(fBDiv).onclick = "";
+		document.getElementById(fBDiv).oncontextmenu = "";
 
 	}
 	if (uMode!="r_phonics"){
@@ -1128,7 +1184,8 @@ function feedback(ch, answer) {
 
 
 
-	document.getElementById("timer").style.color = "#f00";
+	document.getElementById("timer").style.color = "#f60";
+	document.getElementById("timer").style.borderColor = "#f60";
 	if (penalty == false) {
 		penalty = true;
 	} else {
@@ -1138,6 +1195,8 @@ function feedback(ch, answer) {
 	}
 	penaltyTCol = setTimeout(function() {
 		document.getElementById("timer").style.color = "#fff";
+		document.getElementById("timer").style.borderColor = "#393";
+
 	}, 5000);
 	penaltyTime = setTimeout(function() {
 		penalty = false;
@@ -1542,9 +1601,16 @@ function tabooCheck() {
 	}
 
 function selectRandomCat(){
-	var catInd = Math.floor(Math.random() * availCats.length);
-	currentCat=availCats[catInd];
-	setVocArrays();
+	if (uMode!="l_4pic"){
+		var catInd = Math.floor(Math.random() * availCats.length);
+		currentCat=availCats[catInd];
+		setVocArrays();
+	}
+	else {
+		var catInd = Math.floor(Math.random() * availAudCats.length);
+		currentCat=availAudCats[catInd];
+		setVocArrays();
+	}
 }
 
 
@@ -1561,8 +1627,14 @@ function newImage(button) {
 			document.getElementById("controls_central").style.display = "none";
 		}
 		if (uMode == "r_1word4pic" || uMode == "l_4pic") {
-			document.getElementById("imChoiceDev").style.display = "inline";
+			document.getElementById("imChoiceDiv").style.display = "block";
 			document.getElementById("mainImage").src = "images/formatting/1000X597clear_spacer.png";
+		}
+		if (uMode == "r_1pic4word"){
+			document.getElementById("ch1").style.display = "table-cell";
+			document.getElementById("ch2").style.display = "table-cell";
+			document.getElementById("ch3").style.display = "table-cell";
+			document.getElementById("ch4").style.display = "table-cell";
 		}
 		if (uMode == "l_4pic") {
 			document.getElementById("b_replay").style.display = "inline";
@@ -1593,6 +1665,7 @@ function newImage(button) {
 	RImg = vocArray[imgInd];
 	pImgInd = imgInd;
 	choices(imgInd);
+
 
 	if (uMode == "r_1pic4word" || uMode == "sp_teacher") {
 		document.getElementById("mainImage").src = "images/vocab/" + currentCat + "/" + RImg + ".jpg";
