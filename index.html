@@ -770,7 +770,21 @@
 			<!-- =============== -->
 			<!-- Main Displays	 -->
 			<!-- =============== -->
-			<div id="imageDiv" style="background: white; width: 100%; height: 85%; text-align: left; display: block;" >
+			<div  id="welcomeDiv" style="position:relative; z-index: 8; width: 100%; height: 85%; background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; text-align: center; display: block;">
+				<div style="height:0.7em">
+					&nbsp;
+				</div>
+				<div style="width: 65%; margin-left: auto; margin-right: auto; padding: 1%; text-align: left; font-size: 60%; color: #000;  display: block;" >
+					<p style="text-align: center; font-size: 130%;margin-top:1em; margin-bottom: 1.6em">Welcome to the <img style="width: 29%; vertical-align: -0.35em;" src="images/formatting/tp_text.png"/> English Builder.</p>
+					<p style="margin-bottom: 4%">Press <img style="width: 10%; vertical-align: -0.2em;" src="images/buttons/start_button.png" onclick="activity('start')" /> to begin practicing general vocabulary at <img src="images/buttons/b_K2.png" style="width: 8%; vertical-align: -0.3em"/> level. The activity is "1 Word - 4 Pictures".</p>
+					<p style="margin-bottom: 4%">Press <img src="images/buttons/content_button.png" style="width: 12.35%; vertical-align: -0.2em;" onclick="categoryDiv('block')"/> to select other activities, levels and content.</p>
+					<p style="margin-bottom: 2%">Press <img style="width: 5.82%; vertical-align: -0.2em;" src="images/buttons/help button.png"> to return to this help screen. There are also help buttons in the Activities and Content page.</p>
+				</div>
+				<img src="images/formatting/tp_logo.png" style="position: absolute; width:10%; left: 1%; top:7%;" />
+				<img src="images/formatting/tp_logo.png" style="position: absolute; width:10%; right: 1%; top:7%;" />
+			</div>
+
+			<div id="imageDiv" style="background: white; width: 100%; height: 85%; text-align: left; display: none;" >
 				<img id="mainImage" src="images/vocab/titles/all.jpg" alt="Loading. Please wait ..." style="border-style: none; width: 64%; margin-left: 16.6%; margin-top: 1%;"  />
 			</div>
 
@@ -789,14 +803,15 @@
 			<!-- ========== -->
 
 
-			<table border="0" style="width: 100%">
+			<table border="0" style="width: 100%; ">
 				<tbody valign="baseline" align="center">
 					<tr style="height:12.8%">
 						<td style="width: 0.5%">
 							&nbsp;
 						</td>
 						<td style="width: 7.125%">
-							<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_reset','down','100%')" onmouseup="b_press('b_reset','up','100%')" onmouseout="b_press('b_reset','out','100%')" onclick="resetScore()" />
+							<img  id="b_help" src="images/buttons/help button.png" style="width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_welcome','down','100%')" onmouseup="b_press('b_welcome','up','100%')" onmouseout="b_press('b_welcome','out','100%')" onclick="showWelcome()" />
+							<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto; display: none" onmousedown="b_press('b_reset','down','100%')" onmouseup="b_press('b_reset','up','100%')" onmouseout="b_press('b_reset','out','100%')" onclick="resetScore()" />
 						</td>
 						<td style="width:19.875%">
 							&nbsp;

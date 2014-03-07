@@ -134,7 +134,7 @@ function resize() {
 	var h = Math.floor((w/1600)*780);
 
 	var bodFontsize = Math.floor((w / 1600) * 60);
-	document.body.style.cssText = "background: none repeat scroll 0% 0% rgb(69, 62, 42); font: " + bodFontsize + "px 'Nunito',sans-serif;";
+	document.body.style.cssText = "background-image: url('images/formatting/wood03.jpg'); font: " + bodFontsize + "px 'Nunito',sans-serif;";
 
 	document.getElementById("outerDiv").style.width = w+"px";
 	document.getElementById("outerDiv").style.height = h+"px";
@@ -227,6 +227,13 @@ function optionsDiv(disp) {
 
 }
 
+function showWelcome(){
+	resetScore();
+	document.getElementById("welcomeDiv").style.display = "block";
+	document.getElementById("imageDiv").style.display = "none";
+	document.getElementById("phonDisplay").style.display = "none";
+}
+
 function categoryDiv(disp) {
 	resetScore();
 	document.getElementById("contentSelect").style.display = disp;
@@ -254,10 +261,12 @@ function newCount() {
 			document.getElementById('timer').innerHTML = "&nbsp;" + remMin + ":" + remSec + "&nbsp;";
 			if (countTime > 0) {
 				if (tickTock=="tick") {
+					audCtrls(tock, "pause");
 					audCtrls(tick, "play");
 					tickTock="tock";
 				}
 				else if (tickTock=="tock") {
+					audCtrls(tick, "pause");
 					audCtrls(tock, "play");
 					tickTock="tick";
 				}
@@ -315,7 +324,9 @@ function resetScore() {
 	document.getElementById("finishedButton").style.display = "none";
 	document.getElementById("b_replay").style.display = "none";
 	document.getElementById("imChoiceDiv").style.display = "none";
-	document.getElementById("b_start").style.display = "inline";
+	document.getElementById("b_start").style.display = "block";
+	document.getElementById("b_reset").style.display = "none";
+	document.getElementById("b_help").style.display = "block";
 	document.getElementById("controls_central").style.display = "table-cell";
 	document.getElementById("yes_cell").style.display = "none";
 	document.getElementById("no_cell").style.display = "none";
@@ -343,7 +354,7 @@ function b_press(b, dir, origw) {
 	if (dir == "down") {
 		var w = parseFloat(origw) * 0.96;
 		document.getElementById(b).style.width = w + "%";
-		if (b != "b_replay") {
+		if (b!="b_replay" && b!="b_start") {
 			audCtrls(aclick, "play");
 		}
 	} else {
@@ -441,6 +452,7 @@ function selectMode(mode) {
 		document.getElementById("b_" + prevMode).style.border = "none";
 		document.getElementById("on_" + prevMode).style.display = "none";
 		document.getElementById("optDiv").style.display = "none";
+		document.getElementById("welcomeDiv").style.display = "none";
 		uMode = mode;
 
 		for (var i = 0, len = allCats.length; i < len; i++) {
@@ -464,6 +476,7 @@ function selectMode(mode) {
 		if (mode!="r_phonics"){
 		  	document.getElementById("imageDiv").style.display="block";
   			document.getElementById("phonDisplay").style.display="none";
+  			document.getElementById("welcomeDiv").style.display="none";
   			document.getElementById("errDiv").style.display="block";
   			document.getElementById("vocSelect").style.display="table";
   			document.getElementById("phonUSelect").style.display="none";
@@ -486,6 +499,7 @@ function selectMode(mode) {
 		else if (mode=="r_phonics"){
 		  	document.getElementById("imageDiv").style.display="none";
 		  	document.getElementById("choiceDiv").style.display = "none";
+		  	document.getElementById("welcomeDiv").style.display="none";
   			document.getElementById("phonDisplay").style.display="block";
   			document.getElementById("errDiv").style.display="none";
   			document.getElementById("vocSelect").style.display="none";
@@ -504,6 +518,8 @@ function selectLev(level) {
 		document.getElementById("b_" + currentLev).style.width = "100%";
 		document.getElementById("b_" + currentLev).style.border = "none";
 		document.getElementById("on_" + currentLev).style.display = "none";
+		//document.getElementById("imageDiv").style.display = "block";
+		//document.getElementById("welcomeDiv").style.display = "none";
 		currentLev = level;
 		setVocArrays();
 		setTitle();
@@ -540,6 +556,7 @@ function selectDotandBen(book) {
 	document.getElementById("b_" + book).style.width = "94%";
 	document.getElementById("b_" + book).style.border = "outset";
 	document.getElementById("on_" + book).style.display = "inline";
+	document.getElementById("welcomeDiv").style.display = "none";
 	audCtrls(aclick, "play");
 
 	if (currentCat=="dot_and_Ben") {
@@ -573,6 +590,7 @@ function selectCat(category) {
 		document.getElementById("b_all").style.width = "94%";
 		document.getElementById("b_all").style.border = "outset";
 		document.getElementById("on_all").style.display = "inline";
+		document.getElementById("welcomeDiv").style.display = "none";
 		if (currentCat!="dot_and_Ben") {
 			document.getElementById("b_" + currentCat).style.width = "100%";
 			document.getElementById("b_" + currentCat).style.border = "none";
@@ -673,7 +691,7 @@ function selectFB(mode) {
 function setVocArrays() {
 	if (currentLev == "K2") {
 		availCats = new Array("actions", "animals", "body", "clothes", "describing", "food", "occupations", "places and transport", "school", "time");
-		availAudCats = new Array ("animals", "occupations");
+		availAudCats = new Array ("animals", "food", "occupations");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "cook", "count", "cry", "cut", "drink", "eat", "hop", "jump", "listen", "look", "open", "run", "sing", "sit down", "sleep", "stand up", "stop", "swim", "walk");
@@ -710,7 +728,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "P1" || currentLev == "P2") {
 		availCats = new Array("actions", "animals", "clothes", "food", "occupations", "people", "body", "school", "time");
-		availAudCats = new Array ("animals", "occupations");
+		availAudCats = new Array ("animals", "food", "occupations");
 
 		switch (currentCat) {
 			case "actions":
@@ -745,7 +763,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "P3" || currentLev == "P4" || currentLev == "P5") {
 		availCats = new Array("actions", "animals", "describing", "food", "free time", "occupations", "people", "body", "school", "time");
-		availAudCats = new Array ("animals", "occupations");
+		availAudCats = new Array ("animals", "food", "occupations");
 
 		switch (currentCat) {
 			case "actions":
@@ -783,7 +801,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "P6" || currentLev == "all") {
 		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
-		availAudCats = new Array ("animals", "occupations");
+		availAudCats = new Array ("animals", "food", "occupations");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "drive", "eat", "fly", "go", "guess", "hop", "jump", "leave", "like", "listen", "look", "open", "paint", "play", "point", "read", "ride", "run", "say", "shake", "sing", "sit down", "sit", "skip", "sleep", "smile", "speak", "stand", "stand up", "stop", "swim", "talk", "think", "walk", "write");
@@ -823,7 +841,7 @@ function setVocArrays() {
 
 	} else if (currentLev == "scratchpad") {
 		availCats = new Array("actions", "animals", "clothes", "describing", "food", "free time", "occupations", "places and transport", "body", "school", "time");
-		availAudCats = new Array ("animals", "occupations");
+		availAudCats = new Array ("animals", "food", "occupations");
 		switch (currentCat) {
 			case "actions":
 				vocArray = new Array("close", "fly", "play", "cook");
@@ -1618,8 +1636,12 @@ function newImage(button) {
 	if (button == "start") {
 		newCount();
 		document.getElementById("b_start").style.display = "none";
+		document.getElementById("b_help").style.display = "none";
+		document.getElementById("b_reset").style.display = "block";
 		document.getElementById("optDiv").style.display = "none";
 		document.getElementById("contentSelect").style.display = "none";
+		document.getElementById("imageDiv").style.display="block";
+		document.getElementById("welcomeDiv").style.display="none";
 		if (uMode == "sp_teacher") {
 			document.getElementById("yes_cell").style.display = "table-cell";
 			document.getElementById("no_cell").style.display = "table-cell";
