@@ -9,9 +9,9 @@ var cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
 var countTime = 180;
 var countSet = 3;
 var currentBook = "";
-var currentCat = "actions";
+var currentCat = "all";
 var currentLev = "P1";
-var currentPhonUnit="1";
+var currentPhonUnit="phon1";
 var currentTitle = "Actions";
 var fbImInd = 0;
 var fbMode = "common";
@@ -37,10 +37,10 @@ var stopCount = false;
 var stopDL = false;
 var tickFast;
 var tickTock="tick";
+var topicList="genVocab";
 var uMode = "r_1word4pic";
 var vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var vowel="all";
-
 var vIndex;
 var vSpecIndex;
 var fIndex;
@@ -134,7 +134,7 @@ function resize() {
 	var h = Math.floor((w/1600)*780);
 
 	var bodFontsize = Math.floor((w / 1600) * 60);
-	document.body.style.cssText = "background-image: url('images/formatting/wood03.jpg'); font: " + bodFontsize + "px 'Nunito',sans-serif;";
+	document.body.style.cssText = "background: none repeat scroll 0% 0% rgb(0, 0, 0); font: " + bodFontsize + "px 'Nunito',sans-serif;";
 
 	document.getElementById("outerDiv").style.width = w+"px";
 	document.getElementById("outerDiv").style.height = h+"px";
@@ -150,9 +150,6 @@ function resize() {
 	document.getElementById("dLProgBar_end").style.height = y;
 	document.getElementById("dLProgBarAud").style.height = y;
 	document.getElementById("dLProgBarAud_end").style.height = y;
-
-	var z = Math.floor((w / 1600)*665) + "px";
-	document.getElementById("contentInner").style.height = z;
 }
 
 function initAudio() {
@@ -232,6 +229,7 @@ function showWelcome(){
 	document.getElementById("welcomeDiv").style.display = "block";
 	document.getElementById("imageDiv").style.display = "none";
 	document.getElementById("phonDisplay").style.display = "none";
+	document.getElementById("contentSelect").style.display = "none";
 }
 
 function categoryDiv(disp) {
@@ -343,7 +341,7 @@ function resetScore() {
 	}
 
 	document.getElementById("phonDisplay").style.fontSize="300%";
-	document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+currentPhonUnit+".png' />";
+	document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/l_"+currentPhonUnit+"_p.png' />";
 	document.getElementById("ch1").style.display = "none";
 	document.getElementById("ch2").style.display = "none";
 	document.getElementById("ch3").style.display = "none";
@@ -366,29 +364,24 @@ function b_press(b, dir, origw) {
 
 
 function selectPhonUnit(unit) {
-		if (unit != currentPhonUnit) {
-		var prevUnit = currentPhonUnit;
-			audCtrls(aclick, "play");
-			document.getElementById("b_phon_u" + unit).style.width = "94%";
-			document.getElementById("b_phon_u" + unit).style.border = "outset";
-			document.getElementById("on_phon_u" + unit).style.display = "inline";
-			document.getElementById("b_phon_u" + prevUnit).style.width = "100%";
-			document.getElementById("b_phon_u" + prevUnit).style.border = "none";
-			document.getElementById("on_phon_u" + prevUnit).style.display = "none";
+	if (unit != currentPhonUnit) {
+	var prevUnit = currentPhonUnit;
+		audCtrls(aclick, "play");
+		document.getElementById("b_" + unit).style.width = "94%";
+		document.getElementById("b_" + unit).style.border = "outset";
+		document.getElementById("on_" + unit).style.display = "inline";
+		document.getElementById("b_"+currentPhonUnit).style.width = "100%";
+		document.getElementById("b_"+currentPhonUnit).style.border = "none";
+		document.getElementById("on_"+currentPhonUnit).style.display = "none";
+		document.getElementById("panelCont").src="images/buttons/b_"+unit+".png";
+		document.getElementById("panelLev").src="images/labels/l_"+unit+"_p.png";
 
-
-		if (parseInt(unit) < 8) {
-			currentPhonUnit=unit;
-			document.getElementById("phonDisplay").style.fontSize = "300%";
-			document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+unit+".png' />";
-			setPhonicsArrays();
-			newSyllable("ex");
-			resetScore();
-		}
-		else {
-			document.getElementById("u"+currentPhonUnit).checked=true;
-			document.getElementById("phonDisplay").innerHTML = "&nbsp;<span style='font-size:40px'>Sorry, this unit is not ready yet. </ span>&nbsp;";
-		}
+		currentPhonUnit=unit;
+		document.getElementById("phonDisplay").style.fontSize = "300%";
+		document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/U"+unit+".png' />";
+		setPhonicsArrays();
+		newSyllable("ex");
+		resetScore();
 	}
 }
 
@@ -446,11 +439,12 @@ function selectMode(mode) {
 
 		audCtrls(aclick, "play");
 		document.getElementById("b_" + mode).style.width = "94%";
-		document.getElementById("b_" + mode).style.border = "outset";
-		document.getElementById("on_" + mode).style.display = "inline";
+		document.getElementById("b_" + mode).style.border = "outset #5bc8e8";
+		document.getElementById("b_" + mode).src = "images/buttons/ba_" + mode + "_on.png";
+		document.getElementById("panelAct").src = "images/buttons/ba_" + mode + "_off.png";
 		document.getElementById("b_" + prevMode).style.width = "100%";
 		document.getElementById("b_" + prevMode).style.border = "none";
-		document.getElementById("on_" + prevMode).style.display = "none";
+		document.getElementById("b_" + prevMode).src = "images/buttons/ba_" + prevMode + "_off.png";
 		document.getElementById("optDiv").style.display = "none";
 		document.getElementById("welcomeDiv").style.display = "none";
 		uMode = mode;
@@ -480,6 +474,15 @@ function selectMode(mode) {
   			document.getElementById("errDiv").style.display="block";
   			document.getElementById("vocSelect").style.display="table";
   			document.getElementById("phonUSelect").style.display="none";
+  			if (currentCat!="dot_and_Ben"){
+  				document.getElementById("panelCont").src="images/buttons/"+currentCat+".jpg";
+				document.getElementById("panelLev").src="images/buttons/b_"+currentLev+".png";
+  			}
+  			else{
+  				var phonUnit=(parseInt(currentBook.substr(4))+2);
+				document.getElementById("panelLev").src="images/buttons/b_phon"+phonUnit+".png";
+				document.getElementById("panelCont").src="images/buttons/bc_"+currentBook+".jpg";
+			}
   		}
 
 		if (mode == "r_1pic4word") {
@@ -504,6 +507,8 @@ function selectMode(mode) {
   			document.getElementById("errDiv").style.display="none";
   			document.getElementById("vocSelect").style.display="none";
   			document.getElementById("phonUSelect").style.display="table";
+  			document.getElementById("panelCont").src="images/buttons/b_"+currentPhonUnit+".png";
+			document.getElementById("panelLev").src="images/labels/l_"+currentPhonUnit+"_p.png";
 		}
 	}
 }
@@ -518,12 +523,11 @@ function selectLev(level) {
 		document.getElementById("b_" + currentLev).style.width = "100%";
 		document.getElementById("b_" + currentLev).style.border = "none";
 		document.getElementById("on_" + currentLev).style.display = "none";
-		//document.getElementById("imageDiv").style.display = "block";
-		//document.getElementById("welcomeDiv").style.display = "none";
+		document.getElementById("panelLev").src="images/buttons/b_"+level+".png";
 		currentLev = level;
 		setVocArrays();
 		setTitle();
-		preloadAudio();
+		//preloadAudio();
 		audCtrls(aswitch, "play");
 		preLoadImages();
 		monPreload();
@@ -550,14 +554,28 @@ function selectLev(level) {
 		}
 	}
 }
-
+function selectTopicList(list){
+	if (list!=topicList){
+		audCtrls(aclick, "play");
+		document.getElementById("b_"+list).style.width="75%";
+		document.getElementById("b_"+list).style.border = "outset #5bc8e8";
+		document.getElementById("b_"+list).src="images/buttons/bs_"+list+"_on.png";
+		document.getElementById(list).style.display="table";
+		document.getElementById(topicList).style.display="none";
+		document.getElementById("b_"+topicList).style.width="80%";
+		document.getElementById("b_"+topicList).style.border = "none";
+		document.getElementById("b_"+topicList).src="images/buttons/bs_"+topicList+"_off.png";
+		topicList=list;
+	}
+}
 
 function selectDotandBen(book) {
+	audCtrls(aclick, "play");
 	document.getElementById("b_" + book).style.width = "94%";
 	document.getElementById("b_" + book).style.border = "outset";
 	document.getElementById("on_" + book).style.display = "inline";
 	document.getElementById("welcomeDiv").style.display = "none";
-	audCtrls(aclick, "play");
+	document.getElementById("imageDiv").style.display = "block";
 
 	if (currentCat=="dot_and_Ben") {
 		var prevBook=currentBook;
@@ -575,7 +593,9 @@ function selectDotandBen(book) {
 		document.getElementById("on_all").style.display = "none";
 		randomCats=false;
 	}
-
+	var phonUnit=(parseInt(book.substr(4))+2);
+	document.getElementById("panelLev").src="images/buttons/b_phon"+phonUnit+".png";
+	document.getElementById("panelCont").src="images/buttons/bc_"+book+".jpg";
 	currentBook = book;
 	currentCat="dot_and_Ben";
 	setVocArrays();
@@ -584,13 +604,13 @@ function selectDotandBen(book) {
 
 function selectCat(category) {
 	if (category=="all"){
+		audCtrls(aclick, "play");
 		randomCats=true;
 		resetScore();
-		audCtrls(aclick, "play");
 		document.getElementById("b_all").style.width = "94%";
 		document.getElementById("b_all").style.border = "outset";
 		document.getElementById("on_all").style.display = "inline";
-		document.getElementById("welcomeDiv").style.display = "none";
+		document.getElementById("panelCont").src="images/buttons/"+category+".jpg";
 		if (currentCat!="dot_and_Ben") {
 			document.getElementById("b_" + currentCat).style.width = "100%";
 			document.getElementById("b_" + currentCat).style.border = "none";
@@ -624,11 +644,13 @@ function selectCat(category) {
 				}
 			}
 			randomCats=false;
+			document.getElementById("panelCont").src="images/buttons/"+category+".jpg";
+			document.getElementById("panelLev").src="images/buttons/b_"+currentLev+".png";
 			currentCat = category;
 			setVocArrays();
 			setTitle();
 			resetScore();
-			preloadAudio();
+			//preloadAudio();
 			preLoadImages();
 			monPreload();
 		}
@@ -902,40 +924,40 @@ function setVocArrays() {
 
 function setPhonicsArrays () {
 		switch (currentPhonUnit) {
-			case "1":
+			case "phon1":
 			iArray= new Array ("m","s","p","t","");
 			vArray= new Array ("a","i","o","");
 			fArray= new Array ("m","s","p","t","");
 			break;
-		case "2":
+		case "phon2":
 			iArray= new Array ("m","s","p","t","n","f","h","");
 			vArray= new Array ("a","i","o","e","u","");
 			fArray= new Array ("m","s","p","t","n","f","");
 			break;
-		case "3":
+		case "phon3":
 			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","");
 			vArray= new Array ("a","e","i","o","u","");
 			fArray= new Array ("m","s","p","t","n","f","b","d","z","");
 			break;
-		case "4":
+		case "phon4":
 			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","");
 			vArray= new Array ("a","e","i","o","u","");
 			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","");
 			vSpecArray = new Array ("e","i","");
 			break;
-		case "5":
+		case "phon5":
 			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
 			vArray= new Array ("a","e","i","o","u","");
 			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","");
 			vSpecArray = new Array ("e","i","");
 			break;
-		case "6":
+		case "phon6":
 			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
 			vArray= new Array ("a","e","i","o","u","ee","");
 			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","");
 			vSpecArray= new Array ("e","i","ee","");
 			break;
-		case "7":
+		case "phon7":
 			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
 			vArray= new Array ("a","e","i","o","u","ee","");
 			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk","");
@@ -1137,6 +1159,7 @@ function choices(imgInd) {
 		document.getElementById("vocdisplay").innerHTML = vocArray[imgInd];
 	} else if (uMode == "l_4pic") {
 		audObj.src = "audio/vocab/"+currentCat+"/"+vocArray[imgInd]+".mp3";
+		audObj.load();
 		audObj.play();
 	} else if (uMode == "r_1word4pic") {
 	}
@@ -1356,8 +1379,10 @@ function activity(button){
 
 function newSyllable(button) {
 	if (button == "start") {
-		document.getElementById("phonDisplay").style.fontSize = "763%";
+		document.getElementById("phonDisplay").style.fontSize = "840%";
 		newCount();
+		document.getElementById("b_help").style.display = "none";
+		document.getElementById("b_reset").style.display = "block";
 		document.getElementById("b_start").style.display = "none";
 		document.getElementById("optDiv").style.display = "none";
 		document.getElementById("contentSelect").style.display = "none";
@@ -1365,6 +1390,8 @@ function newSyllable(button) {
 		document.getElementById("no_cell").style.display = "table-cell";
 		document.getElementById("clear_cell").style.display = "table-cell";
 		document.getElementById("controls_central").style.display = "none";
+		document.getElementById("welcomeDiv").style.display = "none";
+		document.getElementById("phonDisplay").style.display = "block";
 
 	}
 	else if (button == "yes") {
@@ -1380,25 +1407,25 @@ function newSyllable(button) {
 
 
 	switch (currentPhonUnit) {
-	case "1":
+	case "phon1":
 		unit1();
 		break;
-	case "2":
+	case "phon2":
 		unit2();
 		break;
-	case "3":
+	case "phon3":
 		unit3();
 		break;
-	case "4":
+	case "phon4":
 		unit4();
 		break;
-	case "5":
+	case "phon5":
 		unit5();
 		break;
-	case "6":
+	case "phon6":
 		unit6();
 		break;
-	case "7":
+	case "phon7":
 		unit7();
 		break;
 	}
