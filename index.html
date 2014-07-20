@@ -7,14 +7,14 @@
 		Remove this if you use the .htaccess -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-		<title>Teacher Plus English Builder</title>
+		<title>Saranat English Builder</title>
 		<meta name="description" content="">
 		<meta name="author" content="Ian Smith">
 
 		<meta name="viewport" content="width=device-width; initial-scale=1.0">
 
 		<!--Set up favicon-->
-		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+		<link rel="shortcut icon" href="favicon.ico?v=2" type="image/x-icon"/>
 
 		<!--Import CSS stylesheet-->
 		<link rel="stylesheet" href="tpf_styles.css" type="text/css" />
@@ -38,7 +38,7 @@
 
 	<body style="background: #453e2a; font:60px 'Nunito', sans-serif; margin: 0px" onload="init()" onresize="resize()" oncontextmenu="return false">
 
-		<div id="debugWin" style="position: absolute; z-index: 500; right:0; top:30%; background-color: #eee; display:none;">
+		<div id="debugWin" style="position: absolute; z-index: 500; right:0; top:30%; background-color: #eee; display:none">
 			<table border="0" style="width: 300px; font: 16pt Arial, Helvetica, sans-serif; border-collapse: collapse">
 				<tr>
 					<td colspan="3" style="font: inherit; background: black; color:white; text-align: center;"> Debugging</td>
@@ -315,29 +315,29 @@
 					<tr style="background:#7bd8e8; padding:0.2%; padding-top: 0px; font: inherit">
 						<td style="font:bold 80% sans-serif; padding:inherit; text-align: center;">
 							<div style="position: relative;">
-								<img id="b_r_1word4pic"  src='images/buttons/ba_r_1word4pic_on.png' style="width:94%; border:outset #5bc8e8;" onclick="selectMode('r_1word4pic')"/>
+								<img id="b_read_choose"  src='images/buttons/ba_read_choose_on.png' style="width:94%; border:outset #5bc8e8;" onclick="selectMode('read_choose')"/>
 							</div>
 						Read and Choose </td>
 						<td style="font:bold 80% sans-serif; padding:inherit; text-align: center;">
 							<div style="position: relative;">
-								<img id="b_r_1pic4word"  src='images/buttons/ba_r_1pic4word_off.png' style="width:100%;" onclick="selectMode('r_1pic4word')"/>
+								<img id="b_look_choose"  src='images/buttons/ba_look_choose_off.png' style="width:100%;" onclick="selectMode('look_choose')"/>
 							</div>
 						Look and Choose </td>
 						<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
 							<div style="position: relative;">
-								<img id="b_l_4pic"  src='images/buttons/ba_l_4pic_off.png' style="width:100%;" onclick="selectMode('l_4pic')"/>
+								<img id="b_listen_choose"  src='images/buttons/ba_listen_choose_off.png' style="width:100%;" onclick="selectMode('listen_choose')"/>
 							</div>
 						Listen and Choose </td>
 						<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
 							<div style="position: relative;">
-								<img id="b_sp_teacher"  src='images/buttons/ba_sp_teacher_off.png' style="width:100%;" onclick="selectMode('sp_teacher')"/>
+								<img id="b_say_word"  src='images/buttons/ba_say_word_off.png' style="width:100%;" onclick="selectMode('say_word')"/>
 							</div>
 							Say the Word
 						</td>
 						<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
 							<div style="position: relative;">
-								<img id="on_r_phonics" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-								<img id="b_r_phonics"  src='images/buttons/ba_r_phonics_off.png' style="width:100%;" onclick="selectMode('r_phonics')"/>
+								<img id="on_read_say" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="b_read_say"  src='images/buttons/ba_read_say_off.png' style="width:100%;" onclick="selectMode('read_say')"/>
 							</div>
 							Read and Say
 						</td>
@@ -347,7 +347,7 @@
 					</tr>
 				</table>
 
-				<table id="phonUSelect" style="table-layout:fixed; width:75%;  border: 0.3em ridge #7bd8e8; border-spacing: 0px; background:#7bd8e8; font:inherit; display:none; margin-bottom: 1%">
+				<table border="0" id="phonUSelect" style="table-layout:fixed; width:90%;  border: 0.3em ridge #7bd8e8; border-spacing: 0px; background:#7bd8e8; font:inherit; display:none; margin-bottom: 1%">
 					<tr style=" padding:0.2%; font: inherit">
 						<td style="padding:inherit;  text-align: center;">
 							<div style="position: relative;">
@@ -379,11 +379,42 @@
 								<img id="b_phon5"  src='images/buttons/b_phon5.png' style="width:100%;" onclick="selectPhonUnit('phon5')"/>
 							</div>
 						</td>
-						<td style="padding:inherit;">
-							<div style="position: relative;">
-								<img id="on_phon6" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-								<img id="b_phon6"  src='images/buttons/b_phon6.png' style="width:100%;" onclick="selectPhonUnit('phon6')"/>
-							</div>
+						<td  rowspan="4" style="padding:inherit; font:inherit; width: 40%;">
+							<table border="0" style=" width: 95%; margin-top: 2%; margin-bottom:1%; margin-left:auto; margin-right: auto; font:inherit; background: #b8e4ec; border: thick ridge #7bd8e8">
+									<tr style="height:60px;">
+										<td colspan="3" style="text-align: center; font:inherit; font-size: 150%">
+											Syllable Structure
+										</td>
+										<td style="text-align: center; ">
+											<img id="b_ex" onclick="newSyllable('ex')"  onmousedown="b_press('b_ex','down','65%')" onmouseup="b_press('b_ex','up','65%')" onmouseout="b_press('b_ex','out','65%')"  style="width:65%" src="images/buttons/b_example.png" />
+										</td>
+									</tr>
+									<tr>
+										<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
+											Initial
+										</td>
+										<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
+											Vowel
+										</td>
+										<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
+											Final
+										</td>
+										<td rowspan="2" style="background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; border-top: thick ridge #7bd8e8; border-left: thick ridge #7bd8e8; font: 280% 'Nunito', sans-serif; text-align: center">
+											<span id="phonExample" style="vertical-align: 7%">sim</span>
+										</td>
+									</tr>
+									<tr>
+										<td align="center">
+											<img id="b_initC" onclick="iSet()"  onmousedown="b_press('b_initC','down','80%')" onmouseup="b_press('b_initC','up','80%')" onmouseout="b_press('b_initC','out','80%')"  style="width:80%;" src="images/buttons/b_all.png" />
+										</td>
+										<td align="center">
+											<img id="b_vowel" onclick="vSet()" onmousedown="b_press('b_vowel','down','80%')" onmouseup="b_press('b_vowel','up','80%')" onmouseout="b_press('b_vowel','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
+										</td>
+										<td align="center">
+											<img id="b_finalC" onclick="fSet()" onmousedown="b_press('b_finalC','down','80%')" onmouseup="b_press('b_finalC','up','80%')" onmouseout="b_press('b_finalC','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
+										</td>
+									</tr>
+								</table>
 						</td>
 					</tr>
 					<tr style="padding:0.2%;">
@@ -402,48 +433,55 @@
 						<td style="font: inherit; text-align: center">
 							Phonics Unit <img src="images/labels/l_phon5.png" style="width: 20%" />
 						</td>
+					</tr>
+					<tr style=" padding:0.2%; font: inherit">
+						<td style="padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_phon6" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="b_phon6"  src='images/buttons/b_phon6.png' style="width:100%;" onclick="selectPhonUnit('phon6')"/>
+							</div>
+						</td>
+						<td style="padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_phon7" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="b_phon7"  src='images/buttons/b_phon7.png' style="width:100%;" onclick="selectPhonUnit('phon7')"/>
+							</div>
+						</td>
+						<td style="padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_phon8" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="b_phon8"  src='images/buttons/b_phon8.png' style="width:100%;" onclick="selectPhonUnit('phon8')"/>
+							</div>
+						</td>
+						<td style="padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_phon9" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="b_phon9"  src='images/buttons/b_phon9.png' style="width:100%;" onclick="selectPhonUnit('phon9')"/>
+							</div>
+						</td>
+						<td style="padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_phon10" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="b_phon10"  src='images/buttons/b_phon10.png' style="width:100%;" onclick="selectPhonUnit('phon10')"/>
+							</div>
+						</td>
+
+					</tr>
+					<tr style="padding:0.2%;">
 						<td style="font: inherit; text-align: center">
 							Phonics Unit <img src="images/labels/l_phon6.png" style="width: 20%" />
 						</td>
-					</tr>
-					<tr>
-						<td colspan="6" style="text-align: center; font:inherit">
-
-							<table border="0" style=" width: 70%; margin-top: 2%; margin-bottom:1%; margin-left:auto; margin-right: auto; font:inherit; background: #b8e4ec; border: thick ridge #7bd8e8">
-								<tr style="height:60px;">
-									<td colspan="3" style="text-align: center; font:inherit; font-size: 150%">
-										Syllable Structure
-									</td>
-									<td style="text-align: center; ">
-										<img id="b_ex" onclick="newSyllable('ex')"  onmousedown="b_press('b_ex','down','65%')" onmouseup="b_press('b_ex','up','65%')" onmouseout="b_press('b_ex','out','65%')"  style="width:65%" src="images/buttons/b_example.png" />
-									</td>
-								</tr>
-								<tr>
-									<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
-										Initial
-									</td>
-									<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
-										Vowel
-									</td>
-									<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
-										Final
-									</td>
-									<td rowspan="2" id="phonExample" style="background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; border-top: thick ridge #7bd8e8; border-left: thick ridge #7bd8e8; font: 360% 'Nunito', sans-serif;">
-										sim
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<img id="b_initC" onclick="iSet()"  onmousedown="b_press('b_initC','down','80%')" onmouseup="b_press('b_initC','up','80%')" onmouseout="b_press('b_initC','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
-									</td>
-									<td>
-										<img id="b_vowel" onclick="vSet()" onmousedown="b_press('b_vowel','down','80%')" onmouseup="b_press('b_vowel','up','80%')" onmouseout="b_press('b_vowel','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
-									</td>
-									<td>
-										<img id="b_finalC" onclick="fSet()" onmousedown="b_press('b_finalC','down','80%')" onmouseup="b_press('b_finalC','up','80%')" onmouseout="b_press('b_finalC','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
-									</td>
-								</tr>
-							</table>
+						<td style="font: inherit; text-align: center">
+							Phonics Unit <img src="images/labels/l_phon7.png" style="width: 20%" />
+						</td>
+						<td style="font: inherit; text-align: center">
+							Phonics Unit <img src="images/labels/l_phon8.png" style="width: 20%" />
+						</td>
+						<td style="font: inherit; text-align: center">
+							Phonics Unit <img src="images/labels/l_phon9.png" style="width: 20%" />
+						</td>
+						<td style="font: inherit; text-align: center">
+							Phonics Unit <img src="images/labels/l_phon10.png" style="width: 20%" />
 						</td>
 					</tr>
 				</table>
@@ -560,23 +598,34 @@
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_occupations" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_occupations"  style="width:100%; " onclick="selectCat('occupations')"  src="images/buttons/occupations.jpg" />
+										<img id="on_grammar" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_grammar"  style="width:100%; " onclick="selectCat('grammar')"  src="images/buttons/grammar.jpg" />
 									</div>
 								</td>
 							</tr>
 							<tr style="padding:0.2%;">
-
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_people" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_people"  style="width:100%; " onclick="selectCat('people')"  src="images/buttons/people.jpg" />
+										<img id="on_home" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_home"  style="width:100%; " onclick="selectCat('home')"  src="images/buttons/home.jpg" />
+									</div>
+								</td>
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_occupations" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_occupations"  style="width:100%; " onclick="selectCat('occupations')"  src="images/buttons/occupations.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
 										<img id="on_body" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
 										<img id="b_body"  style="width:100%; " onclick="selectCat('body')"  src="images/buttons/body.jpg" />
+									</div>
+								</td>
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_people" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_people"  style="width:100%; " onclick="selectCat('people')"  src="images/buttons/people.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
@@ -597,8 +646,49 @@
 										<img id="b_time"  style="width:100%; " onclick="selectCat('time')"  src="images/buttons/time.jpg" />
 									</div>
 								</td>
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_weather" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_weather"  style="width:100%; " onclick="selectCat('weather')"  src="images/buttons/weather.jpg" />
+									</div>
+								</td>
+							</tr>
+						</table>
+						<table id="specVocab" style="table-layout:fixed; width:100%; padding: 0 0.4% 0.4% 0.4%; border-spacing:0px; font: inherit; display:none">
+							<tr>
+								<td colspan="8" style="font:inherit; font-size: 120%; font-weight: bold; text-align: center; padding-bottom: 0px;">
+									Specific Vocabulary Topics
+								</td>
+							</tr>
+							<tr style="padding:0.2%; padding-top: 0px">
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_days" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_days"  style="width:100%;" onclick="selectCat('days')"  src="images/buttons/days.jpg" />
+									</div>
+								</td>
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_asean" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_asean"  style="width:100%;" onclick="selectCat('asean')"  src="images/buttons/asean.jpg" />
+									</div>
+								</td>
 								<td style="padding:inherit;">
 
+								</td>
+								<td style="padding:inherit;">
+
+								</td>
+								<td style="padding:inherit;">
+
+								</td>
+								<td style="padding:inherit;">
+
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<img style="width:100%; "  src="images/formatting/content_button_spacer.png" />
 								</td>
 							</tr>
 						</table>
@@ -634,8 +724,11 @@
 										<img id="b_d_B_4"  style="width:100%; " onclick="selectDotandBen('d_B_4')"  src="images/buttons/bc_d_B_4.jpg" />
 									</div>
 								</td>
-								<td style="padding:inherit;">
-
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_d_B_5" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="b_d_B_5"  style="width:100%; " onclick="selectDotandBen('d_B_5')"  src="images/buttons/bc_d_B_5.jpg" />
+									</div>
 								</td>
 								<td style="padding:inherit;">
 
@@ -662,7 +755,7 @@
 							<img id="b_genVocab" src="images/buttons/bs_genVocab_on.png" style="width: 75%; border: outset #5bc8e8" onclick="selectTopicList('genVocab')"/>
 						</div>
 							<div style="height: 2.3em; text-align: center">
-						<img src="images/buttons/bs_specVocab_off.png" style="width: 80%" />
+						<img id="b_specVocab" src="images/buttons/bs_specVocab_off.png" style="width: 80%"  onclick="selectTopicList('specVocab')"/>
 						</div>
 						<div style="height: 2.3em; text-align: center">
 							<img id="b_dotBen" src="images/buttons/bs_dotBen_off.png" style="width: 80%" onclick="selectTopicList('dotBen')"/>
@@ -799,15 +892,15 @@
 					&nbsp;
 				</div>
 				<div style="width: 90%; margin-left: auto; margin-right: auto; padding: 1%; text-align: left; font-size: 60%; color: #000;  display: block;" >
-					<p style="text-align: center; font-size: 130%;margin-top:0.9em; margin-bottom: 1.2em">Welcome to the <img style="width: 23%; vertical-align: -0.35em;" src="images/formatting/tp_text.png"/> English Builder.</p>
+					<p style="text-align: center; font-size: 130%;margin-top:0.9em; margin-bottom: 1.2em">Welcome to the <img style="width: 34%; vertical-align: -0.2em;" src="images/labels/host_text.png"/> English Builder.</p>
 					<p style="margin-bottom: 2.5%">Press <img style="width: 6%; vertical-align: -0.2em;" src="images/buttons/start_button.png" onclick="activity('start')" /> to begin an activity.</p>
 					<p style="margin-bottom: 2.5%">Press <img src="images/buttons/reset_button.png" style="width: 4.07%; vertical-align: -0.2em;" /> to stop an activity at any time, and to reset when an activity is finished.</p>
 					<p style="margin-bottom: 2.5%">The blue box shows which activity, level and content are currently selected.</p>
 					<p style="margin-bottom: 2.5%">Press <img src="images/buttons/content_button.png" style="width: 8.64%; vertical-align: -0.2em;" onclick="categoryDiv('block')"/> to select other activities, levels and content.</p>
 					<p style="margin-bottom: 2%">Press <img style="width: 4.07%; vertical-align: -0.2em;" src="images/buttons/help button.png"> to return to this info screen.</p>
 				</div>
-				<img src="images/formatting/tp_logo.png" style="position: absolute; width:10%; left: 1%; top:7%;" />
-				<img src="images/formatting/tp_logo.png" style="position: absolute; width:10%; right: 1%; top:7%;" />
+				<img src="images/labels/host_logo.png" style="position: absolute; width:10%; left: 1%; top:7%;" />
+				<img src="images/labels/host_logo.png" style="position: absolute; width:10%; right: 1%; top:7%;" />
 			</div>
 
 			<div id="imageDiv" style="background: white; width: 100%; height: 85%; text-align: left; display: none;" >
@@ -843,7 +936,7 @@
 						</td>
 						<td style="width:18.2%">
 							<div style=" background:black; border: 0.5em ridge #5bc8e8;">
-							<img id="panelAct" style="width: 30%; padding: 0.35em 0.35em 0.2em 0.1em" src="images/buttons/ba_r_1word4pic_off.png" />
+							<img id="panelAct" style="width: 30%; padding: 0.35em 0.35em 0.2em 0.1em" src="images/buttons/ba_read_choose_off.png" />
 							<img id="panelLev" style="width: 30%; padding: 0.35em 0.1em 0.2em 0.1em" src="images/buttons/b_K2.png" />
 							<img id="panelCont" style="width: 30%; padding: 0.35em 0.1em 0.2em 0.3em" src="images/buttons/all.jpg"/>
 							</div>
@@ -874,10 +967,6 @@
 					</tr>
 				</tbody>
 			</table>
-		<embed height="50" width="100" src="audio/klaxon_short.mp3" AUTOSTART="false" style="display:none;"> </embed>
-		<embed height="50" width="100" src="audio/clock_ticking_fast.mp3" AUTOSTART="false" AutoRewind="true" style="display:none;"> </embed>
-
-
 		</div>
 	</body>
 </html>
