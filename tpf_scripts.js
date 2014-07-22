@@ -237,6 +237,10 @@ function categoryDiv(disp) {
 	resetScore();
 	document.getElementById("contentSelect").style.display = disp;
 	document.getElementById("optDiv").style.display = "none";
+	document.getElementById("welcomeDiv").style.display = "none";
+	if (uMode!="read_say") {
+		document.getElementById("imageDiv").style.display="block";
+	}
 }
 
 function newCount() {
@@ -450,7 +454,6 @@ function selectMode(mode) {
 		document.getElementById("b_" + prevMode).style.border = "none";
 		document.getElementById("b_" + prevMode).src = "images/buttons/ba_" + prevMode + "_off.png";
 		document.getElementById("optDiv").style.display = "none";
-		document.getElementById("welcomeDiv").style.display = "none";
 		uMode = mode;
 
 		for (var i = 0, len = allCats.length; i < len; i++) {
@@ -474,7 +477,6 @@ function selectMode(mode) {
 		if (mode!="read_say"){
 		  	document.getElementById("imageDiv").style.display="block";
   			document.getElementById("phonDisplay").style.display="none";
-  			document.getElementById("welcomeDiv").style.display="none";
   			document.getElementById("errDiv").style.display="block";
   			document.getElementById("vocSelect").style.display="table";
   			document.getElementById("phonUSelect").style.display="none";
@@ -506,7 +508,6 @@ function selectMode(mode) {
 		else if (mode=="read_say"){
 		  	document.getElementById("imageDiv").style.display="none";
 		  	document.getElementById("choiceDiv").style.display = "none";
-		  	document.getElementById("welcomeDiv").style.display="none";
   			document.getElementById("phonDisplay").style.display="block";
   			document.getElementById("errDiv").style.display="none";
   			document.getElementById("vocSelect").style.display="none";
@@ -578,7 +579,6 @@ function selectDotandBen(book) {
 	document.getElementById("b_" + book).style.width = "94%";
 	document.getElementById("b_" + book).style.border = "outset";
 	document.getElementById("on_" + book).style.display = "inline";
-	document.getElementById("welcomeDiv").style.display = "none";
 	document.getElementById("imageDiv").style.display = "block";
 
 	if (currentCatDir=="dot_and_Ben") {
@@ -763,7 +763,7 @@ function setVocArrays() {
 
 		switch (currentCatDir) {
 			case "actions":
-				vocArray = new Array("cook", "count", "cry", "cut", "dig", "drink", "drive", "eat", "guess", "hop", "jump", "like", "read", "ride", "run", "sing", "sit", "sleep", "stand", "walk", "wear", "write");
+				vocArray = new Array("cook", "count", "cry", "cut", "dig", "drink", "drive", "eat", "guess", "hop", "jump", "like", "read", "ride", "run", "sing", "sit", "sleep", "stand", "walk", "write");
 				break;
 			case "animals":
 				vocArray = new Array("ant", "bat", "bee", "bird", "cat", "cow", "dog", "duck", "elephant", "fish", "hen", "horse", "lion", "monkey", "pig", "snake", "tiger");
@@ -776,7 +776,7 @@ function setVocArrays() {
 				currentCatDir = "time";
 				break;
 			case "food":
-				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "mangoes", "milk", "orange", "papayas", "rice", "tea");
+				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "jam", "mangoes", "milk", "orange", "papayas", "rice", "tea");
 				break;
 			case "home":
 				vocArray = new Array("bed", "bin", "chair", "cupboard", "door", "fan", "lamp", "mat", "sofa", "table", "TV");
@@ -804,7 +804,7 @@ function setVocArrays() {
 
 		switch (currentCatDir) {
 			case "actions":
-				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "drive", "draw", "eat", "give", "guess", "go", "hop", "jump", "like", "open", "play", "read", "ride", "run", "sing", "sit", "sit down", "sleep", "speak", "stand", "stand up", "walk", "wear", "write");
+				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "draw", "drink", "drive", "eat", "give", "go", "guess", "hop", "jump", "like", "open", "play", "read", "ride", "run", "sing", "sit", "sit down", "sleep", "speak", "stand", "stand up", "walk", "write");
 				break;
 			case "animals":
 				vocArray = new Array("animals", "ant", "bat", "bear", "bee", "bird", "cat", "chicken", "cow", "dog", "duck", "elephant", "fish", "gecko", "goat", "hen", "horse", "lion", "monkey", "mouse", "pig", "rabbit", "rat", "sheep", "snake", "tiger", "zebra");
@@ -814,17 +814,17 @@ function setVocArrays() {
 				currentCatDir = "places and transport";
 				break;
 			case "clothes":
-				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jacket", "jeans", "ring", "shirt", "shoe", "shoes", "shorts", "skirt","sock", "socks", "T-shirt", "watch");
+				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jackets", "jeans", "ring", "shirt", "shoe", "shoes", "shorts", "skirt","sock", "socks", "T-shirt", "watch");
 				break;
 			case "days":
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
 				currentCatDir = "time";
 				break;
 			case "food":
-				vocArray = new Array("apple", "banana", "bread", "cake", "candy", "carrots", "chicken", "cookies", "corn", "durian", "egg", "food", "ice cream", "jam", "limes", "mangoes", "mangosteens", "milk", "noodles", "orange", "papayas", "pineapple", "pork", "rice", "soup", "tea", "water", "watermelon");
+				vocArray = new Array("apple", "banana", "bread", "cake", "candy", "carrots", "chicken", "cookies", "corn", "durian", "egg", "food", "ice cream", "jam", "limes", "mangoes", "mangosteens", "milk", "noodles", "orange", "papayas", "pineapple", "pork", "rice", "soup", "tea", "water");
 				break;
 			case "grammar":
-				vocArray = new Array("can", "in", "is", "it", "not", "on", "this", "that", "what", "when", "where", "who");
+				vocArray = new Array("?", "and", "at", "be / is / am / are", "but", "can", "cannot", "how many", "I", "in", "into", "my", "not", "on", "or", "that", "this", "to", "what", "when", "where", "who", "why", "you");
 				break;
 			case "home":
 				vocArray = new Array("basin", "bathroom", "bed", "bedroom", "bin", "broom", "chair", "cup", "cupboard", "dish", "door", "fan", "flower", "glass", "kitchen", "lamp", "living room", "mat", "pan", "picture", "pot", "room", "sink", "sofa", "stove", "table", "TV", "window", "wok");
@@ -833,13 +833,13 @@ function setVocArrays() {
 				vocArray = new Array("barber", "boxer", "bus driver", "butcher", "chef", "cook", "dancer", "dentist", "doctor", "farmer", "fisherman", "fruit seller", "gardener", "guide", "hairdresser", "home-maker", "nurse", "policeman", "postman", "singer", "soldier", "student", "teacher", "vet");
 				break;
 			case "body":
-				vocArray = new Array("arm", "arms", "back", "ears", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "leg", "legs", "mouth", "neck", "nose", "shoulder", "shoulders", "teeth", "toe", "toes", "tooth");
+				vocArray = new Array("arm", "arms", "back", "ears", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "knees", "leg", "legs", "mouth", "neck", "nose", "shoulder", "shoulders", "teeth", "toe", "toes", "tooth");
 				break;
 			case "people":
-				vocArray = new Array("aunt", "boy", "brother", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "queen", "sister", "son", "uncle", "woman");
+				vocArray = new Array("aunt", "baby", "boy", "brother", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "queen", "sister", "son", "uncle", "woman");
 				break;
 			case "places and transport":
-				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "on foot", "home", "Indonesia", "Laos", "Malaysia", "market", "Myanmar", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
+				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "home", "Indonesia", "Laos", "Malaysia", "market", "motorbike", "Myanmar", "on foot", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
 				break;
 			case "school":
 				vocArray = new Array("Art", "bag", "backpack", "blackboard", "book", "box", "chalk", "classroom", "clock", "computer", "desk", "eraser", "homework", "map", "Music", "notebook", "paper", "P.E.", "pen", "pencil", "ruler", "school", "Science");
@@ -855,7 +855,7 @@ function setVocArrays() {
 
 		switch (currentCatDir) {
 			case "actions":
-				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "drive", "draw", "eat", "give", "guess", "go", "hop", "jump", "like", "open", "play", "read", "ride", "run", "sing", "sit", "sit down", "sleep", "speak", "stand", "stand up", "walk", "wear", "write");
+				vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "draw", "drink", "drive", "eat", "give", "go", "guess", "hop", "jump", "like", "open", "play", "read", "ride", "run", "sing", "sit", "sit down", "sleep", "speak", "stand", "stand up", "walk", "write");
 				break;
 			case "animals":
 				vocArray = new Array("animals", "ant", "bat", "bear", "bee", "bird", "cat", "chicken", "cow", "dog", "duck", "elephant", "fish", "gecko", "goat", "hen", "horse", "lion", "monkey", "mouse", "pig", "rabbit", "rat", "sheep", "snake", "tiger", "zebra");
@@ -865,7 +865,7 @@ function setVocArrays() {
 				currentCatDir = "places and transport";
 				break;
 			case "clothes":
-				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jacket", "jeans", "ring", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "T-shirt", "watch");
+				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jackets", "jeans", "ring", "shirt", "shoe", "shoes", "shorts", "skirt", "sock", "socks", "T-shirt", "watch");
 				break;
 			case "days":
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
@@ -884,10 +884,10 @@ function setVocArrays() {
 				vocArray = new Array("barber", "boxer", "bus driver", "butcher", "chef", "cook", "dancer", "dentist", "doctor", "farmer", "fisherman", "fruit seller", "gardener", "guide", "hairdresser", "home-maker", "nurse", "policeman", "postman", "singer", "soldier", "student", "teacher", "vet");
 				break;
 			case "body":
-				vocArray = new Array("arm", "arms", "back", "ears", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "leg", "legs", "mouth", "neck", "nose", "shoulder", "shoulders", "teeth", "toe", "toes", "tooth");
+				vocArray = new Array("arm", "arms", "back", "ears", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "knees", "leg", "legs", "mouth", "neck", "nose", "shoulder", "shoulders", "teeth", "toe", "toes", "tooth");
 				break;
 			case "people":
-				vocArray = new Array("aunt", "boy", "brother", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "queen", "sister", "son", "uncle", "woman");
+				vocArray = new Array("aunt", "baby", "boy", "brother", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "queen", "sister", "son", "uncle", "woman");
 				break;
 			case "places and transport":
 				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "on foot", "home",  "Indonesia", "Laos", "Malaysia", "market", "Myanmar", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
@@ -916,7 +916,7 @@ function setVocArrays() {
 				currentCatDir = "places and transport";
 				break;
 		case "clothes":
-				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jacket", "jeans", "pants", "pyjamas", "ring", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "sweater", "swimsuit", "T-shirt", "watch");
+				vocArray = new Array("belt", "blouse", "cap", "dress", "earrings", "glasses", "handbag", "hat", "jackets", "jeans", "pants", "pyjamas", "ring", "shirt", "shoe", "shoes", "shorts", "skirt", "sock", "socks", "sweater", "swimsuit", "T-shirt", "watch");
 				break;
 			case "days":
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
@@ -941,10 +941,10 @@ function setVocArrays() {
 				vocArray = new Array("actor", "actress", "barber", "boxer", "bus driver", "butcher", "carpenter", "chef", "cook", "dancer", "dentist", "doctor", "dressmaker", "farmer", "fisherman", "fruit seller", "gardener", "guide", "hairdresser", "home-maker", "librarian", "merchants", "monk", "nurse", "policeman", "postman", "sailor", "secretary", "singer", "soldier", "student", "taxi driver", "teacher", "vet", "waiter", "waitress");
 				break;
 			case "body":
-				vocArray = new Array("arm", "arms", "back", "body", "bone", "chest", "chin", "ear", "ears", "eybrows", "eye", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "leg", "legs", "mouth", "nail", "nails", "neck", "nose", "shoulder", "shoulders", "teeth", "thumb", "toe", "toes", "tooth");
+				vocArray = new Array("arm", "arms", "back", "body", "bone", "chest", "chin", "ear", "ears", "eybrows", "eye", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "knees", "leg", "legs", "mouth", "nail", "nails", "neck", "nose", "shoulder", "shoulders", "teeth", "thumb", "toe", "toes", "tooth");
 				break;
 			case "places and transport":
-				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "bicycle", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "next to", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "train", "truck", "tuk-tuk", "van", "Vientiene", "Vietnam", "zoo");
+				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "home", "Indonesia", "Laos", "Malaysia", "market", "motorbike", "Myanmar", "on foot", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
 				break;
 			case "school":
 				vocArray = new Array("art", "backpack", "bag", "basket", "bell", "bin", "blackboard", "book", "bookshelf", "bottle", "box", "broom", "calculator", "calendar", "can", "canteen", "chair", "chalk", "classroom", "clock", "coloured pencils", "computer room", "computer", "crayons", "desk", "door", "eraser", "fan", "floor", "flower", "globe", "glue", "homework", "ink", "key", "library", "lock", "lunchbox", "map", "mat", "music", "music room", "notebook", "paper", "PE", "pen", "pencil", "pencil case", "pencil sharpener", "playground", "room", "ruler", "school", "science", "scissors", "social studies", "table", "toilet", "umbrella", "violin", "wall", "waste paper basket", "whiteboard", "window");
@@ -975,7 +975,7 @@ function setVocArrays() {
 				vocArray = new Array("arm", "arms", "back", "body", "bone", "chest", "chin", "ear", "ears", "eybrows", "eye", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "leg", "legs", "mouth", "nail", "nails", "neck", "nose", "shoulder", "shoulders", "teeth", "thumb", "toe", "toes", "tooth");
 				break;
 			case "clothes":
-				vocArray = new Array("bathing suit", "belt", "blouse", "cap", "checked", "dress", "earrings", "flowered", "glasses", "gloves", "handbag", "hat", "jacket", "jeans", "necklace", "nightdress", "plain", "pyjamas", "raincoat", "ring", "rings", "scarf", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "spotted", "striped", "sweater", "t-shirt", "tie", "trainers", "trousers", "underwear", "wallet", "watch", "wig", "zip");
+				vocArray = new Array("bathing suit", "belt", "blouse", "cap", "checked", "dress", "earrings", "flowered", "glasses", "gloves", "handbag", "hat", "jackets", "jeans", "necklace", "nightdress", "plain", "pyjamas", "raincoat", "ring", "rings", "scarf", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "spotted", "striped", "sweater", "t-shirt", "tie", "trainers", "trousers", "underwear", "wallet", "watch", "wig", "zip");
 				break;
 			case "days":
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
@@ -1019,7 +1019,7 @@ function setVocArrays() {
 				vocArray = new Array("arm", "fingers", "head", "legs", "nose", "toe", "arms", "eyes", "foot", "mouth", "shoulder", "toes", "face", "hair", "shoulders", "ears", "hand", "knee", "finger", "hands", "leg", "neck");
 				break;
 			case "clothes":
-				vocArray = new Array("bathing suit", "belt", "blouse", "cap", "checked", "dress", "earrings", "flowered", "glasses", "gloves", "handbag", "hat", "jacket", "jeans", "necklace", "nightdress", "plain", "pyjamas", "raincoat", "ring", "rings", "scarf", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "spotted", "striped", "sweater", "t-shirt", "tie", "trainers", "trousers", "underwear", "wallet", "watch", "wig", "zip");
+				vocArray = new Array("bathing suit", "belt", "blouse", "cap", "checked", "dress", "earrings", "flowered", "glasses", "gloves", "handbag", "hat", "jackets", "jeans", "necklace", "nightdress", "plain", "pyjamas", "raincoat", "ring", "rings", "scarf", "shirt", "shoe", "shoes", "shorts", "skirt", "socks", "spotted", "striped", "sweater", "t-shirt", "tie", "trainers", "trousers", "underwear", "wallet", "watch", "wig", "zip");
 				break;
 			case "days":
 				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
