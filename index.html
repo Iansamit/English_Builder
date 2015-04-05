@@ -37,8 +37,79 @@
 	</head>
 
 	<body style="background: #453e2a; font:60px 'Nunito', sans-serif; margin: 0px" onload="init()" onresize="resize()" oncontextmenu="return false">
+		<div id="modal_back" style="position: absolute; z-index: 600; left:0; top:3; width:100%; height: 12.9em; display:none">
+			<div id="msg_win" style="position: absolute; z-index: 500; left:0.1em; top:0.1em; width:6em; text-align: center; border:0.1em ridge #f60; background-color:#000; color:#fff" >
+				<div id="msg_dragbar" style="background-image: url('images/formatting/dragbar.jpg'); background-size:100% 100%;  height: 0.5em; cursor: move" onmousedown="moveHelpBox(this.parentNode)">
+				</div>
+				<div id="msg_box" style="padding: 1em 1em 0em 1em; font-size: 30%; text-align: justify" >
 
-		<div id="debugWin" style="position: absolute; z-index: 500; right:0; top:30%; background-color: #eee; display:none">
+				</div>
+				<div id="msg_box_clone" style="padding: 0em 1em 0em 1em; font-size: 30%; text-align: center" >
+					<div style= "width: 4em; float:left; margin-left: 0.5em; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_K2.png" onclick="setVocChoiceTable('clone_topic_cont','K2')" onmousedown="b_press(this)">
+					</div>
+					<div style= "width: 4em; float:left; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_P1.png" onclick="setVocChoiceTable('clone_topic_cont','P1')" onmousedown="b_press(this)">
+					</div>
+					<div style= "width: 4em; float:left; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_P2.png" onclick="setVocChoiceTable('clone_topic_cont','P2')" onmousedown="b_press(this)">
+					</div>
+					<div style= "width: 4em; float:left; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_P3.png" onclick="setVocChoiceTable('clone_topic_cont','P3')" onmousedown="b_press(this)">
+					</div>
+					<div style= "width: 4em; clear:left; float: left; margin-left: 2em; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_P4.png" onclick="setVocChoiceTable('clone_topic_cont','P4')" onmousedown="b_press(this)">
+					</div>
+					<div style= "width: 4em; float:left; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_P5.png" onclick="setVocChoiceTable('clone_topic_cont','P5')" onmousedown="b_press(this)">
+					</div>
+					<div style= "width: 4em; float:left; margin-right:0.3em">
+						<img style= "width: 100%" src="images/buttons/b_P6.png" onclick="setVocChoiceTable('clone_topic_cont','P6')" onmousedown="b_press(this)">
+					</div>
+					<div style="clear:left; width: 100%; height: 2.5em; padding-top: 0.5em">
+						<img style="width: 6em;" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" />
+					</div>
+				</div>
+				<div id="msg_box_save" style="padding: 1em 1em 0em 1em; font-size: 30%; text-align: justify; display: none" >
+					<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Warning</span></p>
+					<p style="margin-bottom: 0.5em">You have made some changes to your User Settings vocabulary. If you leave without saving, <span style="font-weight:bold; color:red" >those changes will be lost!!!</span></p>
+					<p style="margin-bottom: 0.5em">Press <img style="width: 3.8em; vertical-align: middle;" src="images/buttons/save.png" alt="Save" /> if you want to save your settings to a file.</p>
+					<p style="margin-bottom: 0.5em">Press <img style="width: 3.8em; vertical-align: middle" src="images/buttons/leave.png" /> if you don't need to save.</p>
+					<p style="margin-bottom: 0.5em">Press <img style="width: 3.8em; vertical-align: middle" src="images/buttons/cancel_leaving.png" /> if you want to continue working.</p>
+				</div>
+				<div id="msg_close" style="width: 100%; font-size: 30%; height: 2.5em; margin-top: 0.2em">
+					<img id="msg_close_button" style="width: 5em;" src="images/buttons/close_button.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" />
+				</div>
+				<div id="msg_OK_cancel" style="width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.2em">
+					<img style="width: 6em; float: left; margin-left: 2em" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" />
+					<img id="msg_OK" style="width: 6em; float: right; margin-right: 2em" src="images/buttons/continue.png" onmousedown="b_press(this)" />
+				</div>
+				<div id="msg_save_leave_cancel" style="position:relative; width: 100%; text-align:center; font-size: 30%; height: 2.5em; margin-top: 0.2em">
+					<div style="position: absolute; bottom: 0.25em; right:0; left: 0; margin-left: auto; margin-right: auto; width: 4.7em; font: inherit; text-align: center">
+						<img id="msg_leave" style="width: 100%" src="images/buttons/leave.png" onclick="leave()" onmousedown="b_press(this)" />
+					</div>
+					<div style="position: absolute; bottom: 0.25em; left:1em; width: 4.7em; font: inherit; text-align: center">
+						<img id="msg_save" style="width: 100%" src="images/buttons/save.png" onclick="saveSetup();setDisplays({modal_back:'none',msg_box:'block',msg_box_save:'none'})" onmousedown="b_press(this)" />
+					</div>
+					<div style="position: absolute; bottom: 0.25em; right:1em; width: 4.7em; font: inherit; text-align: center">
+						<img style="width: 4.7em; " src="images/buttons/cancel_leaving.png" onclick="setDisplays({modal_back:'none',msg_box:'block',msg_box_save:'none'})" onmousedown="b_press(this)" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="helpWin" style="position: absolute; z-index: 500; left:0.5em; top:3em; width:11em; display:none; text-align: center; border:0.1em ridge #393; background-color:#000; color:#fff" >
+			<div id="dragbar" style="background-image: url('images/formatting/dragbar.jpg'); background-size:100% 100%;  height: 0.5em; cursor: move" onmousedown="moveHelpBox(this.parentNode)">
+			</div>
+			<div id="helpBox" style="padding: 1em 1em 0em 1em; font-size: 30%; text-align: justify" >
+
+			</div>
+			<div style="width: 100%; font-size: 30%; height: 2.5em; margin-top: 0.2em">
+				<img id="infClose" style="width: 5em;" src="images/buttons/close_button.png" onclick="document.getElementById('helpWin').style.display='none'" onmousedown="b_press(this)" />
+			</div>
+		</div>
+
+		<div id="debugWin" style="position: absolute; z-index: 500; left:0; top:30%; background-color: #eee; display:none">
 			<table border="0" style="width: 300px; font: 16pt Arial, Helvetica, sans-serif; border-collapse: collapse">
 				<tr>
 					<td colspan="3" style="font: inherit; background: black; color:white; text-align: center;"> Debugging</td>
@@ -111,7 +182,7 @@
 		<!-- =============-->
 		<!-- Left Pane    -->
 		<!-- ============ -->
-		<div style="position: absolute; z-index: 5; margin-left: 1%; top:1%; width: 15%; height:70%;">
+		<div id="left_pane" style="position: absolute; z-index: 5; margin-left: 1%; top:1%; width: 15%; height:70%;">
 			<div id="timer" align="center" style="width: 90%; height: 15%; margin-left: auto; margin-right: auto; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; background-color:#000; color:#fff">
 				03:00
 			</div>
@@ -154,18 +225,61 @@
 		<!-- ============== -->
 		<!-- Right Panel	-->
 		<!-- ============== -->
+
 		<div id="score" style="position: absolute; right: 1%; top: 1%; z-index: 5; height: 10.5%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393;">
 			Score: 0
 		</div>
+		<div id="correct" style="position: absolute; right: 1%; top: 1%; z-index: 5; height: 10.5%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; display:none">
+			Words: 0
+		</div>
+		<div id="user_settings_data" style="position: absolute; right: 3%; top: 2%; z-index: 5; width: 18%; height: 78%; padding-left: 1.2%; padding-right:1.2%; padding-top: 1.2%; font: inherit; font-size: 50%; border:0.15em ridge #7bd8e8; background-color: #7bd8e8; display: none">
+			<div id="user_level_data" style= "height: 7em; margin-bottom: 0.7em; font: inherit; text-align: center; border: 0.16em ridge #b8e4ec; background: #b8e4ec;">
+			</div>
+			<div id="user_topics_data" style="height: 7.7em; text-align: center; font: inherit; border: 0.16em ridge #b8e4ec; background: #b8e4ec;">
+			</div>
+			<div  style="position:absolute; bottom: 2%; left:3%; right: 3%; height:3.5em; padding-top: 0.5em; border: 0.24em ridge #b8e4ec; background: #b8e4ec; text-align: left; font: inherit; font-size: 75%">
+				<div style="position:relative; height: 50%;">
+					<div style="position: absolute; bottom: 0; width: 45%; left:0; text-align: center;">
+						<img id="b_undo" style="width:87%" src='images/buttons/undo_g.png' />
+					</div>
+					<div id="undo_avail" style="position: absolute; top: 0; left: 47%;">
+						(0 available)
+					</div>
+				</div>
+				<div style="position:relative; height: 50%;">
+					<div style="position: absolute; bottom: 0; width: 45%; left:0; text-align: center;">
+						<img id="b_redo"	style="width:87%" src='images/buttons/redo_g.png' />
+					</div>
+					<div id="redo_avail" style="position: absolute; top: 0; left: 47%">
+						(0 available)
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="clear" style="position: absolute; right: 1%; top: 13%; z-index: 5; height: 10.5%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; display:none">
+			Clear: 0
+		</div>
+		<div id="total" style="position: absolute; right: 1%; top: 25%; z-index: 5; height: 10.5%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; display:none">
+			Total: 0
+		</div>
+		<div id="bingoScore" style="position: absolute; right: 1%; top: 15%; z-index: 5; height: 20%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; display:none">
+			Bingo<p>50</p>
+		</div>
+		<div id="bingoWords" style="position: absolute; right: 1%; top: 60%; z-index: 5; height: 20%; padding-left: 1.2%; padding-right:1.2%; background: black; color: white; text-align: center; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; display:none">
+			Words<p>25</p>
+		</div>
+
+
+
 
 		<!--_____________ -->
 		<!-- Word Choice  -->
 		<!--_____________ -->
-		<div id="choiceDiv" style="position: absolute; top:14.3%; right: 1%; z-index: 5; width: 18%; height: 67%; background-color:#000; border:0.1em ridge #393; display:none;"  >
-			<table  border="0" summary="multiple choice words." align="center" style="table-layout:fixed; background:#000;border-spacing:0 0.1em; padding: 1%" >
+		<div id="choiceDiv" style="position: absolute; top:14.3%; right: 1%; z-index: 5; width: 18%; height: 67%; background-color:#fff; border:0.1em ridge #393;"  >
+			<table id="choiceTable"  border="0" summary="multiple choice words." align="center" style="table-layout:fixed; background:#000;border-spacing:0 0.1em; padding: 1%; display: none" >
 				<tbody>
 					<tr>
-						<td class="choiceCell" style="font-size: 40%;background:black; color:white; border: none">Click on the word that matches the picture:</td>
+						<td class="choiceCell" style="font-size: 40%;background:black; color:white; border: none">Click on the word that matches the picture: </td>
 					</tr>
 					<tr>
 						<td id="ch1" class="choiceCell" onclick="chAnswer(0)" oncontextmenu="chAnswer(0)">
@@ -189,114 +303,32 @@
 					</tr>
 				</tbody>
 			</table>
+			<table id="livesDispSide"  border="0" summary="lives left." align="center" style="table-layout:fixed; width: 100%; background:#fff;border-spacing:0 0.1em; padding: 1%, display:none" >
+				<tbody>
+					<tr>
+						<td style="text-align: center"><img id="life10"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+						<td style="text-align: center"><img id="life9"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: center"><img id="life8"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+						<td style="text-align: center"><img id="life7"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: center"><img id="life6"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+						<td style="text-align: center"><img id="life5"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: center"><img id="life4"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+						<td style="text-align: center"><img id="life3"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+					</tr>
+					<tr>
+						<td style="text-align: center"><img id="life2"  src='images/labels/lives_rem.png' style="width:70%" /></td>
+						<td style="text-align: center"><img id="life1" src='images/labels/lives_rem.png' style="width:70%" /></td>
+					</tr>
+
+				</tbody>
+			</table>
 		</div>
-
-
-
-			<!-- =================================================================================
-			|    Options                                                                          |
-			|                                                                                     |
-			|     GIMP notes for new buttons: 1) size - 150X90px; 2) emboss: Bumpmap; Azimuth: 75;|
-			|     Elevation: 80; Depth: 3;   3)add bevel - width:14;                              |
-			=================================================================================== -->
-			<div id="optDiv" align="center" style="position: absolute; top:24.5%; z-index: 10; width:100%; display:none;">
-				<div style="border:ridge #7bd8e8; width: 30%; padding:0.5%; background-color:#b8e4ec; font:32% 'Nunito', sans-serif;">
-
-					<div style="font: inherit; font-weight: bold;">
-						Activity Options
-					</div>
-					<div style="float:left; width: 45%">
-						<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
-							<tbody style="padding:inherit; font:inherit;">
-								<tr>
-									<td style="width: 100%; font: inherit; font-weight: bold;">
-										Timer
-									</td>
-								</tr>
-								<tr id="cDS10" class="cDSelect" style="font:inherit; padding:1%;">
-									<td  style="font:100% 'Nunito', sans-serif;" onclick="setCountDown(10)">
-										10 minutes
-									</td>
-								</tr>
-								<tr id="cDS9" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(9)">
-										9 minutes
-									</td>
-								</tr>
-								<tr id="cDS8" class="cDSelect" style="font:inherit; padding:1%; td:hover: background:black;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(8)">
-										8 minutes
-									</td>
-								</tr>
-								<tr id="cDS7" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(7)">
-										7 minutes
-									</td>
-								</tr>
-								<tr id="cDS6" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(6)">
-										6 minutes
-									</td>
-								</tr>
-								<tr id="cDS5" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(5)">
-										5 minutes
-									</td>
-								</tr>
-								<tr id="cDS4" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(4)">
-										4 minutes
-									</td>
-								</tr>
-								<tr id="cDS3" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(3)">
-										3 minutes
-									</td>
-								</tr>
-								<tr id="cDS2" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="setCountDown(2)">
-										2 minutes
-									</td>
-								</tr>
-								<tr id="cDS1" class="cDSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif;" onclick="setCountDown(1)">
-										1 minute
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-
-					<div style="float: right; width: 45%; font-weight: bold">
-						<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
-							<tbody style="padding:inherit; font:inherit;">
-								<tr>
-									<td style="width: 100%; font: inherit; font-weight: bold;">
-										Error Feedback
-									</td>
-								</tr>
-								<tr id="fbCommon" class="fBSelected" style="font:inherit; padding:1%;">
-									<td  style="font:100% 'Nunito', sans-serif;" onclick="selectFB('common')">
-										Common Errors
-									</td>
-								</tr>
-								<tr id="fbRecent" class="fBSelect" style="font:inherit; padding:1%;">
-									<td style="font:100% 'Nunito', sans-serif; " onclick="selectFB('recent')">
-										Recent Errors
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-
-					<div style="clear: left">
-						<img style="width: 15%" src="images/buttons/OK.png" onclick="optionsDiv('none')" />
-					</div>
-
-
-				</div>
-			</div>
-
 
 
 			<!-- =================================================================================
@@ -306,46 +338,356 @@
 			|	3) (for ghosted) desaturate: luminosity; 4) brightness: +90, contrast: -20        |
 			=================================================================================== -->
 			<div id="contentSelect" align="center" style="position: absolute; z-index:9; width:100%; height: 85%; background-color:#b8e4ec; font:32% 'Nunito', sans-serif;display:none;"	>
-				<table style="border: 0.3em ridge #7bd8e8; table-layout:fixed; width:60%; font:inherit; border-spacing:0px; margin-top: 1%; margin-bottom: 1%">
+				<table border="0" style="border: 0.3em ridge #7bd8e8; padding-left: 0.5em; background: black; color: white; table-layout:fixed; width:98%; font:inherit; border-spacing:0px; margin-top: 1%; margin-bottom: 1%">
 					<tr>
-						<td colspan="6" style="font:inherit; font-size:120%; font-weight: bold; background: #7bd8e8; padding-bottom: 0px; text-align: center">
-							Activities
+						<td colspan="11" style="font:inherit; font-size:120%; font-weight: bold; color: white; padding-bottom: 0px; text-align: center">
+							<span style="vertical-align: -0.5em">Activities</span>
 						</td>
 					</tr>
-					<tr style="background:#7bd8e8; padding:0.2%; padding-top: 0px; font: inherit">
-						<td style="font:bold 80% sans-serif; padding:inherit; text-align: center;">
-							<div style="position: relative;">
-								<img id="b_read_choose"  src='images/buttons/ba_read_choose_on.png' style="width:94%; border:outset #5bc8e8;" onclick="selectMode('read_choose')"/>
+					<tr style="background:inherit; height: 4em; padding:0.2%; padding-top: 0px; font: inherit">
+						<td rowspan="2" class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_read_choose"  src='images/buttons/ba_read_choose_on.png' class="activityButton" onclick="selectActivity('read_choose')"/>
+								<img id='b_read_choose_gl1' class="buttonGlow" style="display: block" src="images/formatting/button_glow_f1.png" />
+								<img id='b_read_choose_gl2' class="buttonGlow" style="opacity: 0; display: block" src="images/formatting/button_glow_f2.png" />
+
 							</div>
 						Read and Choose </td>
-						<td style="font:bold 80% sans-serif; padding:inherit; text-align: center;">
-							<div style="position: relative;">
-								<img id="b_look_choose"  src='images/buttons/ba_look_choose_off.png' style="width:100%;" onclick="selectMode('look_choose')"/>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_look_choose"  src='images/buttons/ba_look_choose_off.png' class="activityButton" onclick="selectActivity('look_choose')"/>
+								<img id='b_look_choose_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_look_choose_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
 							</div>
-						Look and Choose </td>
-						<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
-							<div style="position: relative;">
-								<img id="b_listen_choose"  src='images/buttons/ba_listen_choose_off.png' style="width:100%;" onclick="selectMode('listen_choose')"/>
+							Look and Choose
+						</td>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_listen_choose"  src='images/buttons/ba_listen_choose_off.png' class="activityButton" onclick="selectActivity('listen_choose')"/>
+								<img id='b_listen_choose_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_listen_choose_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
 							</div>
-						Listen and Choose </td>
-						<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
-							<div style="position: relative;">
-								<img id="b_say_word"  src='images/buttons/ba_say_word_off.png' style="width:100%;" onclick="selectMode('say_word')"/>
+							Listen and Choose
+						</td>
+						<td rowspan="2" class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_play_learn"  src='images/buttons/ba_play_learn_off.png' class="activityButton" onclick="selectActivity('play_learn')"/>
+								<img id='b_play_learn_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_play_learn_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
+							</div>
+							Play and Learn </td>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_book_trans"  src='images/buttons/ba_book_trans_off.png' class="activityButton" onclick="selectActivity('book_trans')"/>
+								<img id='b_book_trans_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_book_trans_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
+							</div>
+							Read a Book
+						</td>
+						<td rowspan="2" class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_say_word"  src='images/buttons/ba_say_word_off.png' class="activityButton" onclick="selectActivity('say_word')"/>
+								<img id='b_say_word_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_say_word_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
 							</div>
 							Say the Word
 						</td>
-						<td style="font:bold 80% sans-serif;	padding:inherit; text-align: center;">
-							<div style="position: relative;">
-								<img id="on_read_say" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-								<img id="b_read_say"  src='images/buttons/ba_read_say_off.png' style="width:100%;" onclick="selectMode('read_say')"/>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_voc_bingo"  src='images/buttons/ba_voc_bingo_off.png' class="activityButton" onclick="selectActivity('voc_bingo')"/>
+								<img id='b_voc_bingo_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_voc_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
+							</div>
+							Vocabulary Bingo
+						</td>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_read_say"  src='images/buttons/ba_read_say_off.png' class="activityButton" onclick="selectActivity('read_say')"/>
+								<img id='b_read_say_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_read_say_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
 							</div>
 							Read and Say
 						</td>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_phon_bingo"  src='images/buttons/ba_phon_bingo_off.png' class="activityButton" onclick="selectActivity('phon_bingo')"/>
+								<img id='b_phon_bingo_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_phon_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
+							</div>
+							Phonics Bingo
+						</td>
+						<td rowspan="2"  class="activityButtonCell">
+							<div style="position: relative; height: 6.2em">
+								<img id="b_numbers"  src='images/buttons/ba_numbers_off.png' class="activityButton" onclick="selectActivity('numbers')"/>
+								<img id='b_numbers_gl1' class="buttonGlow" src="images/formatting/button_glow_f1.png" />
+								<img id='b_numbers_gl2' class="buttonGlow" style="opacity: 0" src="images/formatting/button_glow_f2.png" />
+							</div>
+							Say the Number
+						</td>
+						<td style="vertical-align: center; font:inherit">
+							<img id="b_info" src='images/buttons/help button.png' style="width:4em; padding-top:0.2em; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="setInfo(uMode,'open','#393','11em',3.5)" />
+						</td>
+					</tr>
+					<tr style="padding:0.2%; height: 3em; padding-top: 0px; font: inherit">
 						<td>
-							<img id="b_options" src='images/buttons/options_button.png' style="width:80%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press('b_options','down','80%')" onmouseup="b_press('b_options','up','80%')" onmouseout="b_press('b_options','out','80%')" onclick="optionsDiv('block')"/>
+							<img id="b_options" src='images/buttons/options_button.png' style="width:80%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="optionsDiv('block')"/>
 						</td>
 					</tr>
 				</table>
+
+
+				<!-- =================================================================================
+				|    Options                                                                          |
+				|                                                                                     |
+				|     GIMP notes for new buttons: 1) size - 150X90px; 2) emboss: Bumpmap; Azimuth: 75;|
+				|     Elevation: 80; Depth: 3;   3)add bevel - width:14;                              |
+				=================================================================================== -->
+
+				<div id="optDiv" align="center" style="width:100%; display:none; font: inherit">
+					<div style="position:relative; border:0.3em  ridge #7bd8e8; width: 90%; height: 19em; padding:0.5%; background-color:#7bd8e8; font: inherit">
+
+						<div style="font: inherit; font-weight: bold;">
+							Activity Options
+						</div>
+						<div  class="optGrp" style="width: 15%">
+							<div class="optGrpTitle">
+								Controls
+							</div>
+							Controls for human-assessed activities
+							<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr  style="font:inherit; padding:1%;">
+										<td id="contBoth"  class="fBSelected" onclick="tAControls('both')">
+											Both
+										</td>
+									</tr>
+									<tr  style="font:inherit; padding:1%;">
+										<td id="contOS" class="fBSelect" onclick="tAControls('os')">
+											On Screen
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="contKB"  class="fBSelect" onclick="tAControls('kb')">
+											Keyboard
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div  class="optGrp" style="width: 15%">
+							<div class="optGrpTitle">
+								Scoring
+							</div>
+							Separate Points for Clear Pronunciation
+							<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr style="font:inherit; padding:1%;">
+										<td id="scoreClearSplitOn" class="fBSelect"  onclick="selectScoreSplit(true)">
+											ON
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="scoreClearSplitOff" class="fBSelected" onclick="selectScoreSplit(false)">
+											OFF
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit; margin-top: 0.5em">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr style="font:inherit;">
+										<td style="padding:inherit; font:inherit;">
+											Time Penalty
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="tPenaltyOn" class="fBSelected"  onclick="selectTimePenalty(true)">
+											ON
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="tPenaltyOff" class="fBSelect" onclick="selectTimePenalty(false)">
+											Off
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="optGrp" style="width: 20%">
+							<div class="optGrpTitle">
+								Timer
+							</div>
+							<div style="float:left; width: 48%">
+								<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+									<tbody style="padding:inherit; font:inherit;">
+										<tr id="cDS10" class="cDSelect">
+											<td onclick="setCountDown(10)">
+												10 minutes
+											</td>
+										</tr>
+										<tr id="cDS9" class="cDSelect">
+											<td onclick="setCountDown(9)">
+												9 minutes
+											</td>
+										</tr>
+										<tr id="cDS8" class="cDSelect" style="font:inherit; padding:1%; td:hover: background:black;">
+											<td onclick="setCountDown(8)">
+												8 minutes
+											</td>
+										</tr>
+										<tr id="cDS7" class="cDSelect">
+											<td onclick="setCountDown(7)">
+												7 minutes
+											</td>
+										</tr>
+										<tr id="cDS6" class="cDSelect">
+											<td onclick="setCountDown(6)">
+												6 minutes
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div style="float:right; width: 48%">
+								<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+									<tbody style="padding:inherit; font:inherit;">
+										<tr id="cDS5" class="cDSelect">
+											<td onclick="setCountDown(5)">
+												5 minutes
+											</td>
+										</tr>
+										<tr id="cDS4" class="cDSelect">
+											<td onclick="setCountDown(4)">
+												4 minutes
+											</td>
+										</tr>
+										<tr id="cDS3" class="cDSelect">
+											<td onclick="setCountDown(3)">
+												3 minutes
+											</td>
+										</tr>
+										<tr id="cDS2" class="cDSelect">
+											<td onclick="setCountDown(2)">
+												2 minutes
+											</td>
+										</tr>
+										<tr id="cDS1" class="cDSelect">
+											<td onclick="setCountDown(1)">
+												1 minute
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div  class="optGrp" style="width: 15%">
+							<div class="optGrpTitle">
+								Feedback
+							</div>
+
+							<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr>
+										<td style="padding:inherit; font:inherit;">
+											Errors
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="fbCommon" class="fBSelected" style="font:100% 'Nunito', sans-serif;" onclick="selectFB('common')">
+											Common Errors
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="fbRecent" class="fBSelect" style="font:100% 'Nunito', sans-serif; " onclick="selectFB('recent')">
+											Recent Errors
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<table border="0" style="border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit; margin-top: 0.5em">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr style="font:inherit;">
+										<td style="padding:inherit; font:inherit;">
+											Nearly Finished Warning Klaxon
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td  id="finWarningOn" class="fBSelected" style="font:100% 'Nunito', sans-serif;" onclick="setFinWarning(true)">
+											ON
+										</td>
+									</tr>
+									<tr style="font:inherit; padding:1%;">
+										<td id="finWarningoff" class="fBSelect" style="font:100% 'Nunito', sans-serif; " onclick="setFinWarning(false)">
+											Off
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div  class="optGrp" style="width: 15%; padding-bottom: 0">
+							<div class="optGrpTitle" >
+								Vocabulary
+							</div>
+							<table border="0" style="table-layout:fixed; border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr style="font:inherit; ;">
+										<td id="voc_mode_def" class="fBSelected"  style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setVocMode('default')">
+											Default
+										</td>
+										<td id="voc_mode_user" class="fBSelect"  style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setVocMode('user')">
+											User
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div style="position:relative; width: 100%; height: 2.2em; font: inherit; text-align: center">
+								<div style="position: absolute; bottom: 0; font: inherit">
+									<img style="width: 35%" src="images/buttons/setup_button.png" onclick="setVocMode('user');setVocChoiceTable('topics')" onmousedown="b_press(this)" />
+								</div>
+							</div>
+						</div>
+						<div  class="optGrp" style="width: 15%">
+							<div class="optGrpTitle">
+								Book Translation
+							</div>
+							Start Page
+							<table border="0" style="table-layout:fixed; border:none; width:100%; text-align:center; border-spacing:1%; padding:0.3%; font:inherit;">
+								<tbody style="padding:inherit; font:inherit;">
+									<tr style="font:inherit; ;">
+										<td id="setDBPage1" class="fBSelected" style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setDBStartPage(1)">
+											1-2
+										</td>
+										<td id="setDBPage3" class="fBSelect"  style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setDBStartPage(3)">
+											3-4
+										</td>
+										<td id="setDBPage5" class="fBSelect"  style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setDBStartPage(5)">
+											5-6
+										</td>
+									</tr>
+									<tr  style="font:inherit; ">
+										<td  id="setDBPage7" class="fBSelect" style="width=40%; font:100% 'Nunito', sans-serif;" onclick="setDBStartPage(7)">
+											7-8
+										</td>
+										<td id="setDBPage9" class="fBSelect"  style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setDBStartPage(9)">
+											9-10
+										</td>
+										<td id="setDBPage11" class="fBSelect"  style="width=33%; font:100% 'Nunito', sans-serif;" onclick="setDBStartPage(11)">
+											11-12
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div style="position: absolute; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto; width: 7%; z-index: 200">
+							<img style="width: 100%;" src="images/buttons/close_button.png" onclick="optionsDiv('none')" onmousedown="b_press(this)" />
+						</div>
+					</div>
+
+				</div>
+
+
 
 				<table border="0" id="phonUSelect" style="table-layout:fixed; width:90%;  border: 0.3em ridge #7bd8e8; border-spacing: 0px; background:#7bd8e8; font:inherit; display:none; margin-bottom: 1%">
 					<tr style=" padding:0.2%; font: inherit">
@@ -357,36 +699,36 @@
 						</td>
 						<td style="padding:inherit;  text-align: center;">
 							<div style="position: relative;">
-								<img id="on_phon2" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon2" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon2"  src='images/buttons/b_phon2.png' style="width:100%;" onclick="selectPhonUnit('phon2')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;  text-align: center;">
 							<div style="position: relative;">
-								<img id="on_phon3" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon3" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon3"  src='images/buttons/b_phon3.png' style="width:100%;" onclick="selectPhonUnit('phon3')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon4" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon4" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon4"  src='images/buttons/b_phon4.png' style="width:100%;" onclick="selectPhonUnit('phon4')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon5" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon5" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon5"  src='images/buttons/b_phon5.png' style="width:100%;" onclick="selectPhonUnit('phon5')"/>
 							</div>
 						</td>
 						<td  rowspan="4" style="padding:inherit; font:inherit; width: 40%;">
-							<table border="0" style=" width: 95%; margin-top: 2%; margin-bottom:1%; margin-left:auto; margin-right: auto; font:inherit; background: #b8e4ec; border: thick ridge #7bd8e8">
+							<table border="0" style=" width: 95%; margin-top: 2%; margin-bottom:1%; margin-left:auto; margin-right: auto; font:inherit; background: #b8e4ec; border: 0.3em ridge #7bd8e8">
 									<tr style="height:60px;">
 										<td colspan="3" style="text-align: center; font:inherit; font-size: 150%">
 											Syllable Structure
 										</td>
 										<td style="text-align: center; ">
-											<img id="b_ex" onclick="newSyllable('ex')"  onmousedown="b_press('b_ex','down','65%')" onmouseup="b_press('b_ex','up','65%')" onmouseout="b_press('b_ex','out','65%')"  style="width:65%" src="images/buttons/b_example.png" />
+											<img id="b_ex" onclick="newSyllable('ex')"  onmousedown="b_press(this)" style="width:65%" src="images/buttons/b_example.png" />
 										</td>
 									</tr>
 									<tr>
@@ -399,19 +741,19 @@
 										<td style="width: 22%; text-align: center; font:inherit; font-weight:bold; background: #7bd8e8; border: solid #b8e4ec;">
 											Final
 										</td>
-										<td rowspan="2" style="background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; border-top: thick ridge #7bd8e8; border-left: thick ridge #7bd8e8; font: 280% 'Nunito', sans-serif; text-align: center">
+										<td rowspan="2" style="background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; border-top: 0.1em ridge #7bd8e8; border-left: 0.1em ridge #7bd8e8; font: inherit; font-size: 280%; text-align: center">
 											<span id="phonExample" style="vertical-align: 7%">sim</span>
 										</td>
 									</tr>
 									<tr>
 										<td align="center">
-											<img id="b_initC" onclick="iSet()"  onmousedown="b_press('b_initC','down','80%')" onmouseup="b_press('b_initC','up','80%')" onmouseout="b_press('b_initC','out','80%')"  style="width:80%;" src="images/buttons/b_all.png" />
+											<img id="b_initC" onclick="iSet()"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/b_all.png" />
 										</td>
 										<td align="center">
-											<img id="b_vowel" onclick="vSet()" onmousedown="b_press('b_vowel','down','80%')" onmouseup="b_press('b_vowel','up','80%')" onmouseout="b_press('b_vowel','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
+											<img id="b_vowel" onclick="vSet()" onmousedown="b_press(this)" style="width:80%" src="images/buttons/b_all.png" />
 										</td>
 										<td align="center">
-											<img id="b_finalC" onclick="fSet()" onmousedown="b_press('b_finalC','down','80%')" onmouseup="b_press('b_finalC','up','80%')" onmouseout="b_press('b_finalC','out','80%')"  style="width:80%" src="images/buttons/b_all.png" />
+											<img id="b_finalC" onclick="fSet()" onmousedown="b_press(this)" style="width:80%" src="images/buttons/b_all.png" />
 										</td>
 									</tr>
 								</table>
@@ -437,31 +779,31 @@
 					<tr style=" padding:0.2%; font: inherit">
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon6" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon6" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon6"  src='images/buttons/b_phon6.png' style="width:100%;" onclick="selectPhonUnit('phon6')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon7" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon7" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon7"  src='images/buttons/b_phon7.png' style="width:100%;" onclick="selectPhonUnit('phon7')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon8" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon8" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon8"  src='images/buttons/b_phon8.png' style="width:100%;" onclick="selectPhonUnit('phon8')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon9" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon9" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon9"  src='images/buttons/b_phon9.png' style="width:100%;" onclick="selectPhonUnit('phon9')"/>
 							</div>
 						</td>
 						<td style="padding:inherit;">
 							<div style="position: relative;">
-								<img id="on_phon10" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+								<img id="on_phon10" src="images/formatting/button_on.png" class="buttonOn"/>
 								<img id="b_phon10"  src='images/buttons/b_phon10.png' style="width:100%;" onclick="selectPhonUnit('phon10')"/>
 							</div>
 						</td>
@@ -486,60 +828,206 @@
 					</tr>
 				</table>
 
-				<div id="vocSelect" style="width: 95%; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8;">
-					<table style="table-layout:fixed; width: 75%; margin-bottom: 1em; margin-left: auto; margin-right: auto; font: inherit">
+				<table border="0"  id="numUSelect" style="height:15em; table-layout:fixed; width:90%; border: 0.3em ridge #7bd8e8; border-spacing: 0px; background:#7bd8e8; font:inherit; display:none; margin-bottom: 1%">
+					<tr style="height:1em; padding:0.2%; font: inherit">
+						<td style="vertical-align:top; padding:inherit;  text-align: center;">
+							<div style="position: relative;">
+								<img id="on_num1" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8;"/>
+								<img id="b_num1"  src='images/buttons/b_num1.png' style="width:94%; border:outset" onclick="selectNumUnit('num1')"/>
+							</div>
+						</td>
+						<td style="vertical-align:top; padding:inherit;  text-align: center;">
+							<div style="position: relative;">
+								<img id="on_num2" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_num2"  src='images/buttons/b_num2.png' style="width:100%;" onclick="selectNumUnit('num2')"/>
+							</div>
+						</td>
+						<td style="vertical-align:top; padding:inherit;  text-align: center;">
+							<div style="position: relative;">
+								<img id="on_num3" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_num3"  src='images/buttons/b_num3.png' style="width:100%;" onclick="selectNumUnit('num3')"/>
+							</div>
+						</td>
+						<td style="vertical-align:top; padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_num4" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_num4"  src='images/buttons/b_num4.png' style="width:100%;" onclick="selectNumUnit('num4')"/>
+							</div>
+						</td>
+						<td style="vertical-align:top; padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_num5" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_num5"  src='images/buttons/b_num5.png' style="width:100%;" onclick="selectNumUnit('num5')"/>
+							</div>
+						</td>
+						<td style="vertical-align:top; padding:inherit;">
+							<div style="position: relative;">
+								<img id="on_num6" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_num6"  src='images/buttons/b_num6.png' style="width:100%;" onclick="selectNumUnit('num6')"/>
+							</div>
+						</td>
+						<td id="opt_num1" colspan="2" rowspan="2" style="vertical-align:top; font: inherit; text-align: center; border: 0.3em ridge #7bd8e8; background: #b8e4ec">
+							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon1.png" style="width: 10%" /> Options</div>
+							<div>
+								<div style="float: left; width: 15%; height: 2.5em">
+									<img id="b_numOpZero" onclick="numOpSet('numOpZero')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+								</div>
+								<div style="text-align: left">Include Zero</div>
+							</div>
+							<div style="clear: left">
+								<div style="float: left; width: 15%; height: 2.5em">
+								<img id="b_numOp12" onclick="numOpSet('numOp12')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								</div>
+								<div style="text-align: left">Include 11 &amp; 12</div>
+							</div>
+						</td>
+
+						<td id="opt_num2" colspan="2" rowspan="2"  style="vertical-align:top; font: inherit; text-align: center; border: 0.3em ridge #7bd8e8; background: #b8e4ec; display: none">
+							<div style="font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon2.png" style="width: 10%" /> Options</div>
+							<div>
+								<div style="float: left; width: 15%; height: 2.5em">
+									<img id="b_numOpAll" onclick="numOpSet('numOpAll')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+								</div>
+								<div style="text-align: left">All Tens</div>
+							</div>
+							<div style="clear: left">
+								<div style="float: left; width: 15%; height: 2.5em">
+								<img id="b_numOpReg" onclick="numOpSet('numOpReg')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								</div>
+								<div style="text-align: left">Regular Tens Only</div>
+							</div>
+							<div style="clear: left">
+								<div style="float: left; width: 15%; height: 2.5em">
+								<img id="b_numOpIrreg" onclick="numOpSet('numOpIrreg')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								</div>
+								<div style="text-align: left">Irregular Tens Only</div>
+							</div>
+						</td>
+						<td id="opt_num3" colspan="2" rowspan="2"  style="vertical-align:top; font: inherit; text-align: center; border: 0.3em ridge #7bd8e8; background: #b8e4ec; display: none">
+							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon3.png" style="width: 10%" /> Options</div>
+							<p style="font-size: 1em">There are no options for this unit.</p>
+						</td>
+						<td id="opt_num4" colspan="2" rowspan="2"  style="vertical-align:top; font: inherit; text-align: center; border: 0.3em ridge #7bd8e8; background: #b8e4ec; display: none">
+							<div style="font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon4.png" style="width: 10%" /> Options</div>
+							<div>
+								<div style="float: left; width: 15%; height: 2.5em">
+									<img id="b_numOpAll2" onclick="numOpSet('numOpAll2')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+								</div>
+								<div style="text-align: left">All Teens</div>
+							</div>
+							<div style="clear: left">
+								<div style="float: left; width: 15%; height: 2.5em">
+								<img id="b_numOpReg2" onclick="numOpSet('numOpReg2')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								</div>
+								<div style="text-align: left">Regular Teens Only</div>
+							</div>
+							<div style="clear: left">
+								<div style="float: left; width: 15%; height: 2.5em">
+								<img id="b_numOpIrreg2" onclick="numOpSet('numOpIrreg2')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								</div>
+								<div style="text-align: left">Irregular Teens Only</div>
+							</div>
+						</td>
+						<td  id="opt_num5" colspan="2" rowspan="2"  style="vertical-align:top; font: inherit; text-align: center; border: 0.3em ridge #7bd8e8; background: #b8e4ec; display: none">
+							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon5.png" style="width: 10%" /> Options</div>
+							<div>
+								<div style="float: left; width: 15%; height: 2.5em">
+									<img id="b_numOp0_9" onclick="numOpSet('numOp0_9')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+								</div>
+								<div style="text-align: left">Include 0-9</div>
+							</div>
+						</td>
+						<td id="opt_num6" colspan="2" rowspan="2"  style="vertical-align:top; font: inherit; text-align: center; border: 0.3em ridge #7bd8e8; background: #b8e4ec; display: none">
+							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon6.png" style="width: 10%" /> Options</div>
+							<div>
+								<div style="float: left; width: 15%; height: 2.5em">
+									<img id="b_numOp0_99" onclick="numOpSet('numOp0_99')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+								</div>
+								<div style="text-align: left">Include 0-99</div>
+							</div>
+						</td>
+					</tr>
+					<tr style="padding:0.2%;">
+						<td style="vertical-align:top; font: inherit; text-align: center">
+							Numbers Unit <img src="images/labels/l_phon1.png" style="width: 20%;"  />
+						</td>
+						<td style="vertical-align:top; font: inherit; text-align: center">
+							Numbers Unit <img src="images/labels/l_phon2.png" style="width: 20%" />
+						</td>
+						<td style="vertical-align:top; font: inherit; text-align: center">
+							Numbers Unit <img src="images/labels/l_phon3.png" style="width: 20%" />
+						</td>
+						<td style="vertical-align:top; font: inherit; text-align: center">
+							Numbers Unit <img src="images/labels/l_phon4.png" style="width: 20%" />
+						</td>
+						<td style="vertical-align:top; font: inherit; text-align: center">
+							Numbers Unit <img src="images/labels/l_phon5.png" style="width: 20%" />
+						</td>
+						<td style="vertical-align:top; font: inherit; text-align: center">
+							Numbers Unit <img src="images/labels/l_phon6.png" style="width: 20%" />
+						</td>
+					</tr>
+
+					<tr style="padding:0.2%">
+
+					</tr>
+
+				</table>
+
+				<div id="vocSelect" style="width: 95%; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8; font: inherit">
+					<table style="table-layout:fixed; width: 75%; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; font: inherit; font-size: 80%">
 						<tr>
-							<td colspan="8" style="font:inherit; font-size:120%; font-weight: bold; padding-bottom: 0px;  text-align: center">
+							<td colspan="8" style="font:inherit; font-size:160%; font-weight: bold; padding-bottom: 0px;  text-align: center">
 								Levels
 							</td>
 						</tr>
-						<tr>
-							<td style="padding-top: 0px">
-								<div style="position: relative;">
-									<img id="on_K2" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_K2" style="width:100%; " onclick="selectLev('K2')"  src="images/buttons/b_K2.png" />
+						<tr >
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_K2" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_K2" style="width:100%; font: inherit" onclick="selectLev('K2','button')"  src="images/buttons/b_K2.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_P1" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_P1" style="width:100%" onclick="selectLev('P1')"  src="images/buttons/b_P1.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_P1" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_P1" style="width:100%; font: inherit" onclick="selectLev('P1','button')"  src="images/buttons/b_P1.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_P2" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_P2"  style="width:100%" onclick="selectLev('P2')"  src="images/buttons/b_P2.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_P2" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_P2"  style="width:100%; font: inherit" onclick="selectLev('P2','button')"  src="images/buttons/b_P2.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_P3" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_P3"  style="width:100%" onclick="selectLev('P3')"  src="images/buttons/b_P3.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_P3" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_P3"  style="width:100%; font: inherit" onclick="selectLev('P3','button')"  src="images/buttons/b_P3.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_P4" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_P4"  style="width:100%" onclick="selectLev('P4')"  src="images/buttons/b_P4.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_P4" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_P4"  style="width:100%; font: inherit" onclick="selectLev('P4','button')"  src="images/buttons/b_P4.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_P5" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_P5"  style="width:100%" onclick="selectLev('P5')"  src="images/buttons/b_P5.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_P5" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_P5"  style="width:100%" onclick="selectLev('P5','button')"  src="images/buttons/b_P5.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_P6" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_P6"  style="width:100%" onclick="selectLev('P6')"  src="images/buttons/b_P6.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_P6" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_P6"  style="width:100%; font: inherit" onclick="selectLev('P6','button')"  src="images/buttons/b_P6.png" />
 								</div>
 							</td>
-							<td>
-								<div style="position: relative;">
-									<img id="on_scratchpad" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-									<img id="b_scratchpad"  style="width:100%" onclick="selectLev('scratchpad')"  src="images/buttons/b_Scratch.png" />
+							<td style="padding-top: 0px; font: inherit">
+								<div style="position: relative; font: inherit;">
+									<img id="on_Scratch" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_Scratch"  style="width:100%; font: inherit" onclick="selectLev('Scratch','button')"  src="images/buttons/b_Scratch.png" />
 								</div>
 							</td>
 						</tr>
@@ -549,107 +1037,139 @@
 					<div style="width: 86%; float: right; background: inherit; ">
 						<table id="genVocab" style="table-layout:fixed; width:100%; padding: 0 0.4% 0.4% 0.4%; border-spacing:0px; font: inherit">
 							<tr>
-								<td colspan="8" style="font:inherit; font-size: 120%; font-weight: bold; text-align: center; padding-bottom: 0px;">
+								<td rowspan="2" style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_multi" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8;"/>
+										<img id="b_multi"  style="width:94%; border:outset " onclick="selectTopic('multi','button')"  src="images/buttons/multi.jpg" />
+									</div>
+									<img id="b_comCats_select" src='images/buttons/select_button.png' style="width:60%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="comCatsSelect()"/>
+								</td>
+								<td colspan="7" style="font:inherit; font-size: 120%; font-weight: bold; text-align: center; padding-bottom: 0px;">
 									General Vocabulary Topics
 								</td>
 							</tr>
 							<tr style="padding:0.2%; padding-top: 0px">
-								<td style="padding:inherit; text-align: center;">
-									<div style="position: relative;">
-										<img id="on_all" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8;"/>
-										<img id="b_all"  style="width:94%; border:outset " onclick="selectCat('all')"  src="images/buttons/all.jpg" />
-									</div>
-								</td>
 								<td style="padding:inherit;">
-									<div style="position: relative;">
-										<img id="on_actions" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_actions"  style="width:100%; " onclick="selectCat('actions')"  src="images/buttons/actions.jpg" />
+									<div style="position: relative; left: 0; top: 0">
+										<img id="ch_actions" onclick="modComCats('actions')" class="topicCheckbox" src="images/buttons/yes_button.png">
+
+										<img id="in_actions" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_actions" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_actions"  style="width:100%; " onclick="selectTopic('actions','button')"  src="images/buttons/actions.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_animals" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_animals"  style="width:100%; " onclick="selectCat('animals')"  src="images/buttons/animals.jpg" />
+										<img id="ch_animals" onclick="modComCats('animals')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_animals" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_animals" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_animals"  style="width:100%; " onclick="selectTopic('animals','button')"  src="images/buttons/animals.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_clothes" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_clothes"  style="width:100%; " onclick="selectCat('clothes')"  src="images/buttons/clothes.jpg" />
+										<img id="ch_clothes" onclick="modComCats('clothes')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_clothes" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_clothes" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_clothes"  style="width:100%; " onclick="selectTopic('clothes','button')"  src="images/buttons/clothes.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_describing" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_describing"  style="width:100%; " onclick="selectCat('describing')"  src="images/buttons/describing.jpg" />
+										<img id="ch_describing" onclick="modComCats('describing')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_describing" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_describing" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_describing"  style="width:100%; " onclick="selectTopic('describing','button')"  src="images/buttons/describing.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_food" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_food"  style="width:100%; " onclick="selectCat('food')"  src="images/buttons/food.jpg" />
+										<img id="ch_food" onclick="modComCats('food')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_food" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_food" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_food"  style="width:100%; " onclick="selectTopic('food','button')"  src="images/buttons/food.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_free time" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_free time"  style="width:100%; " onclick="selectCat('free time')"  src="images/buttons/free time.jpg" />
+										<img id="ch_free time" onclick="modComCats('free time')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_free time" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_free time" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_free time"  style="width:100%; " onclick="selectTopic('free time','button')"  src="images/buttons/free time.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_grammar" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_grammar"  style="width:100%; " onclick="selectCat('grammar')"  src="images/buttons/grammar.jpg" />
+										<img id="ch_grammar" onclick="modComCats('grammar')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_grammar" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_grammar" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_grammar"  style="width:100%; " onclick="selectTopic('grammar','button')"  src="images/buttons/grammar.jpg" />
 									</div>
 								</td>
 							</tr>
 							<tr style="padding:0.2%;">
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_home" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_home"  style="width:100%; " onclick="selectCat('home')"  src="images/buttons/home.jpg" />
+										<img id="ch_home" onclick="modComCats('home')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_home" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_home" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_home"  style="width:100%; " onclick="selectTopic('home','button')"  src="images/buttons/home.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_occupations" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_occupations"  style="width:100%; " onclick="selectCat('occupations')"  src="images/buttons/occupations.jpg" />
+										<img id="ch_occupations" onclick="modComCats('occupations')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_occupations" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_occupations" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_occupations"  style="width:100%; " onclick="selectTopic('occupations','button')"  src="images/buttons/occupations.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_body" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_body"  style="width:100%; " onclick="selectCat('body')"  src="images/buttons/body.jpg" />
+										<img id="ch_body" onclick="modComCats('body')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_body" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_body" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_body"  style="width:100%; " onclick="selectTopic('body','button')"  src="images/buttons/body.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_people" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_people"  style="width:100%; " onclick="selectCat('people')"  src="images/buttons/people.jpg" />
+										<img id="ch_people" onclick="modComCats('people')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_people" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_people" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_people"  style="width:100%; " onclick="selectTopic('people','button')"  src="images/buttons/people.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_places and transport" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_places and transport"  style="width:100%; " onclick="selectCat('places and transport')"  src="images/buttons/places and transport.jpg" />
+										<img id="ch_places and transport" onclick="modComCats('places and transport')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_places and transport" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_places and transport" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_places and transport"  style="width:100%; " onclick="selectTopic('places and transport','button')"  src="images/buttons/places and transport.jpg" />
 									</div>
 								</td>
 									<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_school" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_school"  style="width:100%; " onclick="selectCat('school')"  src="images/buttons/school.jpg" />
+										<img id="ch_school" onclick="modComCats('school')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_school" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_school" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_school"  style="width:100%; " onclick="selectTopic('school','button')"  src="images/buttons/school.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_time" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_time"  style="width:100%; " onclick="selectCat('time')"  src="images/buttons/time.jpg" />
+										<img id="ch_time" onclick="modComCats('time')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_time" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_time" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_time"  style="width:100%; " onclick="selectTopic('time','button')"  src="images/buttons/time.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_weather" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_weather"  style="width:100%; " onclick="selectCat('weather')"  src="images/buttons/weather.jpg" />
+										<img id="ch_weather" onclick="modComCats('weather')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_weather" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_weather" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_weather"  style="width:100%; " onclick="selectTopic('weather','button')"  src="images/buttons/weather.jpg" />
 									</div>
 								</td>
 							</tr>
@@ -663,70 +1183,91 @@
 							<tr style="padding:0.2%; padding-top: 0px">
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_days" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_days"  style="width:100%;" onclick="selectCat('days')"  src="images/buttons/days.jpg" />
+										<img id="on_asean" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_asean"  style="width:100%;" onclick="selectTopic('asean','button')"  src="images/buttons/asean.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_asean" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
-										<img id="b_asean"  style="width:100%;" onclick="selectCat('asean')"  src="images/buttons/asean.jpg" />
+										<img id="on_days" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_days"  style="width:100%;" onclick="selectTopic('days','button')"  src="images/buttons/days.jpg" />
 									</div>
 								</td>
-								<td style="padding:inherit;">
-
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_months" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_months"  style="width:100%;" onclick="selectTopic('months','button')"  src="images/buttons/months.jpg" />
+									</div>
 								</td>
-								<td style="padding:inherit;">
-
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_stationery" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_stationery"  style="width:100%;" onclick="selectTopic('stationery','button')"  src="images/buttons/stationery.jpg" />
+									</div>
 								</td>
-								<td style="padding:inherit;">
-
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_beach" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_beach"  style="width:100%;" onclick="selectTopic('beach','button')"  src="images/buttons/beach.jpg" />
+									</div>
 								</td>
-								<td style="padding:inherit;">
-
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_easy" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_easy"  style="width:100%;" onclick="selectTopic('easy','button')"  src="images/buttons/easy.jpg" />
+									</div>
 								</td>
 							</tr>
 							<tr>
-								<td>
-									<img style="width:100%; "  src="images/formatting/content_button_spacer.png" />
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_finding game" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_finding game"  style="width:100%;" onclick="selectTopic('finding game','button')"  src="images/buttons/finding game.jpg" />
+									</div>
+								</td>
+								<td style="padding:inherit; text-align: center;">
+									<div style="position: relative;">
+										<img id="on_location" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_location"  style="width:100%;" onclick="selectTopic('location','button')"  src="images/buttons/location.jpg" />
+									</div>
 								</td>
 							</tr>
 						</table>
 						<table id="dotBen" style="table-layout:fixed; width:100%; padding: 0 0.4% 0.4% 0.4%; border-spacing:0px; font: inherit; display: none">
 							<tr>
 								<td colspan="8" style="font:inherit; font-size: 120%; font-weight: bold; text-align: center; padding-bottom: 0px;">
-									Vocabulary from Dot and Ben Books
+									Dot and Ben Books
 								</td>
 							</tr>
 							<tr style="background:#7bd8e8; padding:0.2%; font: inherit;">
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_d_B_1" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="on_d_B_1" src="images/formatting/button_on.png" class="buttonOn"/>
 										<img id="b_d_B_1"  style="width:100%; " onclick="selectDotandBen('d_B_1')"  src="images/buttons/bc_d_B_1.jpg" />
 									</div>
 								</td>
 
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_d_B_2" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="on_d_B_2" src="images/formatting/button_on.png" class="buttonOn"/>
 										<img id="b_d_B_2"  style="width:100%; " onclick="selectDotandBen('d_B_2')"  src="images/buttons/bc_d_B_2.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_d_B_3" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="on_d_B_3" src="images/formatting/button_on.png" class="buttonOn"/>
 										<img id="b_d_B_3"  style="width:100%; " onclick="selectDotandBen('d_B_3')"  src="images/buttons/bc_d_B_3.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_d_B_4" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="on_d_B_4" src="images/formatting/button_on.png" class="buttonOn"/>
 										<img id="b_d_B_4"  style="width:100%; " onclick="selectDotandBen('d_B_4')"  src="images/buttons/bc_d_B_4.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="on_d_B_5" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8; display:none"/>
+										<img id="on_d_B_5" src="images/formatting/button_on.png" class="buttonOn"/>
 										<img id="b_d_B_5"  style="width:100%; " onclick="selectDotandBen('d_B_5')"  src="images/buttons/bc_d_B_5.jpg" />
 									</div>
 								</td>
@@ -752,13 +1293,13 @@
 							Topic Lists
 						</div>
 						<div style="height: 2.3em; text-align: center">
-							<img id="b_genVocab" src="images/buttons/bs_genVocab_on.png" style="width: 75%; border: outset #5bc8e8" onclick="selectTopicList('genVocab')"/>
+							<img id="b_genVocab" src="images/buttons/bs_genVocab_on.png" style="width: 75%; border: outset #5bc8e8" onclick="selectTopicList('genVocab','button')"/>
 						</div>
 							<div style="height: 2.3em; text-align: center">
-						<img id="b_specVocab" src="images/buttons/bs_specVocab_off.png" style="width: 80%"  onclick="selectTopicList('specVocab')"/>
+						<img id="b_specVocab" src="images/buttons/bs_specVocab_off.png" style="width: 80%"  onclick="selectTopicList('specVocab','button')"/>
 						</div>
 						<div style="height: 2.3em; text-align: center">
-							<img id="b_dotBen" src="images/buttons/bs_dotBen_off.png" style="width: 80%" onclick="selectTopicList('dotBen')"/>
+							<img id="b_dotBen" src="images/buttons/bs_dotBen_off.png" style="width: 80%" onclick="selectTopicList('dotBen','button')"/>
 						</div>
 					</div>
 					<div style="clear: both">
@@ -800,8 +1341,8 @@
 						</td>
 					</tr>
 				</table>
-				<div style="position: absolute; z-index: 20; width: 100%; bottom: 0.5em; font:inherit">
-					<img id="b_contentOK" onclick="categoryDiv('none')" onmousedown="b_press('b_contentOK','down','5%')" onmouseup="b_press('b_contentOK','up','5%')" onmouseout="b_press('b_contentOK','out','5%')"  src="images/buttons/OK.png" style="width:5%; " />
+				<div style="position: absolute; z-index: 20; width: 100%; bottom: 0.1em; font:inherit;">
+					<img id="b_contentOK" onclick="categoryDiv('none')" onmousedown="b_press(this)" src="images/buttons/OK.png" style="width:5%; " />
 				</div>
 			</div>
 
@@ -818,7 +1359,9 @@
 				<table border="0" style="table-layout:fixed; margin-left: 18%; width:62%; border:none; font:bold 110% 'Nunito', sans-serif;"  >
 					<tbody>
 						<tr>
-							<td colspan="2" style="font:inherit"><div style="width:85%; margin-left:auto; margin-right:auto; margin-bottom: 0.2em; text-align:center; background:black; border:0.13em ridge #393; color:white; font:75% 'Nunito', sans-serif;" id="vocdisplay">
+							<td colspan="2" style="font:inherit">
+								<div style="width:85%; margin-left:auto; margin-right:auto; margin-bottom: 0.2em; text-align:center; background:black; border:0.13em ridge #393; color:white; font:75% 'Nunito', sans-serif;" id="vocdisplay">
+									&nbsp;
 								</div>
 							</td>
 						</tr>
@@ -903,16 +1446,303 @@
 				<img src="images/labels/host_logo.png" style="position: absolute; width:10%; right: 1%; top:7%;" />
 			</div>
 
-			<div id="imageDiv" style="background: white; width: 100%; height: 85%; text-align: left; display: none;" >
-				<img id="mainImage" src="images/vocab/titles/all.jpg" alt="Loading. Please wait ..." style="border-style: none; width: 64%; margin-left: 16.6%; margin-top: 2.5%;"  />
-			</div>
+			<div id="imageDiv" style="background: white; width: 100%; height: 85%; text-align: left; display: none" >
+				<div  id="livesDispTop" style="position:absolute; width:53%; height: 1.5em; margin-left:7.5em; margin-top: 0.2em; text-align:center; background:white; border:0.13em ridge #393; color:white; font:75% 'Nunito', sans-serif; display: none">
+					<img id="lifeT10"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT9"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT8"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT7"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT6"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT5"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT4"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT3"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT2"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+					<img id="lifeT1"  src='images/labels/lives_rem.png' style="width:8%; margin-top:0.07em" />
+				</div>
 
+				<div style="position:absolute; width: 60%; margin-left: 18.3%; margin-top: 5%">
+					<img id="book_overlay" src="images/formatting/d_B_spacer.png" style="width: 100%;display: none"/>
+				</div>
+				<div style="position:absolute; width: 60%; margin-left: 18.3%; margin-top: 5%">
+					<div id="d_B_Score" style="text-align: right; padding-right:2em; padding-top:7em; display: none">
+
+					</div>
+				</div>
+				<div id="voc_tab_div" style="position:absolute; width: 70%; height: 10.73em; margin-left: 15%; margin-top: 1%; overflow: auto">
+					<table  id="voc_tab" style="width:100%; table-layout:fixed; display:none">
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+
+				<div id="lev_tab_div" style="position:absolute; margin-left: 3%; bottom:16.6%; width: 70%; height: 5.2em; padding-top: 0.1em; padding-left: 0.1%;  background:  #7bd8e8; border: 0.3em ridge  #7bd8e8; font: inherit; font-size: 30%; display:none">
+
+					<div style="position: relative; float: left; width: 13.49%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_K2" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_K2" style="width:100%; " onclick="selectUserLev('K2')"  src="images/buttons/b_K2.png" />
+					</div>
+
+					<div style="position: relative; float: left; width: 13.48%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_P1" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_P1" style="width:100%" onclick="selectUserLev('P1')"  src="images/buttons/b_P1.png" />
+					</div>
+
+					<div style="position: relative; float: left; width: 13.49%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_P2" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_P2"  style="width:100%" onclick="selectUserLev('P2')"  src="images/buttons/b_P2.png" />
+					</div>
+
+					<div style="position: relative; float: left; width: 13.48%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_P3" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_P3"  style="width:100%" onclick="selectUserLev('P3')"  src="images/buttons/b_P3.png" />
+					</div>
+
+					<div style="position: relative; float: left; width: 13.49%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_P4" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_P4"  style="width:100%" onclick="selectUserLev('P4')"  src="images/buttons/b_P4.png" />
+					</div>
+
+					<div style="position: relative; float: left; width: 13.48%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_P5" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_P5"  style="width:100%" onclick="selectUserLev('P5')"  src="images/buttons/b_P5.png" />
+					</div>
+
+					<div style="position: relative; float: left; width: 13.49%; margin-left: 0.4%; margin-right: 0.4%; text-align: center">
+						<img id="lt_on_P6" src="images/formatting/button_on.png" class="buttonOn"/>
+						<img id="lt_b_P6"  style="width:100%" onclick="selectUserLev('P6')"  src="images/buttons/b_P6.png" />
+					</div>
+
+				</div>
+
+				<img id="mainImage" src="images/vocab/titles/multi.jpg" alt="Loading. Please wait ..."  style="width: 60%; margin-left: 18.3%; margin-top: 5%; display:none" />
+			</div>
+				<img id="bingo_overlay" src="images/labels/bingo11win.png" style="position:absolute; z-index: 10; width:60%; height: 9.7em; margin-left: 19.8%; margin-top: 4.9%; display: none;"/>
 			<div id="phonDisplay" align="center" style="height:85% ; background-image: url('images/formatting/graphemes_back.jpg'); background-size:100% 100%; font: 'Nunito', sans-serif; font-size:300%; display: none" >
 				<div style="padding-top: 18%">
 					Phonics Unit
 					<img src='images/labels/U1.png' style="width:11.5%; vertical-align: -2%;"/>
 				</div>
 			</div>
+
+			<div id="bingoDisplay" align="center" style="height:85% ; background-color:white; background-size:100% 100%; font: inherit; display: none" >
+				<table style="width: 60%; font:inherit">
+					<tbody style="font:inherit; font-size:80%">
+						<tr>
+							<td colspan="5" style="font:inherit; height: 2em">
+								&nbsp;
+							</td>
+						</tr>
+						<tr style="height: 2em">
+							<td id="bing0Cell" style=" background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font:inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing0')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing0X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing0">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing1Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing1')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing1X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing1">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing2Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing2')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing2X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing2">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing3Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing3')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing3X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing3">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing4Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing4')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing4X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing4">
+								&nbsp;
+								</div>
+							</td>
+						</tr>
+						<tr style="height: 2em;">
+							<td id="bing5Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing5')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing5X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing5">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing6Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing6')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing6X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing6">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing7Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing7')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing7X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing7">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing8Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing8')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing8X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing8">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing9Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing9')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing9X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing9">
+								&nbsp;
+								</div>
+							</td>
+						</tr>
+						<tr style="height: 2em">
+							<td id="bing10Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing10')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing10X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing10">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing11Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing11')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing11X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing11">
+								&nbsp;
+								</div>
+							</td>
+							<td style="text-align: center; background-image: url('images/labels/host_logo_wide.png');background-size:100% 100%;">
+
+							</td>
+							<td id="bing12Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing12')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing12X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing12">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing13Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing13')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing13X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing13">
+								&nbsp;
+								</div>
+							</td>
+						</tr>
+						<tr style="height: 2em">
+							<td id="bing14Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing14')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing14X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing14">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing15Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing15')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing15X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing15">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing16Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing16')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing16X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing16">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing17Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing17')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing17X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing17">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing18Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing18')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing18X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing18">
+								&nbsp;
+								</div>
+							</td>
+						</tr>
+						<tr style="height: 2em">
+							<td id="bing19Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing19')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing19X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing19">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing20Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing20')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing20X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing20">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing21Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing21')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing21X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing21">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing22Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing22')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing22X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing22">
+								&nbsp;
+								</div>
+							</td>
+							<td id="bing23Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing23')">
+								<div style="position: relative; text-align: left; font: inherit">
+									<img id="bing23X" src='images/formatting/30clear_spacer.png' style="position:absolute; left:0; top:-0.2em; height: 1.8em; width:100%;"  />
+								</div>
+								<div id="bing23">
+								&nbsp;
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+
 
 
 
@@ -921,45 +1751,179 @@
 			<!-- ========== -->
 
 
-			<table border="0" style="width: 100%;padding-top: 0.16em; padding-bottom: 0.14em; background-image: url('images/formatting/bg_panel.jpg'); background-size: 100%">
-				<tbody valign="center" align="center">
-					<tr style="height:1.67em">
+			<table border="0" style="width: 100%;padding-top: 0.16em; padding-bottom: 0.14em; background-image: url('images/formatting/bg_panel.jpg'); background-size: 100%; font: inherit">
+				<tbody valign="center" align="center" style="font: inherit">
+					<tr style="height:1.65em; font: inherit">
 						<td style="width: 0.5%">
 							&nbsp;
 						</td>
 						<td style="width: 6.41%">
-							<img  id="b_help" src="images/buttons/help button.png" style="width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press('b_help','down','100%')" onmouseup="b_press('b_help','up','100%')" onmouseout="b_press('b_help','out','100%')" onclick="showWelcome()" />
-							<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto; display: none" onmousedown="b_press('b_reset','down','100%')" onmouseup="b_press('b_reset','up','100%')" onmouseout="b_press('b_reset','out','100%')" onclick="resetScore()" />
+							<img  id="b_help" src="images/buttons/help button.png" style="width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="showWelcome()" />
+							<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto; display: none" onmousedown="b_press(this)" onclick="resetScore(this)" />
 						</td>
 						<td style="width:3.64%">
 							&nbsp;
 						</td>
-						<td style="width:18.2%">
-							<div style=" background:black; border: 0.5em ridge #5bc8e8;">
-							<img id="panelAct" style="width: 30%; padding: 0.35em 0.35em 0.2em 0.1em" src="images/buttons/ba_read_choose_off.png" />
-							<img id="panelLev" style="width: 30%; padding: 0.35em 0.1em 0.2em 0.1em" src="images/buttons/b_K2.png" />
-							<img id="panelCont" style="width: 30%; padding: 0.35em 0.1em 0.2em 0.3em" src="images/buttons/all.jpg"/>
-							</div>
+						<td style="width:18.2%; font: inherit; font-size: 50%;">
+							<table style="background:black; border: 0.1em ridge #5bc8e8; font:inherit; margin-bottom: 0.1em">
+								<tr>
+									<td style="font: inherit; ">
+										<div style="height: 1.8em">
+											<img id="panelAct" style="width: 3em; " src="images/buttons/ba_read_choose_off.png" />
+										</div>
+									</td>
+									<td style="font: inherit">
+										<div style="height: 1.8em">
+											<img id="panelLev" style="width: 3em" src="images/buttons/b_K2.png" />
+										</div>
+									</td>
+									<td style="font: inherit">
+										<div style="height: 1.8em">
+											<img id="panelCont" style="width:3em" src="images/buttons/multi.jpg"/>
+										</div>
+									</td>
+								</tr>
+							</table>
 						</td>
 						<td id="controls_central" style="width: 40.5%">
-							<img id="b_start" style="width: 27.2%;  margin-left:auto; margin-right:auto" src="images/buttons/start_button.png" onmousedown="b_press('b_start','down','27.2%')" onmouseup="b_press('b_start','up','27.2%')" onmouseout="b_press('b_start','out','27.2%')" onclick="activity('start')" />
+							<img id="b_start" style="width: 27.2%;  margin-left:auto; margin-right:auto" src="images/buttons/start_button.png" onmousedown="b_press(this)" onclick="activity('start')" />
 							<img id="finishedButton" src='images/buttons/finished_button.png' alt="Finished!" style="width:45.14%; display: none" />
-							<img id="b_replay" style="width:19%; display:none; " src='images/buttons/replay_button.png'	onmousedown="b_press('b_replay','down','19%')" onmouseup="b_press('b_replay','up','19%')" onmouseout="b_press('b_replay','out','19%')" onclick="playVocab()" />
+							<img id="b_replay" style="width:19%; display:none; " src='images/buttons/replay_button.png'	onmousedown="b_press(this)" onclick="playVocab()" />
+						</td>
+						<td id="order_cell" style="width:28.5%; display: none">
+							<img id="orderButton"	style="width:40%;" src='images/buttons/random_button.png' onmousedown="b_press(this)" onclick="activity('random')"/>
+						</td>
+						<td id="voc_choice_controls" style="width: 56.13%; font:inherit; display: none">
+							<div style=" background-color:#7bd8e8;  border: 0.2em ridge #5bc8e8; height:4.5em; margin-left:2em; margin-right: 2em; margin-bottom: 0.1em; font:inherit; font-size: 30%">
+								<div class="userSetupGroup" style="width: 10%; background: none; border: none">
+									<div style="position:relative; height: 100%; font:inherit">
+										<div class=userSetupButtonDiv style="bottom: -0.1em">
+											<img id="b_vc_info"	style="width:90%;" src='images/buttons/help button.png' onmousedown="b_press(this)" onclick="setMsg('u_c','User Settings Information')"/>
+										</div>
+									</div>
+
+								</div>
+
+
+
+								<div class="userSetupGroup" style="width: 30%">
+									<div style="width: 100%; height: 50%; margin-top: 0.2em; font: inherit; font-size: 120%; font-weight: bold; color: black; ">
+										Display
+									</div>
+									<div style="position:relative; float:left; height: 50%; width: 50%;">
+										<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
+											<img id="b_show_all"	style="width:90%" src='images/buttons/show_all.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('show_all')"/>
+										</div>
+									</div>
+									<div style="position:relative; float:left; height: 50%; width: 50%;">
+										<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
+											<img id="b_show_selected"	style="width:90%" src='images/buttons/show_selected.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('show_selected')"/>
+										</div>
+									</div>
+								</div>
+								<div style="width: 16.5%; float:left; height:100%; display:none">
+									<div style="position:relative; height: 50%; ">
+										<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
+
+										</div>
+									</div>
+								</div>
+								<div class="userSetupGroup">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_select_all"	style="width:79.4%;" src='images/buttons/select_all.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('select_all')"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_clear_all"	style="width:79.4%" src='images/buttons/clear_all.png' onmousedown="b_press(this)" onclick="adjustUserTopics('','clear')"/>
+										</div>
+									</div>
+								</div>
+
+								<div class="userSetupGroup">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_reset_to_default" style="width:79.4%" src='images/buttons/reset_to_default.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('init')"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<input type="file" id="reset_topic" onchange="loadSetup(this)" style="display: none">
+											<img id="b_reset_to_saved" style="width:79.4%" src='images/buttons/reset_to_saved.png' onmousedown="b_press(this)" onclick="loadSetup(this)"/>
+										</div>
+									</div>
+								</div>
+								<div id="save_load_grp" class="userSetupGroup">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_save"	style="width:79.4%" src='images/buttons/save_all.png' onmousedown="b_press(this)" onclick="saveSetup()"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<input type="file" id="reset_all" onchange="loadSetup(this)" style="display: none">
+											<img id="b_reset_all" style="width:79.4%" src='images/buttons/load_all.png' onmousedown="b_press(this)" onclick="loadSetup(this)"/>
+										</div>
+									</div>
+								</div>
+								<div id="topic_clone_grp" class="userSetupGroup" style="display: none">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_select_topic"	style="width:79.4%" src='images/buttons/select_topic.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('topics')"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_clone_topic"	style="width:79.4%" src='images/buttons/clone_topic.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('clone_topic')"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+
+						<td id="hide_cell" style="width:12%; text-align: left; font: inherit; font-size: 18%; display: none">
+							<div style="background-color:black; color: white; border: 0.35em ridge #5bc8e8; margin-bottom: 0.15em; padding: 0.2em 0 0.1em 1em">
+								<div style="height: 2.4em; font: inherit;">
+									<div style="width: 4em; float: left">
+										<img id="showAllButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/yes_button.png' onmousedown="b_press(this)" onclick="activity('showBoth')"/>
+									</div>
+									<div style="float: left; font: inherit;font-size: 1.7em">
+										Show All
+									</div>
+								</div>
+								<div  style="height: 2.4em; ">
+									<div style="width: 4em; float: left">
+										<img id="hideImgButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/no_button.png' onmousedown="b_press(this)" onclick="activity('hideImg')"/>
+									</div>
+									<div style="float: left; font: inherit; font-size: 1.7em">
+										Hide Images
+									</div>
+								</div>
+								<div style="height: 2.4em;">
+									<div style="width: 4em; float: left">
+										<img id="hideTxtButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/no_button.png' onmousedown="b_press(this)" onclick="activity('hideTxt')"/>
+									</div>
+									<div style="float: left; font: inherit; font-size: 1.7em">
+										Hide Text
+									</div>
+								</div>
+							</div>
 						</td>
 						<td id="no_cell" style="width:13.5%; display: none">
-							<img style="width:48.3%;" src='images//buttons/no_button.png' id="noButton"	onmousedown="b_press('noButton','down','48.3%')" onmouseup="b_press('noButton','up','48.3%')" onmouseout="b_press('noButton','out','48.3%')" onclick="activity('no')"/>
+							<img id="noButton"	style="width:48.3%;" src='images/buttons/no_button.png' onmousedown="b_press(this)" onclick="activity('no')"/>
 						</td>
 						<td id="clear_cell" style="display:none; width:13.5%">
-							<img id="clearButton" src="images/buttons/clear.png" style="width: 65%" onmousedown="b_press('clearButton','down','65%')" onmouseup="b_press('clearButton','up','65%')" onmouseout="b_press('clearButton','out','65%')" onclick="activity('clear')" />
+							<img id="clearButton" src="images/buttons/clear.png" style="width: 65%" onmousedown="b_press(this)" onclick="activity('clear')" />
 						</td>
 						<td id="yes_cell" style="display:none; width:13.5%">
-							<img id="yesButton" style="width:48.3%" src='images/buttons/yes_button.png' onmousedown="b_press('yesButton','down','48.3%')" onmouseup="b_press('yesButton','up','48.3%')" onmouseout="b_press('yesButton','out','48.3%')" onclick="activity('yes')"/>
+							<img id="yesButton" style="width:48.3%" src='images/buttons/yes_button.png' onmousedown="b_press(this)" onclick="activity('yes')"/>
 						</td>
-						<td style="width:15.63%">
+						<td id="controls_spacer" style="width:15.63%">
 							&nbsp;
 						</td>
 						<td style="width: 13.62%">
-							<img id="b_content" src="images/buttons/content_button.png" style="width:100%" onmousedown="b_press('b_content','down','100%')" onmouseup="b_press('b_content','up','100%')" onmouseout="b_press('b_content','out','100%')"	onclick="categoryDiv('block')"/>
+							<img id="b_content" src="images/buttons/content_button.png" style="width:100%" onmousedown="b_press(this)" onclick="categoryDiv('block')"/>
 						</td>
 						<td style="0.5%">
 							&nbsp;

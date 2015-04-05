@@ -69,32 +69,6 @@ input[type="image"]:-moz-focusring {outline:none;}
 
 /* ID Styles */
 
-.choiceCell {
-	font:bold 65% 'Nunito',sans-serif;
-	text-align:center;
-	color: #000;
-	display: block;
-	background: #fff;
-	border: 0.1em ridge #393;
-	cursor: pointer;
-  }
-
-.choiceCell div:hover {
-  background: #339933;
-  display: block;
-  color:#ff6600;
-}
-
-.choiceCellFB {
-	font:bold 65% 'Nunito',sans-serif;
-	text-align:center;
-	color: #000;
-	display: block;
-	background: #f60;
-	border: 0.1em ridge #f60;
-	cursor: pointer;
-  }
-
 #taglineEn {
   font: 7pt Verdana, Arial, Helvetica, sans-serif;
   color: #33ffcc;
@@ -332,8 +306,112 @@ input[type="image"]:-moz-focusring {outline:none;}
 
 /* Class Styles */
 
+.activityButtonCell {
+	font:bold 75% sans-serif;
+	padding:inherit;
+	color: white;
+	text-align: center;
+}
 
+.activityButton {
+	position:absolute;
+	left: 0;
+	z-index: 11;
+	width:100%;
+}
 
+.buttonGlow {
+	position: absolute;
+	top:-1.16em;
+	left:-12%;
+	font: inherit;
+	width:123.3%;
+	z-index: 10;
+	display:none
+}
+
+.userSetupButtonDiv {
+	position: absolute;
+	bottom: 0;
+	margin-bottom: -0.3em;
+	margin-left: auto;
+	margin-right: auto;
+	left:0;
+	right: 0;
+	font:inherit;
+}
+
+.userSetupGroup {
+	width: 17%;
+	float:left;
+	height:85%;
+	margin: 0.2em;
+	border: 0.25em ridge #b8e4ec;
+	background-color: #b8e4ec;
+	font:inherit;
+}
+
+.vocCell {
+	text-align:center;
+	font: 35% 'Nunito',sans-serif;
+	color:black;
+	padding-bottom: 1em;
+	vertical-align: top;
+}
+
+.vocCellHidden {
+	text-align:center;
+	font: 35% 'Nunito',sans-serif;
+	color:#bbb;
+	background-color:#bbb;
+	padding-bottom: 1em;
+	vertical-align: top;
+	cursor: pointer;
+}
+
+.vocImgCell {
+	border: ridge;
+}
+
+.choiceCell {
+	font:bold 65% 'Nunito',sans-serif;
+	text-align:center;
+	color: #000;
+	display: block;
+	background: #fff;
+	border: 0.1em ridge #393;
+	cursor: pointer;
+  }
+
+.choiceCell div:hover {
+  background: #92FF92;
+  display: block;
+  color:#000;
+}
+
+.choiceCellFB {
+	font:bold 65% 'Nunito',sans-serif;
+	text-align:center;
+	color: #000;
+	display: block;
+	background: #f60;
+	border: 0.1em ridge #f60;
+	cursor: pointer;
+  }
+
+.topicMask{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: none;
+}
+
+.topicCheckbox{
+position:absolute;
+width: 25%;
+z-index: 2;
+display: none;
+}
 
 .bodyTextEn{
   font:13px Verdana, Arial, Helvetica, sans-serif;
@@ -441,11 +519,20 @@ input[type="image"]:-moz-focusring {outline:none;}
   text-align:center;
   }
 
+ .buttonOn {
+ 	position: absolute;
+ 	width:94%;
+ 	border: 0.3em outset #5bc8e8;
+ 	display:none;
+ 	font: inherit;
+ }
+
 .cDSelect td{
  	 background-color : #7bd8e8;
  	 display:block;
- 	 border: ridge #7bd8e8;
+ 	 border: 0.25em ridge #7bd8e8;
  	 cursor: pointer;
+ 	 font: inherit;
  }
 
  .cDSelect td:hover{
@@ -456,8 +543,27 @@ input[type="image"]:-moz-focusring {outline:none;}
   .cDSelected td{
  	 background-color : #000;
  	 color : #fff;
- 	 border: ridge #7bd8e8;
+ 	 border: 0.25em ridge #7bd8e8;
  	 cursor: pointer;
+ 	 font: inherit;
+ }
+
+ .optGrp {
+ 	float: left;
+ 	background-color: #b8e4ec;
+ 	border: 0.3em ridge #7bd8e8;
+ 	padding: 1%;
+ 	margin-left: 1%;
+ 	font: inherit;
+ }
+
+ .optGrpTitle {
+ 	font: inherit;
+ 	font-weight: bold;
+ 	text-align: center;
+ 	background-color: #b8e4ec;
+ 	border: 0.3em ridge #7bd8e8;
+ 	margin-bottom: 0.5em;
  }
 
 .dlTitle {
@@ -658,23 +764,25 @@ input[type="image"]:-moz-focusring {outline:none;}
   display:block;
   }
 
- .fBSelect td{
+ .fBSelect {
  	 background-color : #7bd8e8;
- 	 display:block;
- 	 border: ridge #7bd8e8;
+ 	 border: 0.25em ridge #7bd8e8;
  	 cursor: pointer;
+ 	 font: inherit;
+
  }
 
-  .fBSelect td:hover{
+  .fBSelect:hover{
  	 background-color : #000;
  	 color : #f60;
  }
 
-   .fBSelected td{
+   .fBSelected {
  	 background-color : #000;
  	 color : #f60;
- 	 border: ridge #7bd8e8;
+ 	 border: 0.25em ridge #7bd8e8;
  	 cursor: pointer;
+ 	 font: inherit;
  }
 
 .flag {
