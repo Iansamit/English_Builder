@@ -1,5 +1,6 @@
 var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
+var ipc = require('ipc');
 
 // Report crashes to our server.
 require('crash-reporter').start();
@@ -21,12 +22,27 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  splashWindow = new BrowserWindow({width: 600, height: 450, frame: false});
+  mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname + '/images/formatting/e_b_icon.png'});
+  mainWindow.minimize()
 
   // and load the index.html of the app.
+
+  splashWindow.loadUrl('file://' + __dirname + '/splash.html');
+
   mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  mainWindow.webContents.executeJavaScript("electron=true");
   
-  mainWindow.maximize()
+  ipc.on('nearly', function(event){mainWindow.webContents.executeJavaScript("audCtrls(startup, 'play');");});
+  ipc.on('finished', function(event) {startMain ();});
+
+  function startMain () {
+    mainWindow.maximize();
+    mainWindow.setMenuBarVisibility(true);
+    splashWindow.close()
+  }
+
+
 
   // Open the DevTools.
  // mainWindow.openDevTools();

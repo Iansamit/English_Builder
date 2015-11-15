@@ -121,6 +121,70 @@
 			</div>
 		</div>
 
+		<div id="debugWin" style="position: absolute; z-index: 500; left:0; top:30%; background-color: #eee; display:none">
+			<table border="0" style="width: 300px; font: 16pt Arial, Helvetica, sans-serif; border-collapse: collapse">
+				<tr>
+					<td colspan="3" style="font: inherit; background: black; color:white; text-align: center;"> Debugging</td>
+				</tr>
+				<tr>
+
+					<td style="width:20px; font:inherit; border:thin solid; border-right: none">
+						1:&nbsp;
+					</td>
+					<td id="debug0" style="font:inherit; text-align:left; border-top:thin solid; border-bottom: thin solid">
+						&nbsp;
+					</td>
+					<td id="debug1" style="width: 100%; font:inherit; border:thin solid; border-left: none">
+						&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td style="font:inherit; border:thin solid; border-right: none">
+						2:&nbsp;
+					</td>
+					<td id="debug2" style="font:inherit; border-top:thin solid; border-bottom: thin solid">
+						&nbsp;
+					</td>
+					<td id="debug3" style="font:inherit; border:thin solid; border-left: none">
+						&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td  style="font:inherit; border:thin solid; border-right: none">
+						3:&nbsp;
+					</td>
+					<td id="debug4" style="font:inherit; border-top:thin solid; border-bottom: thin solid">
+						&nbsp;
+					</td>
+					<td id="debug5" style="font:inherit; border:thin solid; border-left: none">
+						&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td  style="font:inherit; border:thin solid; border-right: none">
+						4:&nbsp;
+					</td>
+					<td id="debug6" style="font:inherit; border-top:thin solid; border-bottom: thin solid">
+						&nbsp;
+					</td>
+					<td id="debug7" style="font:inherit; border:thin solid; border-left: none">
+						&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td  style="font:inherit; border:thin solid; border-right: none">
+						5:&nbsp;
+					</td>
+					<td id="debug8" style="font:inherit; border-top:thin solid; border-bottom: thin solid">
+						&nbsp;
+					</td>
+					<td id="debug9" style="font:inherit; border:thin solid; border-left: none">
+						&nbsp;
+					</td>
+				</tr>
+			</table>
+		</div>
+
 		<div id="outerDiv" style="position: absolute; width: 1600px; height:780px; background: none">
 
 			<div id="footer" style="position:absolute; top:13.3em; right:2%; text-align:right">
@@ -128,7 +192,7 @@
 					<a href="http://responsivevoice.org">ResponsiveVoice-NonCommercial</a> 
 					licensed under 
 					<a href="http://creativecommons.org/licenses/by-nc-nd/4.0/">
-					<img title="ResponsiveVoice Text To Speech" src="images/formatting/rv_logo.png" alt="R.V. logo" style="width:8em" /></a>
+					<img title="ResponsiveVoice Text To Speech" src="images/formatting/rv_logo.png" alt="95x15" style="width:7em" /></a>
 				</div>
 			</div>
 
@@ -593,7 +657,7 @@
 											<tbody style="padding:inherit; font:inherit;">
 												<tr id="vox_none" style="font:inherit; display: none ;">
 													<td colspan="2" class="optSelect"  style="width=33%; font:85% 'Nunito', sans-serif;">
-														Sorry! Computer voices are not available.
+														Sorry! Computer voices only available in Google Chrome.
 													</td>
 												</tr>
 												<tr style="font:inherit; ;">
@@ -1719,22 +1783,9 @@
 					<p style="text-align: center; font-size: 130%;margin-top:0.9em; margin-bottom: 1.2em">Welcome to the <img style="width: 34%; vertical-align: -0.2em;" src="images/labels/host_text.png"/> English Builder.</p>
 					<p style="margin-bottom: 2.5%">Press <img style="width: 6%; vertical-align: -0.2em;" src="images/buttons/start_button.png" onclick="activity('start')" /> to begin an activity.</p>
 					<p style="margin-bottom: 2.5%">Press <img src="images/buttons/reset_button.png" style="width: 4.07%; vertical-align: -0.2em;" /> to stop an activity at any time, and to reset when an activity is finished.</p>
-					<p style="margin-bottom: 2%">Press <img style="width: 4.07%; vertical-align: -0.2em;" src="images/buttons/help button.png"> to show this info screen, or get information about each activity.</p>
-					<p style="margin-bottom: 2.5%">
-						<div style="position:relative; float:left; top:-0.3em; left:0; padding:0.05em; margin-right:0.2em;  border: 0.05em ridge #5bc8e8; font:inherit; font-size:140%; background:black;">
-							<div style="float:left">
-								<img id="panelAct2" style="display:block; width: 1.6em; " src="images/buttons/ba_read_choose_off.png" />
-							</div>
-							<div style="float:left">
-								<img id="panelLev2" style="display:block; width: 1.6em; margin-left:0.05em" src="images/buttons/b_K2.png" />
-							</div>
-							<div style="float:left">
-								<img id="panelCont2" style="display:block; width:1.6em; margin-left:0.05em" src="images/buttons/multi.jpg"/>
-							</div>
-						</div>
-					 shows the current activity, level and content.</p>
-					<p style="margin-bottom: 2.5%; margin-top:2%">Press <img src="images/buttons/content_button.png" style="width: 8.64%; vertical-align: -0.2em;" onclick="categoryDiv('block')"/> to select other activities, levels and content.</p>
-					
+					<p style="margin-bottom: 2.5%">The blue box shows which activity, level and content are currently selected.</p>
+					<p style="margin-bottom: 2.5%">Press <img src="images/buttons/content_button.png" style="width: 8.64%; vertical-align: -0.2em;" onclick="categoryDiv('block')"/> to select other activities, levels and content.</p>
+					<p style="margin-bottom: 2%">Press <img style="width: 4.07%; vertical-align: -0.2em;" src="images/buttons/help button.png"> to return to this info screen.</p>
 				</div>
 
 				<div style="position: absolute;  right: 2%; bottom:2%; width: 25em; height: 10em; padding: 1em; background-color: #e6e6ff; border: 0.25em ridge #ADADC7; border-radius: 0.6em; font: inherit; font-size: 25%; text-align: justify; cursor: pointer;"  onclick="showAttribution('open')">
@@ -1843,7 +1894,8 @@
 
 
 
-                <div id="innerDiv" style="position:absolute; z-index:200; width: 60%; margin-top:7%; margin-left: 18.3%; height: 30em; font-family:'FreeSerif'; font-size:30%; display:none">
+                <div id="innerDiv" style="position:absolute; z-index:200; width: 60%; margin-top:7%; margin-left: 18.3%; height: 30em; font-family:'FreeSerif'; font-size:30%">
+                    Hello
 				</div>
 
 				<div style="position:absolute; width: 60%; margin-left: 18.3%; margin-top: 5%">
@@ -2148,16 +2200,26 @@
 								onclick="activity('submit')" />
 						</div>
 					</div>
-					<div style="position:relative; float:left; top:0.2em; left:1.4em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black;">
-						<div style="float:left">
-							<img id="panelAct" style="display:block; width: 1.6em; " src="images/buttons/ba_read_choose_off.png" />
-						</div>
-						<div style="float:left">
-							<img id="panelLev" style="display:block; width: 1.6em; margin-left:0.05em" src="images/buttons/b_K2.png" />
-						</div>
-						<div style="float:left">
-							<img id="panelCont" style="display:block; width:1.6em; margin-left:0.05em" src="images/buttons/multi.jpg"/>
-						</div>
+					<div style="position:relative; float:left; top:0.2em; left:1.4em">
+						<table style="background:black; border: 0.05em ridge #5bc8e8; font:inherit">
+							<tr>
+								<td style="font: inherit; ">
+									<div style="height: 1em">
+										<img id="panelAct" style="width: 1.6em; " src="images/buttons/ba_read_choose_off.png" />
+									</div>
+								</td>
+								<td style="font: inherit">
+									<div style="height: 1em">
+										<img id="panelLev" style="width: 1.6em" src="images/buttons/b_K2.png" />
+									</div>
+								</td>
+								<td style="font: inherit">
+									<div style="height: 1em">
+										<img id="panelCont" style="width:1.6em" src="images/buttons/multi.jpg"/>
+									</div>
+								</td>
+							</tr>
+						</table>
 					</div>
 					<div id="controls_central" style="position:relative; float:left; left:1.5em; height:1.5em; width:10.5em">
 						<div style="position: absolute; bottom: 0; left: 0; right: 0">
@@ -2322,6 +2384,198 @@
 					</div>
 				</div>
 			</div>
+
+
+
+			<table border="0" style="width: 100%;padding-top: 0.16em; padding-bottom: 0.14em; background-image: url('images/formatting/bg_panel.jpg'); background-size: 100%; font: inherit; display:none">
+				<tbody valign="center" align="center" style="font: inherit">
+					<tr style="height:1.65em; font: inherit">
+						<td style="width: 0.5%; font:inherit">
+							&nbsp;
+						</td>
+						<td style="width: 6.41%">
+							<img  id="b_help" src="images/buttons/help button.png" style="width:100%; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="showWelcome()" />
+							<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto; display: none" onmousedown="b_press(this)" onclick="resetScore(this)" />
+						</td>
+						<td style="width:3.64%">
+							&nbsp;
+						</td>
+						<td style="width:18.2%; font: inherit; font-size: 50%;">
+							<table style="background:black; border: 0.1em ridge #5bc8e8; font:inherit; margin-bottom: 0.1em">
+								<tr>
+									<td style="font: inherit; ">
+										<div style="height: 1.8em">
+											<img id="panelAct" style="width: 3em; " src="images/buttons/ba_read_choose_off.png" />
+										</div>
+									</td>
+									<td style="font: inherit">
+										<div style="height: 1.8em">
+											<img id="panelLev" style="width: 3em" src="images/buttons/b_K2.png" />
+										</div>
+									</td>
+									<td style="font: inherit">
+										<div style="height: 1.8em">
+											<img id="panelCont" style="width:3em" src="images/buttons/multi.jpg"/>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td id="controls_central" style="width: 40.5%">
+							<img id="b_start" style="width: 27.2%;  margin-left:auto; margin-right:auto" src="images/buttons/start_button.png" onmousedown="b_press(this)" onclick="activity('start')" />
+							<img id="finishedButton" src='images/buttons/finished_button.png' alt="Finished!" style="width:45.14%; display: none" />
+							<img id="b_replay" style="width:19%; display:none; " src='images/buttons/replay_button.png'	onmousedown="b_press(this)" onclick="playVocab()" />
+						</td>
+						<td id="order_cell" style="width:28.5%; display: none">
+							<img id="orderButton"	style="width:40%;" src='images/buttons/random_button.png' onmousedown="b_press(this)" onclick="activity('random')"/>
+						</td>
+						<td id="voc_choice_controls" style="width: 56.13%; font:inherit; display: none">
+							<div style=" background-color:#7bd8e8;  border: 0.2em ridge #5bc8e8; height:4.5em; margin-left:2em; margin-right: 2em; margin-bottom: 0.1em; font:inherit; font-size: 30%">
+								<div class="userSetupGroup" style="width: 10%; background: none; border: none">
+									<div style="position:relative; height: 100%; font:inherit">
+										<div class=userSetupButtonDiv style="bottom: -0.1em">
+											<img id="b_vc_info"	style="width:90%;" src='images/buttons/help button.png' onmousedown="b_press(this)" onclick="setMsg('u_c','User Settings Information')"/>
+										</div>
+									</div>
+
+								</div>
+
+
+
+								<div class="userSetupGroup" style="width: 30%">
+									<div style="width: 100%; height: 50%; margin-top: 0.2em; font: inherit; font-size: 120%; font-weight: bold; color: black; ">
+										Display
+									</div>
+									<div style="position:relative; float:left; height: 50%; width: 50%;">
+										<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
+											<img id="b_show_all"	style="width:90%" src='images/buttons/show_all.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('show_all')"/>
+										</div>
+									</div>
+									<div style="position:relative; float:left; height: 50%; width: 50%;">
+										<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
+											<img id="b_show_selected"	style="width:90%" src='images/buttons/show_selected.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('show_selected')"/>
+										</div>
+									</div>
+								</div>
+								<div style="width: 16.5%; float:left; height:100%; display:none">
+									<div style="position:relative; height: 50%; ">
+										<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
+
+										</div>
+									</div>
+								</div>
+								<div class="userSetupGroup">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_select_all"	style="width:79.4%;" src='images/buttons/select_all.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('select_all')"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_clear_all"	style="width:79.4%" src='images/buttons/clear_all.png' onmousedown="b_press(this)" onclick="adjustUserTopics('','clear')"/>
+										</div>
+									</div>
+								</div>
+
+								<div class="userSetupGroup">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_reset_to_default" style="width:79.4%" src='images/buttons/reset_to_default.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('init')"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<input type="file" id="reset_topic" onchange="loadSetup(this)" style="display: none">
+											<img id="b_reset_to_saved" style="width:79.4%" src='images/buttons/reset_to_saved.png' onmousedown="b_press(this)" onclick="loadSetup(this)"/>
+										</div>
+									</div>
+								</div>
+								<div id="save_load_grp" class="userSetupGroup">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_save"	style="width:79.4%" src='images/buttons/save_all.png' onmousedown="b_press(this)" onclick="saveSetup()"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<input type="file" id="reset_all" onchange="loadSetup(this)" style="display: none">
+											<img id="b_reset_all" style="width:79.4%" src='images/buttons/load_all.png' onmousedown="b_press(this)" onclick="loadSetup(this)"/>
+										</div>
+									</div>
+								</div>
+								<div id="topic_clone_grp" class="userSetupGroup" style="display: none">
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_select_topic"	style="width:79.4%" src='images/buttons/select_topic.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('topics')"/>
+										</div>
+									</div>
+									<div style="position:relative; height: 50%; font:inherit">
+										<div class=userSetupButtonDiv>
+											<img id="b_clone_topic"	style="width:79.4%" src='images/buttons/clone_topic.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('clone_topic')"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+
+						<td id="hide_cell" style="width:12%; text-align: left; font: inherit; font-size: 18%; display: none">
+							<div style="background-color:black; color: white; border: 0.35em ridge #5bc8e8; margin-bottom: 0.15em; padding: 0.2em 0 0.1em 1em">
+								<div style="height: 2.4em; font: inherit;">
+									<div style="width: 4em; float: left">
+										<img id="showAllButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/yes_button.png' onmousedown="b_press(this)" onclick="activity('showBoth')"/>
+									</div>
+									<div style="float: left; font: inherit;font-size: 1.7em">
+										Show All
+									</div>
+								</div>
+								<div  style="height: 2.4em; ">
+									<div style="width: 4em; float: left">
+										<img id="hideImgButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/no_button.png' onmousedown="b_press(this)" onclick="activity('hideImg')"/>
+									</div>
+									<div style="float: left; font: inherit; font-size: 1.7em">
+										Hide Images
+									</div>
+								</div>
+								<div style="height: 2.4em;">
+									<div style="width: 4em; float: left">
+										<img id="hideTxtButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/no_button.png' onmousedown="b_press(this)" onclick="activity('hideTxt')"/>
+									</div>
+									<div style="float: left; font: inherit; font-size: 1.7em">
+										Hide Text
+									</div>
+								</div>
+							</div>
+						</td>
+						<td id="no_cell" style="width:13.5%; display: none">
+							<img id="noButton"	style="width:48.3%;" src='images/buttons/no_button.png' onmousedown="b_press(this)" onclick="activity('no')"/>
+						</td>
+                        <td id="back_cell" style="width:13.5%; display: none; visibility: hidden">
+							<img style="width:48.3%;" src='images/buttons/b_back.png' onmousedown="b_press(this)" onclick="activity('back')"/>
+						</td>
+						<td id="clear_cell" style="display:none; width:13.5%">
+							<img id="clearButton" src="images/buttons/clear.png" style="width: 65%" onmousedown="b_press(this)" onclick="activity('clear')" />
+						</td>
+                        <td id="submit_cell" style="display:none; width:13.5%">
+							<img src="images/buttons/clear.png" style="width: 65%" onmousedown="b_press(this)" onclick="activity('submit')" />
+						</td>
+						<td id="yes_cell" style="display:none; width:13.5%">
+							<img id="yesButton" style="width:48.3%" src='images/buttons/yes_button.png' onmousedown="b_press(this)" onclick="activity('yes')"/>
+						</td>
+                        <td id="forward_cell" style="display:none; width:13.5%">
+							<img style="width:48.3%" src='images/buttons/b_forward.png' onmousedown="b_press(this)" onclick="activity('forward')"/>
+						</td>
+						<td id="controls_spacer" style="width:15.63%">
+							&nbsp;
+						</td>
+						<td style="width: 13.62%">
+							<img id="b_content" src="images/buttons/content_button.png" style="width:100%" onmousedown="b_press(this)" onclick="categoryDiv('block')"/>
+						</td>
+						<td style="0.5%">
+							&nbsp;
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</body>
 </html>
