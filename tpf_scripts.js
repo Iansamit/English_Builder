@@ -1,5 +1,6 @@
 var	activity_group ="vocab";
 var	all_voc_array = new Array ("");
+var anim_glow_on=false;
 var	audArray = new Array("");
 var	audDLRemaining;
 var aud_rv_vol = 0.5;
@@ -8,7 +9,6 @@ var	audVoc = new Audio ();
 var	availCats = new Array("");
 var	bingArray = new Array ("");
 var	bingCalled = new Array ();
-var	bingComplete = new Array ("phon3","phon4");
 var	bingCorrect = new Array ();
 var	bingEx = "";
 var	bingExAud = "";
@@ -106,14 +106,18 @@ var timbre_select="random";
 var	timePenalty=true;
 var	topicList="genVocab";
 var	topics_all = new Array("actions", "asean", "animals", "beach", "clothes", "days", "easy", "describing", "finding game", "food", "free_time", "grammar", "health", "home", "months", "occupations", "people", "places_and_transport",  "location", "body", "school", "socialising", "stationery", "time", "weather", "onet_pass", "onet_cloze");
+var topics_all_editable ="actions,animals,beach,clothes,easy,describing,finding game,food,free_time,grammar,health,home,occupations,people,places_and_transport,location,body,school,socialising,stationery,time,weather"
 var topics_no_audio = new Array ("finding game", "location");
 var topics_no_multi = new Array ("asean", "beach", "days", "easy", "finding game", "months", "stationery",  "location", "onet_inst", "onet_q_a", "onet_gq", "onet_soc", "onet_voc", "onet_phon", "onet_pass", "onet_cloze", "onet_full");
+var topics_no_edit = ["asean", "days", "months"];
+var topics_subsets = ["asean", "days",  "location", "months", "stationery"];
 var topics_onet = new Array ("onet_voc", "onet_inst", "onet_q_a", "onet_gq", "onet_soc", "onet_phon", "onet_full");
 var	uMode = "read_choose";
 var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
+var version_num="0.9100";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -170,9 +174,10 @@ function init() {
 	document.getElementById("imChoiceDiv").addEventListener("touchstart", function(event){ event.stopPropagation(); event.preventDefault(); });
 
 	initAudio();
-	initUserSettings();
 	initOptions();
+	initUserVocab();
 	resize();
+	document.getElementById("version_display").innerHTML= version_num;
 	var plImg1 = new Image();
 	plImg1.src = "images/vocab/titles/actions.jpg";
 	var plImg2 = new Image();
@@ -198,16 +203,22 @@ function init() {
 	var b_save_img = new Image();
 	b_save_img.src = "images/buttons/save.png";
 	b_save_img.style="width: 3.8em; vertical-align: middle;";
-	setTimeout(function(){selectLev("K2");},500);
-	setTimeout(function(){setAllVocArray();},600);
+	
+	selectLev("K2");
 	
 	setTimeout(function(){
 		if (electron==false){
 			audCtrls(startup, "play");
 		}
 		else{
-			var ipc = require('ipc');
+			var ipc = require('electron').ipcRenderer
 			ipc.send('tickVol', 0.6);
+		}
+		if (electron==true) {
+			document.getElementById("bing_dl_notes_norm").style.display="none";
+			document.getElementById("bing_dl_notes_electron").style.display="block";
+			document.getElementById("bing_dl_normal").style.display="none";
+			document.getElementById("bing_dl_electron").style.display="block";
 		}
 	},400);	
 }
@@ -253,43 +264,130 @@ function initOptions(){
 			}
 		}
 
-		tempArr.length=0;
-		for (var j=0; j<timbreArray.length; j++) {
-			tempArr[j]=timbreArray[j];
-		}
-		for (var k=0;k<tempArr.length;k++){
-			if (localStorage.timbreArray.indexOf(tempArr[k])==-1) {
-				selectVox(tempArr[k],document.getElementById("vox_"+tempArr[k]+"_toggle"));
-			}
-		}
-
 		if (localStorage.user_vocab){
 			loadSetup("local");
 		}
-
-		setVocMode(localStorage.voc_mode);
-		setTimbreSelect(localStorage.timbre_select,document.getElementById("timbre_"+localStorage.timbre_select));
-		setCountDown((localStorage.countTime)/60);
-		selectTimePenalty(Boolean(Number(localStorage.timePenalty)));
-		selectFB(localStorage.fbMode);
+		if (localStorage.voc_mode) {
+			setVocMode(localStorage.voc_mode);
+		}
+		if (localStorage.timbre_select) {
+			setTimbreSelect(localStorage.timbre_select,document.getElementById("timbre_"+localStorage.timbre_select));
+		}
+		if (localStorage.countTime) {
+			setCountDown((localStorage.countTime)/60);
+		}
+		if (localStorage.timePenalty) {
+			selectTimePenalty(Boolean(Number(localStorage.timePenalty)));
+		}
+		if (localStorage.fbMode) {
+			selectFB(localStorage.fbMode);
+		}
 		document.getElementById("errCell0").style.display = "none";
-		setFinWarning(Boolean(Number(localStorage.finWarning)));
-		tAControls(localStorage.tAControls);
+
+		if (localStorage.finWarning) {
+			setFinWarning(Boolean(Number(localStorage.finWarning)));
+		}
+		if (localStorage.tAControls) {
+			tAControls(localStorage.tAControls);
+		}
 	}
 }
 
-window.onbeforeunload = function(event) {
-	if (user_changes) {
-		setMsg('choice_save',"","save_leave_cancel");
-		return 'You made some changes to your User Settings vocabulary.';
-	}
-};
+function initUserVocab (mode) {
+	var vm=voc_mode;
+	var lev=currentLev;
+	var top=curr_topic_title;
+	voc_mode="default";
+	for (var i=1; i<7;i++) {
+		if (!localStorage["topics_gen_P"+i] || mode=="no_check") {
+			currentLev=("P"+i);
+			setAvailCats();
+			localStorage["topics_gen_P"+i] =availCats;
+		}
+		
+		tempArray = localStorage["topics_gen_P"+i].split(",");
+		currentLev=("P"+i);
 
-function leave() {
-	user_changes=false;
-	var myWindow = window.open("", "_self");
-	myWindow.document.write("");
-	setTimeout (function() {myWindow.close();},1000);
+		for (var j=0; j<tempArray.length;j++) {
+			if (!localStorage["P"+i+"_"+tempArray[j]]  || mode=="no_check"){
+				curr_topic_title=tempArray[j];
+				setVocArrays();
+				localStorage["P"+i+"_"+tempArray[j]] =vocArray;
+			}
+		}
+	}
+
+	if (!localStorage["topics_gen_K2"]  || mode=="no_check") {
+		currentLev=("K2");
+		setAvailCats();
+		localStorage["topics_gen_K2"] =availCats;
+		tempArray = localStorage["topics_gen_K2"].split(",");
+		for (var k=0; k<tempArray.length;k++) {
+			if (!localStorage["K2_"+tempArray[k]]  || mode=="no_check"){
+				curr_topic_title=tempArray[k];
+				setVocArrays();
+				localStorage["K2_"+tempArray[k]] =vocArray;
+			}
+		}
+	}
+
+	setDisplays({imageDiv:"none"});
+	tempArray.length=0;
+	voc_mode=vm;
+	if (mode=="no_check") {
+		setVocMode('user');
+		currentLev=lev;
+		selectTopic(top);
+		setVocChoiceTable("topics");
+		setMsg("user_voc_reset_complete","success");
+	}
+}
+
+
+function setOnetUserVocab () {
+	var txt;
+	var scr;
+
+	localStorage.user_onet_vocab="";
+
+	for (var i=0;i<vocArray.length;i++) {
+		txt=vocArray[i].txt;
+		src=vocArray[i].src;
+		localStorage.user_onet_vocab+=txt + "|" + src + "#";
+	}
+
+	localStorage.user_onet_vocab = localStorage.user_onet_vocab.slice(0,-1);
+}
+
+
+function getOnetUserVocab () {
+	var txt_val;
+	var src_val;
+	var tArray=[];
+	var tArray2=[];
+	var rArray=[];
+
+	//vocArray=[];
+	if (localStorage.user_onet_vocab && localStorage.user_onet_vocab!="") {
+		tArray=localStorage.user_onet_vocab.split("#");
+		for (var i=0; i<tArray.length; i++) {
+			tArray2=tArray[i].split("|");
+
+			txt_val=tArray2[0];
+			if (txt_val.indexOf(",")!= -1) {
+				txt_val=txt_val.split(",");
+			}
+			src_val=tArray2[1];
+			if (src_val.indexOf(",")!= -1) {
+				src_val=src_val.split(",");
+			}
+			rArray[i]={txt: txt_val, src: src_val};
+		}
+		return rArray;
+	}
+	else {
+		return [];
+	}
 }
 
 
@@ -301,6 +399,9 @@ function processKey(ev) {
 	else if (finished==true && ev.keyCode==27) {
 		audCtrls(aclick, "play");
 		resetScore();
+	}
+	else if (ev.keyCode==73 && ev.ctrlKey && electron) {
+		require('remote').getCurrentWindow().toggleDevTools();
 	}
 	else if (finished==false || finished=="nearly") {
 		switch (uMode) {
@@ -324,6 +425,7 @@ function processKey(ev) {
 						case 27:
 							audCtrls(aclick, "play");
 							resetScore();
+							break;							
 					}
 				}
 				break;
@@ -441,18 +543,12 @@ function initAudio() {
 			aswitch = new Audio("audio/switch.mp3");
 			fanfare = new Audio("audio/fanfare.mp3");
 			msg_sound = new Audio ("audio/msg_sound.mp3");
+			success = new Audio ("audio/correct.mp3");
 			startup= new Audio ("audio/startup.mp3");
 			warning= new Audio ("audio/warning_bells.mp3");
-
-			//audCtrls (warning,"volume",0.2);
-		} else {
-			finAudio = new Audio("audio/klaxon_short.ogg");
-			tickFast = new Audio("audio/clock_ticking_fast.ogg");
-			tickFast.loop = true;
-			aclick = new Audio("audio/click.ogg");
-			aswitch = new Audio("audio/switch.ogg");
-
-		}
+			cheer= new Audio ("audio/cheer.mp3");
+			dot_ben_fb= new Audio ();
+		} 
 
 		function loadRV() {
 			console.log("Trying to load RV");
@@ -460,14 +556,32 @@ function initAudio() {
 				if (typeof responsiveVoice!="undefined"){
 					clearInterval(net_check);
 					console.log("RV loaded");
-					timbreArray= new Array ("US English Female","UK English Female","UK English Male","Ian");
+
 					document.getElementById("vox_Ian_toggle").style.display="table-cell";
 					document.getElementById("vox_UK English Female_toggle").style.display="table-cell";
 					document.getElementById("vox_UK English Male_toggle").style.display="table-cell";
 					document.getElementById("vox_US English Female_toggle").style.display="table-cell";
-					document.getElementById("vox_none").style.display="none";
-					adjustVolume("vox",localStorage.vox*10);
-					document.getElementById("sli_vox").style.top=((1-localStorage.vox)*5)+"em";
+					document.getElementById("vox_none").style.display="none";					
+					if (localStorage.timbreArray){
+						timbreArray.length=0;
+						
+						timbreArray = localStorage.timbreArray.split(",");
+
+					}
+					else {
+						timbreArray= new Array ("US English Female","UK English Female","UK English Male","Ian");
+					}
+
+					for (var i=0;i<timbreArray.length;i++){
+						document.getElementById("vox_"+timbreArray[i]+"_toggle").className="optSelected";
+					}
+
+
+
+					if (localStorage.vox){
+						adjustVolume("vox",localStorage.vox*10);
+						document.getElementById("sli_vox").style.top=((1-localStorage.vox)*5)+"em";
+					}
 				}
 				else {
 					console.log("RV load failed");
@@ -480,18 +594,35 @@ function initAudio() {
 		},60000);
 		loadRV();
 
+		if (!localStorage.music){
+			localStorage.setItem("music", 0.45);
+			localStorage.setItem("clicks", 0.23);
+			localStorage.setItem("ticktock", 0.27);
+			localStorage.setItem("ian", 0.42);
+			localStorage.setItem("vox", 0.65);
+			localStorage.setItem("bells", 0.65);
+		}
+		if (!localStorage.dot_ben_fb) {
+			localStorage.setItem("dot_ben_fb", 0.65);
+		}
+
 		adjustVolume("music",localStorage.music*10);
 		document.getElementById("sli_music").style.top=((1-localStorage.music)*5)+"em";
+
 		adjustVolume("clicks",localStorage.clicks*10);
 		document.getElementById("sli_clicks").style.top=((1-localStorage.clicks)*5)+"em";
+
 		adjustVolume("ticktock",localStorage.ticktock*10);
 		document.getElementById("sli_ticktock").style.top=((1-localStorage.ticktock)*5)+"em";
+
 		adjustVolume("ian",localStorage.ian*10);
 		document.getElementById("sli_ian").style.top=((1-localStorage.ian)*5)+"em";
-		if (localStorage.bells){
-			adjustVolume("bells",localStorage.bells*10);
-			document.getElementById("sli_bells").style.top=((1-localStorage.bells)*5)+"em";
-		}
+
+		adjustVolume("bells",localStorage.bells*10);
+		document.getElementById("sli_bells").style.top=((1-localStorage.bells)*5)+"em";
+
+		adjustVolume("dot_ben_fb",localStorage.dot_ben_fb*10);
+		document.getElementById("sli_dot_ben_fb").style.top=((1-localStorage.dot_ben_fb)*5)+"em";
 		
 		// Code below could replace responsiveVoice code if/when other browsers get their act together!!!
 		/*if (window.speechSynthesis) {
@@ -571,6 +702,10 @@ function adjustVolume(aud,vol){
 			audCtrls(finAudio,"volume",(vol*0.1));
 			document.getElementById("disp_bells").innerHTML= Math.floor(vol*10);
 		break;
+		case "dot_ben_fb":
+			audCtrls(dot_ben_fb,"volume",(vol*0.1));
+			document.getElementById("disp_dot_ben_fb").innerHTML= Math.floor(vol*10);
+		break;
 		case "ian":
 			audVoc.volume=(vol*0.1);
 			document.getElementById("disp_ian").innerHTML= Math.floor(vol*10);
@@ -630,6 +765,7 @@ function optionsDiv(disp) {
 		localStorage.setItem("music", fanfare.volume);
 		localStorage.setItem("clicks", aclick.volume);
 		localStorage.setItem("ticktock", tick.volume);
+		localStorage.setItem("dot_ben_fb", dot_ben_fb.volume);
 		localStorage.setItem("ian", audVoc.volume);
 		localStorage.setItem("vox", aud_rv_vol);
 		localStorage.setItem("bells", finAudio.volume);
@@ -641,14 +777,14 @@ function optionsDiv(disp) {
 		localStorage.setItem("optGrp_controls", document.getElementById("optGrp_controls").style.display);
 		localStorage.setItem("optGrp_volume", document.getElementById("optGrp_volume").style.display);
 		localStorage.setItem("voc_mode", voc_mode);
-		localStorage.setItem("timbreArray", timbreArray);
 		localStorage.setItem("timbre_select", timbre_select);
 		localStorage.setItem("countTime", countTime);
 		localStorage.setItem("timePenalty", Number(timePenalty));
 		localStorage.setItem("fbMode", fbMode);
 		localStorage.setItem("finWarning", Number(finWarning));
-		if (user_changes==true){
-			saveSetup("local");
+
+		if (typeof responsiveVoice!="undefined") {
+			localStorage.timbreArray= timbreArray;
 		}
 	}
 }
@@ -676,11 +812,15 @@ function showAttribution(caller){
 function categoryDiv(disp) {
 	resetScore();
 	setDisplays ({contentSelect:disp,welcomeDiv:"none",attributionDiv:"none"});
-	if (uMode!="read_say" && uMode!="phon_bingo" && uMode!="numbers" && uMode!="num_bingo") {
+	if (uMode!="read_say" && uMode!="phon_bingo" && uMode!="numbers" && uMode!="num_bingo" && uMode!="phon_bingo_class") {
 		setDisplays ({imageDiv:"block"});
 	}
 	if (disp=="block"){
-		animateGlow();
+		if (anim_glow_on==false) {
+			animateGlow();
+			anim_glow_on=true;
+		}
+
 	}
 }
 
@@ -717,22 +857,17 @@ function tAControls (mode) {
 
 		
 function countDown(){
-	var ipc = require('ipc');
+	var ipc = require('electron').ipcRenderer
 	tick = new Audio("audio/tick_slow.mp3");
 	tock = new Audio("audio/tock_slow.mp3");
 	audCtrls(tick,"volume",0.1);
 	audCtrls(tock,"volume",0.1);
 	audCtrls(tick,"play");
-	setTimeout(function() {document.getElementById("counter").innerHTML=9; audCtrls(tick,"pause");audCtrls(tock,"play");}, 1000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=8; audCtrls(tock,"pause");audCtrls(tick,"play");}, 2000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=7; audCtrls(tick,"pause");audCtrls(tock,"play");}, 3000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=6; audCtrls(tock,"pause");audCtrls(tick,"play");}, 4000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=5; audCtrls(tick,"pause");audCtrls(tock,"play");}, 5000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=4; audCtrls(tock,"pause");audCtrls(tick,"play");}, 6000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=3; audCtrls(tick,"pause");audCtrls(tock,"play");ipc.send('nearly');}, 7000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=2; audCtrls(tock,"pause");audCtrls(tick,"play");}, 8000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=1; audCtrls(tick,"pause");audCtrls(tock,"play");}, 9000);
-	setTimeout(function() {document.getElementById("counter").innerHTML=0;ipc.send('finished');}, 10000);
+	setTimeout(function() {document.getElementById("counter").innerHTML=4; audCtrls(tock,"pause");audCtrls(tick,"play");}, 1000);
+	setTimeout(function() {document.getElementById("counter").innerHTML=3; audCtrls(tick,"pause");audCtrls(tock,"play");ipc.send('nearly');}, 2000);
+	setTimeout(function() {document.getElementById("counter").innerHTML=2; audCtrls(tock,"pause");audCtrls(tick,"play");}, 3000);
+	setTimeout(function() {document.getElementById("counter").innerHTML=1; audCtrls(tick,"pause");audCtrls(tock,"play");}, 4000);
+	setTimeout(function() {document.getElementById("counter").innerHTML=0;ipc.send('finished');}, 5000);
 }
 
 function newCount() {
@@ -830,7 +965,7 @@ function resetScore(caller) {
 		audCtrls(fanfare, "play");
 	}
 
-	if (vocArray.length<4 && curr_topic_title!="multi") {
+	if (vocArray.length<4 && localStorage["topics_gen_" + currentLev].split(",").indexOf(curr_topic_title) != -1 && uMode!="phon_bingo_class") {
 		modUserAvailTopics(curr_topic_title,"delete");
 	}
 
@@ -856,7 +991,7 @@ function resetScore(caller) {
 	document.getElementById("clear").innerHTML = "Clear: " + pronPoints;
 	document.getElementById("total").innerHTML = "Total: " + 0;
 
-	setDisplays ({back_fwd_div:"none",yes_no_div:"none",d_B_Score:"none",order_div:"none",hide_div:"none",voc_tab:"none",mainImage:"inline",voc_choice_controls:"none",
+	setDisplays ({back_fwd_div:"none",yes_no_div:"none",bing_class_controls:"none", d_B_Score:"none",order_div:"none",hide_div:"none",voc_tab:"none",mainImage:"inline",voc_choice_controls:"none",
 				lev_tab_div:"none",user_settings_data:"none",left_pane:"block",innerDiv:"none",ch1:"none",ch2:"none",ch3:"none",ch4:"none"});
 	document.getElementById("voc_tab_div").style.marginLeft="15%";
 
@@ -866,6 +1001,7 @@ function resetScore(caller) {
 	else if (uMode=="book_trans"){
 		document.getElementById("mainImage").src = "images/vocab/titles/" + currentBook + ".jpg";
 		document.getElementById("book_overlay").src = "images/formatting/d_B_spacer.png";
+		document.getElementById("book_trans_fb_img").src = "images/labels/dot_correct.jpg";
 	}
   	else if (curr_topic_title=="onet_full") {
 		if (onet_ready==false){
@@ -888,7 +1024,7 @@ function resetScore(caller) {
 		setCountDown(countSet);
   	}
 	document.getElementById("phonDisplay").style.fontSize="300%";
-	if (uMode=="read_say" || uMode=="phon_bingo") {
+	if (uMode=="read_say" || uMode=="phon_bingo" || uMode=="phon_bingo_class") {
 		document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img style='width:1em' src='images/labels/l_"+currentPhonUnit+"_p.png' />";
 	}
 	else if (uMode=="numbers" || uMode == "num_bingo"){
@@ -899,7 +1035,7 @@ function resetScore(caller) {
 	for (i = 1; i < 11; i++) {
 		document.getElementById("life"+livesPos+i).src="images/labels/lives_rem.png";
 	}
-	if (uMode=="phon_bingo" || uMode=="voc_bingo" || uMode=="num_bingo") {
+	if (uMode=="phon_bingo" || uMode=="voc_bingo" || uMode=="num_bingo" || uMode=="phon_bingo_class") {
 		for (i = 0; i < 24; i++) {
 			document.getElementById("bing"+i+"X").src="images/formatting/30clear_spacer.png";
 		}
@@ -911,10 +1047,10 @@ function resetScore(caller) {
 	    bingoPoints =50;
 	    bingoTime=0;
 	    bingWords=25;
-	    setDisplays ({bingoDisplay:"none",bingo_overlay:"none"});
+	    setDisplays ({bingoDisplay:"none",bingo_overlay:"none",bing_class_display:"none",imageDiv:"none"});
 		document.getElementById("bingoScore").innerHTML = "Bingo<p>50</p>";
   		document.getElementById("bingoWords").innerHTML = "Words<p>25<p>";
-  		if (uMode=="phon_bingo"){
+  		if (uMode=="phon_bingo" || uMode=="phon_bingo_class"){
   			setBingoArrays();
   			setDisplays ({phonDisplay:"block"});
   		}
@@ -941,7 +1077,7 @@ function b_press(b) {
 		var s = "em";
 	}
 	b.style.width = w +s;
-	if (b.id && b.id!="b_replay" && b.id!="b_start") {
+	if (b.id && b.id!="b_replay" && b.id!="b_start" &&b.id!="bing_play_button") {
 		audCtrls(aclick, "play");
 	}
 
@@ -995,7 +1131,7 @@ function selectPhonUnit(unit) {
 
 function selectNumUnit(unit) {
 	if (unit != currentNumUnit) {
-	var prevUnit = currentPhonUnit;
+	var prevUnit = currentNumUnit;
 		audCtrls(aclick, "play");
 		document.getElementById("b_" + unit).style.width = "94%";
 		document.getElementById("b_" + unit).style.border = "0.3em outset";
@@ -1075,6 +1211,14 @@ function setVocMode(mode) {
 	voc_mode=mode;
 	if (curr_topic_title=="multi") {
 		setAllVocArray();
+	}
+	else if (curr_topic_title=="onet_voc") {
+		if (voc_mode=="user") {
+			vocArray=getOnetUserVocab();
+		}
+		else {
+			setOnetVocab();	
+		}
 	}
 	else {
 		setVocArrays();
@@ -1209,6 +1353,9 @@ function animateGlow() {
 	if (document.getElementById("contentSelect").style.display == "block") {
 		setTimeout(function(){animateGlow();},1600);
 	}
+	else {
+		anim_glow_on=false;
+	}
 }
 
 function selectActivityGroup(group){
@@ -1232,7 +1379,7 @@ function selectActivityGroup(group){
 
 		switch (group){
 			case "vocab":
-				setDisplays ({phonUSelect:"none",vocSelect:"block",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"block",reader_act_title:"none",onet_act_title:"none",read_choose_icon:"block",book_trans_icon:"none",look_choose_icon:"block",list_choose_icon:"block",play_learn_icon:"block",say_word_icon:"block",voc_bingo_icon:"block",onet_act_icon:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"block",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"block",reader_act_title:"none",onet_act_title:"none",read_choose_icon:"block",book_trans_icon:"none",look_choose_icon:"block",list_choose_icon:"block",play_learn_icon:"block",say_word_icon:"block",voc_bingo_icon:"block",onet_act_icon:"none",onet_voc_set:"none"});
 				selectActivity("read_choose");
 				document.getElementById("panelLev").src="images/buttons/b_"+currentLev+".png";
 				document.getElementById("panelLev2").src="images/buttons/b_"+currentLev+".png";
@@ -1254,7 +1401,7 @@ function selectActivityGroup(group){
 				document.getElementById("panelLev2").src="images/labels/l_"+currentNumUnit+"_p.png";
 			break;
 			case "readers":
-				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"block",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"block",onet_act_title:"none",book_trans_icon:"block",read_choose_icon:"block",look_choose_icon:"block",list_choose_icon:"none",play_learn_icon:"block",say_word_icon:"none",voc_bingo_icon:"block",onet_act_icon:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"block",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"block",onet_act_title:"none",book_trans_icon:"block",read_choose_icon:"block",look_choose_icon:"block",list_choose_icon:"none",play_learn_icon:"block",say_word_icon:"none",voc_bingo_icon:"block",onet_act_icon:"none",onet_voc_set:"none"});
 				selectActivity("book_trans");
 			break;
 			case "onet":
@@ -1337,11 +1484,27 @@ function selectActivity(mode) {
 				document.getElementById("choiceDiv").style.backgroundColor = "black";
 				selectScoreSplit(false);
 				livesPos="T";
+				switch (curr_topic_title) {
+					case "onet_q_a":
+						document.getElementById("choice_instructions").innerHTML="Match the answer to the question word:"
+					break;
+
+					case "onet_gq":
+					case "onet_soc":
+					case "onet_phon":
+						document.getElementById("choice_instructions").innerHTML="Choose the best answer - 1, 2, 3 or 4:"
+					break;
+
+					default:
+						document.getElementById("choice_instructions").innerHTML="Click on the word that matches the picture:"
+				}
+				
 			break;
 
 			case "book_trans":
 				setDisplays ({choiceTable:"table",livesDispSide:"none"});
 				document.getElementById("choiceDiv").style.backgroundColor = "black";
+				document.getElementById("choice_instructions").innerHTML="Click on the best translation:"
 				selectScoreSplit(false);
 				livesPos="T";
 				if (curr_topic_title!="dot_and_Ben") {
@@ -1354,7 +1517,6 @@ function selectActivity(mode) {
 				document.getElementById("ch2").style.font="bold 50% 'Browallia New',sans-serif";
 				document.getElementById("ch3").style.font="bold 50% 'Browallia New',sans-serif";
 				document.getElementById("ch4").style.font="bold 50% 'Browallia New',sans-serif";
-				selectTopicList("dotBen");
 				setDBStartPage(1);
 			break;
 
@@ -1391,6 +1553,15 @@ function selectActivity(mode) {
 				setBingoArrays();
 			break;
 
+			case "phon_bingo_class":
+				document.getElementById("panelCont").src="images/buttons/b_"+currentPhonUnit+".png";
+				document.getElementById("panelCont2").src="images/buttons/b_"+currentPhonUnit+".png";
+				document.getElementById("panelLev").src="images/labels/l_"+currentPhonUnit+"_p.png";
+				document.getElementById("panelLev2").src="images/labels/l_"+currentPhonUnit+"_p.png";
+				selectScoreSplit(false);
+				setBingoArrays();
+			break;
+
 			case "numbers":
 				document.getElementById("panelCont").src="images/buttons/b_"+currentNumUnit+".png";
 				document.getElementById("panelCont2").src="images/buttons/b_"+currentNumUnit+".png";
@@ -1407,7 +1578,6 @@ function selectActivity(mode) {
 				setNumBingoSheet();
 			break;
 		}
-
 		setActivityDisplays();
 
 		if (curr_topic_title=="multi"){
@@ -1431,19 +1601,19 @@ function setActivityDisplays() {
 	switch  (uMode) {
 
 		case "play_learn":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"none",timer:"none"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"none",timer:"none"});
 		break;
 
 		case "read_choose":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "look_choose":
       		if (curr_topic_title!="onet_full") {	  
-      			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"block",phonDisplay:"none",score:"block",timer:"block"});
+      			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"block",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
 			}
 			else {
-				setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"none",timer:"block",choice_onet:"block"});
+				setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"block",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"none",timer:"block",choice_onet:"block"});
 			}
 			if (curr_topic_title=="onet_gq"){
 				setDisplays({errDiv:"none"});
@@ -1451,34 +1621,38 @@ function setActivityDisplays() {
 		break;
 
 		case "book_trans":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"block",choiceDiv:"block",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"block",book_trans_fb:"block",choiceDiv:"block",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "listen_choose":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "say_word":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"block",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"block",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
 			break;
 		case "voc_bingo":
-			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "read_say":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"block",phonDisplay:"block",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"block",phonDisplay:"block",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "phon_bingo":
-			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",bing_class_display:"none",score:"block",timer:"block"});
+		break;
+
+		case "phon_bingo_class":
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",bing_class_display:"none",score:"none",timer:"none"});
 		break;
 
 		case "numbers":
-			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "num_bingo":
-			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",score:"block",timer:"block"});
+			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",score:"block",timer:"block"});
 		break;
 	}
 }
@@ -1525,11 +1699,14 @@ function selectLev(level, caller) {
 			document.getElementById("panelLev2").src="images/buttons/b_"+level+".png";
 		}
 		currentLev = level;
-		setVocArrays();
-		//preloadAudio();
-		preLoadImages();
 
+		if (curr_topic_title!="multi") {
+			setVocArrays();
+		}
+
+		setAvailCats();
 		setTopicButtons();
+
 
 		if (availCats.indexOf(curr_topic_title) == -1) {
 			selectTopic("multi");
@@ -1537,13 +1714,14 @@ function selectLev(level, caller) {
 
 		if (curr_topic_title=="multi"){
 			setComCats();
-			setAllVocArray();
+			setTimeout(function(){setAllVocArray();},600);
 		}
 	}
 }
 
 
 function setTopicButtons(){
+	//debugger;
 	for (var i = 0; i<topics_all.length; i++) {
 		if (uMode!="listen_choose"){
 			if (availCats.indexOf(topics_all[i]) == -1 && topics_onet.indexOf(topics_all[i]) == -1)  {
@@ -1684,7 +1862,12 @@ function selectTopic(topic,caller) {
 				curr_topic_dir=topic;
 				      		
         		if (topic=="onet_voc"){
-					setOnetVocab();
+					if (voc_mode=="user") {
+						vocArray=getOnetUserVocab();
+					}
+					else {
+						setOnetVocab();	
+					}
         		}
         		else {
 					setVocArrays();
@@ -1693,14 +1876,14 @@ function selectTopic(topic,caller) {
         		
         		if (topic.slice(0,4)=="onet"){
         			if (topic=="onet_voc"){
-						setDisplays ({read_choose_icon:"block",play_learn_icon:"block",onet_act_icon:"none",onet_full_select:"none"});
+						setDisplays ({read_choose_icon:"block",play_learn_icon:"block",onet_act_icon:"none",onet_full_select:"none",onet_voc_set:"block"});
         			}
 					else if (topic=="onet_full"){
-						setDisplays ({read_choose_icon:"none",play_learn_icon:"none",onet_act_icon:"block",onet_full_select:"block"});
+						setDisplays ({read_choose_icon:"none",play_learn_icon:"none",onet_act_icon:"block",onet_full_select:"block",onet_voc_set:"none"});
 						document.getElementById("l_onet_topic").src="images/buttons/"+topic+".jpg";
 					}
         			else {
-        				setDisplays ({read_choose_icon:"none",play_learn_icon:"none",onet_act_icon:"block",onet_full_select:"none"});
+        				setDisplays ({read_choose_icon:"none",play_learn_icon:"none",onet_act_icon:"block",onet_full_select:"none",onet_voc_set:"none"});
         				document.getElementById("l_onet_topic").src="images/buttons/"+topic+".jpg";
         			}
         		}
@@ -1713,6 +1896,20 @@ function selectTopic(topic,caller) {
 
 		if (uMode=="voc_bingo") {
 			setVocBingSheet();
+		}
+		switch (curr_topic_title) {
+			case "onet_q_a":
+				document.getElementById("choice_instructions").innerHTML="Match the answer to the question word:"
+			break;
+
+			case "onet_gq":
+			case "onet_soc":
+			case "onet_phon":
+				document.getElementById("choice_instructions").innerHTML="Choose the best answer - 1, 2, 3 or 4:"
+			break;
+
+			default:
+				document.getElementById("choice_instructions").innerHTML="Click on the word that matches the picture:"
 		}
 	}
 }
@@ -1889,108 +2086,175 @@ function scrollDiv(evt,caller){
 }
 
 
-function setMsg(content,name,response_type) {
-	audCtrls(msg_sound, "play");
+function setMsg(content,response_type,string_1,string_2) {
+	if (response_type == "success") {
+		audCtrls(success, "play");
+	}
+	else {
+		audCtrls(msg_sound, "play");
+	}
 	var oK_response = "";
 	var msg_box=document.getElementById("msg_box");
 
 	document.getElementById("modal_back").style.display="block";
 	document.getElementById("msg_win").style.top ="0.1em";
 	document.getElementById("msg_win").style.left ="0.1em";
+	document.getElementById("msg_win").style.borderColor = "#f60";
 
 	switch (response_type) {
 		case "OK_Cancel":
-			setDisplays({msg_close:"none",msg_save_leave_cancel:"none",msg_OK_cancel:"block",msg_box_clone:"none",msg_edit_delete:"none"});
-			break;
-		case "save_leave_cancel":
-			setDisplays({msg_close:"none",msg_OK_cancel:"none",msg_save_leave_cancel:"block",msg_box_clone:"none",msg_edit_delete:"none"});
-			break;
+			setDisplays({msg_close:"none",msg_OK_cancel:"block",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+		break;
+
 		case "msg_clone":
-			setDisplays({msg_box_clone:"block",msg_close:"none",msg_OK_cancel:"none",msg_save_leave_cancel:"none",msg_edit_delete:"none"});
-			break;
+			setDisplays({msg_box_clone:"block",msg_close:"none",msg_OK_cancel:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+		break;
+
 		case "edit_delete":
-			setDisplays({msg_box_clone:"none",msg_close:"none",msg_OK_cancel:"none",msg_save_leave_cancel:"none",msg_edit_delete:"block"});
-			break;
+			setDisplays({msg_box_clone:"none",msg_close:"none",msg_OK_cancel:"none",msg_edit_delete:"block",msg_new_continue:"none"});
+		break;
+
+		case "new_continue":
+			setDisplays({msg_close:"none",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"block"});
+		break;
+
+		case "success":
+			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+			document.getElementById("msg_win").style.borderColor = "#393";
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:#0DDB0D; \
+															color:black; border:0.15em grey ridge; \font-weight:bold; font-size:150%">Success</span></p>';
+			msg_box.style.display="block";															
+		break;
+
 		default:
-			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_save_leave_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none"});
-			break;
+			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+		break;
 	}
 
 	switch (content) {
-		case "err1":
-			document.getElementById("msg_box").innerHTML="Sorry! Pronunciation points can only be scored for the activities: 'Say the Word' and 'Say the Number'.";
-			break;
-		case "err2":
-			document.getElementById("msg_box").innerHTML="Sorry! You need at least one topic. Please add another before deleting this one.";
-			break;
-		case "err3":
-			document.getElementById("msg_box").innerHTML="Sorry, Vocabulary Bingo needs at least 24 words, and your combination only contains " +all_voc_array.length+". Please add another topic or choose another activity.";
-			break;
-		case "err4":
-			var t = curr_topic_title.substr(0,1).toUpperCase()+curr_topic_title.substr(1);
-			if (t=="Dot_and_Ben") {
-				t=d_B_Title;
-			}
-			document.getElementById("msg_box").innerHTML="Sorry, Vocabulary Bingo needs at least 24 words, and <b>"+t +"</b> only contains " +vocArray.length+". Please choose another topic or another activity.";
-			break;
-		case "err5":
-			document.getElementById("msg_box").innerHTML="Sorry, Vocabulary Bingo needs at least 24 words, and your selection only contains " +vocArray.length+". Multi has been reset to all available topics.";
-			break;
-		case "err6":
-			document.getElementById("msg_box").innerHTML='Sorry, <span style="background-image: url( \'images/formatting/d_B_TitleL.png \'); background-size:100% 100%">&nbsp</span><span style="color:black; background-image: url( \'images/formatting/d_B_TitleBack.jpg \'); background-size:100% 100%" >'+d_B_Title+'</span><span style="color:black; background-image: url( \'images/formatting/d_B_TitleR.png \'); background-size:100% 100%" >&nbsp'+'</span> only has '+((d_B_ExArray.length*2)-1)+' pages.';
-			break;
+
+		case "bing_back":
+			msg_box.innerHTML='Would you like to start a new game or continue the previous one?';
+			document.getElementById("msg_new").onclick= function() {activity("phon_bingo_class_cont");setDisplays({modal_back:'none'})};
+			document.getElementById("msg_continue").onclick= function() {bingClassProc("backup");};
+		break;
+
+		case "err_pron_points":
+			msg_box.innerHTML="Sorry! Pronunciation points can only be scored for the activities: 'Say the Word' and 'Say the Number'.";
+		break;
+
+		case "err_topics":
+			msg_box.innerHTML="Sorry! You need at least one topic. Please add another before deleting this one.";
+		break;
+
+		case "err_bingo_multi":
+			msg_box.innerHTML="Sorry, Vocabulary Bingo needs at least 24 words, and your combination only contains " +all_voc_array.length+". Please add another topic or choose another activity.";
+		break;
+
+		case "err_db_start":
+			msg_box.innerHTML='Sorry, <span style="background-image: url( \'images/formatting/d_B_TitleL.png \'); background-size:100% 100%">&nbsp</span><span style="color:black;\
+								background-image: url( \'images/formatting/d_B_TitleBack.jpg \'); background-size:100% 100%" >'+d_B_Title+'</span><span style="color:black; \
+								background-image: url( \'images/formatting/d_B_TitleR.png \'); background-size:100% 100%" >&nbsp'+'</span> only has '+((d_B_ExArray.length*2)-1)+' pages.';
+		break;
+
 		case "err_no_topic":
-			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Warning</span></p>'+topicTitle(curr_topic_title)+' for '+currentLev+' does not exist in the file: '+name;
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">\
+								Warning</span></p>'+topicTitle(curr_topic_title)+' for '+currentLev+' does not exist in the file: '+string_1;
 		break;
+
 		case "err_file":
-			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Sorry</span></p><p style="margin-bottom: 0.5em">'+name+' could not be loaded.</p><p style="margin-bottom: 0.5em">It is not an English Builder file.</p>';
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%;\
+								">Sorry</span></p><p style="margin-bottom: 0.5em"><span style="color:#64FFFF; font-weight:bold">'+string_1+'</span> could not be loaded.</p><p style="margin-bottom: 0.5em">It is not an English Builder file.</p>';
 		break;
+
 		case "err_version":
-			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Sorry</span></p><p style="margin-bottom: 0.5em">'+name+' could not be loaded.</p><p style="margin-bottom: 0.5em">It is a more recent file version than this application can load.<p style="margin-bottom: 0.5em">Please update English Builder to the latest version.</p>';
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; \
+								">Sorry</span></p><p style="margin-bottom: 0.5em"><span style="color:cyan">'+string_1+'</span> could not be loaded.</p><p style="margin-bottom: 0.5em">It is a more recent file version than this application can load.\
+								<p style="margin-bottom: 0.5em">Please update English Builder to the latest version.</p>';
 		break;
+
 		case "err_no_clone":
-			document.getElementById("msg_box").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Sorry</span></p><p style="margin-bottom: 0.5em">'+currentLev + ' does not have a <span style="background-color:#b8e4ec; color:black; padding: 0 0.2em 0 0.2em">'+topicTitle(curr_topic_title)+'</span> topic to clone from.</p>';
-		document.getElementById("msg_close_button").onclick= function() {setMsg("choice_clone","","msg_clone");};
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">\
+								Sorry</span></p><p style="margin-bottom: 0.5em"><span style="color:#64FFFF; font-weight:bold">'+string_1 + '</span> does not have a <span style="color:#64FFFF; font-weight:bold">'+topicTitle(curr_topic_title)+'</span> \
+								topic to clone from.</p>';
+			document.getElementById("msg_close_button").onclick= function() {setMsg("choice_clone","msg_clone");};
 		break;
-		case "choice1":
-			document.getElementById("msg_box").innerHTML="<p style='text-align:center; margin-bottom:1em;'><span style='padding:0 0.3em 0 0.3em; \
-			background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%'>Warning</span></p><p style='margin-bottom:\
-			 0.5em'><span style='background-color:#b8e4ec; color:black; padding: 0 0.2em 0 0.2em'>"+topicTitle(name)+"</span> is not in your list of topics\
-			  for "+currentLev+".</p><p style='margin-bottom: 0.5em'> Choose <img style='width:4.7em; vertical-align:middle' \
-			  src= 'images/buttons/continue.png' /> to add it and choose vocabulary items.</p>";
-			document.getElementById("msg_OK").onclick = function () {document.getElementById('modal_back').style.display='none';modUserAvailTopics(name,"add_continue");};
+			
+		case "clone_success":
+			msg_box.innerHTML+=topicTitle(curr_topic_title)+' successfully cloned from '+string_1+'.';
 		break;
+
+		case "choice_add_topic":
+			msg_box.innerHTML="<p style='text-align:center; margin-bottom:1em;'><span style='padding:0 0.3em 0 0.3em; \
+								background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%'>Warning</span></p><p style='margin-bottom:\
+								0.5em'><span style='color:#64FFFF; font-weight:bold'>"+topicTitle(string_1)+"</span> is not in your list of topics\
+								for <span style='color:#64FFFF; font-weight:bold'>"+currentLev+".</span></p><p style='margin-bottom: 0.5em'> Choose <img style='width:4.7em; vertical-align:middle' \
+								src= 'images/buttons/continue.png' /> to add it and select vocabulary items.</p>";
+			document.getElementById("msg_OK").onclick = function () {document.getElementById('modal_back').style.display='none';modUserAvailTopics(string_1,"add_continue");};
+		break;
+
 		case "choice_delete_topic":
-			document.getElementById("msg_box").innerHTML="<p style='text-align:center; margin-bottom:1em;'><span style='padding:0 0.3em 0 0.3em; \
-			background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%'>Warning</span></p><p style='margin-bottom:\
-			 0.5em'><span style='background-color:#b8e4ec; color:black; padding: 0 0.2em 0 0.2em'>"+topicTitle(name)+"</span> currently has less than \
-			 4 items, which is not enough for a topic.</p><p style='margin-bottom: 0.5em'>If you choose <img style='width:3.7em; vertical-align:middle' \
-			 src= 'images/buttons/delete_topic.png' />, <span style='background-color:#b8e4ec; color:black; padding: 0 0.2em 0 0.2em'>"+topicTitle(name)+"</span>\
-			  <span style='font-weight:bold; color:red'>will be removed</span> from your "+currentLev+" list of topics!</p><p style='margin-bottom: 0.5em'>\
-			  Alternatively, you can choose <img style='width:3.7em; vertical-align:middle' src= 'images/buttons/edit_topic.png' /> to add some more items.";
+			msg_box.innerHTML="<p style='text-align:center; margin-bottom:1em;'><span style='padding:0 0.3em 0 0.3em; \
+								background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%'>Warning</span></p><p style='margin-bottom:\
+								0.5em'><span style='color:#64FFFF; font-weight:bold'>"+topicTitle(string_1)+"</span> currently has less than \
+								4 items, which is not enough for a topic.</p><p style='margin-bottom: 0.5em'>If you choose <img style='width:3.7em; vertical-align:middle' \
+								src= 'images/buttons/delete_topic.png' />, <span style='color:#64FFFF; font-weight:bold'>"+topicTitle(string_1)+"</span>\
+								<span style='font-weight:bold; color:red'>will be removed</span> from your "+currentLev+" list of topics!</p><p style='margin-bottom: 0.5em'>\
+								<p style='margin-bottom:0.5em'>Choose <img style='width:3.7em; vertical-align:middle' src= 'images/buttons/edit_topic.png' /> to add some more items.</p> \
+								<p style='margin-bottom:0.5em'>Choose <img style='width:5.6em; vertical-align:middle' src= 'images/buttons/reset_to_default.png' /> to reset \
+								<span style='color:#64FFFF; font-weight:bold'>"+topicTitle(string_1)+"</span> to the default.</p>";
 			document.getElementById("msg_edit_topic").onclick = function () {setDisplays({modal_back:'none'});setVocChoiceTable("show_all");};
-			document.getElementById("msg_delete_topic").onclick = function () {setDisplays({modal_back:'none'});modUserAvailTopics(name,"delete_continue");};
+			document.getElementById("msg_default_topic").onclick = function () {setDisplays({modal_back:'none'});setVocChoiceTable("default");};
+			document.getElementById("msg_delete_topic").onclick = function () {setDisplays({modal_back:'none'});modUserAvailTopics(string_1,"delete_continue");};
 		break;
+
+		case "warn_all_voc_default":
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">\
+								Warning</span></p><p style="margin-bottom: 0.5em">This will return <span style="color:#64FFFF; font-weight:bold">all user vocabulary</span> from <span style="color:#64FFFF; font-weight:bold">\
+								all levels</span> to the program\'s default settings.</p><p style="margin-bottom: 0.5em">Are you sure?</p>';
+			document.getElementById("msg_OK").onclick = function () {document.getElementById('modal_back').style.display='none';initUserVocab('no_check');};
+		break;
+		
+		case "warn_delete_topic":
+			msg_box.innerHTML="<p style='text-align:center; margin-bottom:1em;'><span style='padding:0 0.3em 0 0.3em; \
+								background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%'>Warning</span></p><p style='margin-bottom:\
+								0.5em'>Are you sure you want to delete <span style='color:#64FFFF; font-weight:bold'>"+topicTitle(string_1)+"</span>?</p>";
+			document.getElementById("msg_OK").onclick = function () {setDisplays({modal_back:'none'});modUserAvailTopics(string_1,"delete_continue");};
+		break;
+
 		case "choice_clone":
-			document.getElementById("msg_box").innerHTML='<p style="margin-bottom: 0.5em">Please select a level that you want to clone this topic <span style="font-weight: bold;\
+			msg_box.innerHTML='<p style="margin-bottom: 0.5em">Please select a level that you want to clone this topic <span style="font-weight: bold;\
 			color: red">from</span>.</p>';
 			document.getElementById("msg_close_button").onclick= function() {setDisplays({modal_back:'none'});};
 		break;
+
 		case "choice_load":
-			document.getElementById("msg_box").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Warning</span></p><p style="margin-bottom: 0.5em">This will change <b>all</b> topics from <b>all</b> levels to those saved in your file.</p><p style="margin-bottom: 0.5em">Are you sure you want to continue?';
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  \
+								font-weight:bold; font-size:150%; ">Warning</span></p><p style="margin-bottom: 0.5em">This will change <span style="color:#64FFFF; font-weight:bold">all user vocabulary</span> from \
+								<span style="color:#64FFFF; font-weight:bold">all levels</span> to that saved in your file.</p>\
+								<p style="margin-bottom: 0.5em">Are you sure you want to continue?';
 			document.getElementById("msg_OK").onclick = function () {document.getElementById('modal_back').style.display='none';document.getElementById("reset_all").click();};
-			//;
 		break;
-		case "choice_save":
-			document.getElementById("msg_box").style.display="none";
-			document.getElementById("msg_box_save").style.display="block";
-		break;
+
 		case "u_c":
-			document.getElementById("msg_box").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">'+name+'</span> is still under construction.';
-			break;
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">\
+								Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">'+string_1+'</span> \
+								is still under construction.';
+		break;
+
+		case "load_all_complete":
+			msg_box.innerHTML+='<p style="margin-bottom:1em;">The file <span style="color:#64FFFF; font-weight:bold">' +string_1 +'</span> has loaded successfully!</p><p><span style="color:#64FFFF; font-weight:bold">All user vocabulary</span> has been set by that file.</p><br>';
+		break;
+
+		case "load_topic_complete":
+			msg_box.innerHTML+='<p style="margin-bottom:1em;">The file <span style="color:#64FFFF; font-weight:bold">' +string_1 +'</span> has loaded successfully!</p><p><span style="color:#64FFFF; font-weight:bold">'
+								 + topicTitle(curr_topic_title) +' user vocabulary</span> has been set by that file.</p><br>';
+		break;
+
+		case "user_voc_reset_complete":
+			msg_box.innerHTML+='<p style="margin-bottom:1em;"><span style="color:#64FFFF; font-weight:bold">All topics</span> have been reset to default</p>';
+		break;
 	}
-
-
 }
 
 function setInfo(content,action,bCol,w,yPos,xPos) {
@@ -2031,6 +2295,9 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 			break;
 		case "phon_bingo":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Phonics Bingo:</span> is a listening activity, similar to Vocabulary Bingo, but focussing on the relationship between spelling and pronunciation (Phonics). Learners listen to syllables and words and must select matching text from the grid. Each item is repeated 3 times before proceeding to the next.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct selection while the item is current; 1/2 point if the item was played previously. Selecting a cell that has not been played yet results in a 5 second penalty. </p><p style='padding-top:0.5em'>The Bingo bonus starts at 50 points with 1 point deducted every few seconds. To score Bingo, players must get a complete row, column or diagonal before the time or words run out.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start / Repeat Item</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
+			break;
+		case "phon_bingo_class":
+			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Bingo: Classroom Version</span> is still under construction.';
 			break;
 		case "numbers":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Say the Number:</span> is similar to Say the Word and Read and Say, but focusses on numbers. Learners are presented with a number, and must pronounce it as clearly as possible.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> This is a human-assessed activity, meaning that a teacher, parent or more advanced student is needed to award points.</p><p style='padding-top:0.5em'>There are two ways to score. When starting a new unit, focus on independence, giving 2 points if students can read the numbers without help (see Read and Say). Once students can generally read without help, move the focus to give 2 points for clarity (see Say the Word).</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span> Click on <span id='b_method' style='border:#7bd8e8 ridge ; background-color:blue; padding:0em 0.2em; cursor: pointer' onclick='swapScoring()'>Scoring Method 1</span> to see alternative.</p><div id='scoringM1' style='margin:0.5em 5em 0.5em 5em'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p><span style='color:red'>cannot</span> read</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p>read <span style='color:#f60'>with help</span></p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p>read <span style='color:green'>without help</span></p><p>(2 points)</p></div></div><div id='scoringM2' style='margin:0.5em 5em 0.5em 5em; display:none'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p style='color:red'>incorrect</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p style='color:#f60'>correct</p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p style='color:green'>correct and clear</p><p>(2 points)</p></div></div><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
@@ -2099,58 +2366,83 @@ function topicTitle(title) {
 	switch (title) {
 		case "actions":
 			return("Actions");
-			break;
+		break;
+		
 		case "animals":
 			return("Animals");
-			break;
+		break;
+		
 		case "beach":
 			return("At the Beach");
+		break;
+
 		case "body":
 			return("Parts of the Body");
-			break;
+		break;
+		
 		case "clothes":
 			return("Clothes");
-			break;
+		break;
+		
 		case "describing":
 			return("Describing");
-			break;
+		break;
+		
 		case "easy":
 			return("Easy Reading");
+		break;
+
 		case "finding game":
 			return("The Finding Game");
+		break;
+
 		case "food":
 			return("Food and Drinks");
-			break;
+		break;
+		
 		case "free_time":
 			return("Free Time");
-			break;
+		break;
+		
 		case "grammar":
 			return("Grammar and Punctuation");
-			break;
+		break;
+		
 		case "home":
 			return("Home");
-			break;
+		break;
+		
 		case "location":
 			return("Location");
-			break;
+		break;
+		
 		case "occupations":
 			return("Occupations");
-			break;
+		break;
+
+		case "onet_voc":
+			return("ONET");
+		break;
+
 		case "people":
 			return("People");
-			break;
+		break;
+		
 		case "places_and_transport":
 			return("Places and Transport");
-			break;
+		break;
+		
 		case "school":
 			return("School");
-			break;
+		break;
+		
 		case "time":
 			return("Time");
-			break;
+		break;
+		
 		case "weather":
 			return("Weather and Seasons");
-			break;
+		break;
 	}
 }
 
@@ -2207,7 +2499,7 @@ function selectScoreSplit(mode) {
 			document.getElementById("total").style.display="inline";
 		}
 		else {
-			setMsg("err1");
+			setMsg("err_pron_points");
 		}
 	}
 	else {
@@ -2222,7 +2514,7 @@ function selectScoreSplit(mode) {
 
 function setDBStartPage(page) {
 	if (page > (d_B_ExArray.length*2)-1) {
-		setMsg("err6");
+		setMsg("err_db_start");
 	}
 	else {
 	document.getElementById("setDBPage"+DBStartPage).className = "optSelect";
@@ -2291,7 +2583,7 @@ function modComCats(cat){
 			document.getElementById("ch_"+cat).src="images/buttons/no_button.png";
 		}
 		else {
-			setMsg("err2");
+			setMsg("err_topics");
 			document.getElementById("ch_"+cat).src="images/buttons/yes_button.png";
 		}
 	}
@@ -2301,7 +2593,7 @@ function modComCats(cat){
 	}
 	setAllVocArray();
 	if (uMode=="voc_bingo" && all_voc_array.length <24) {
-		setMsg("err3");
+		setMsg("err_bingo_multi");
 		comCats.splice(0,0,cat);
 		document.getElementById("ch_"+cat).src="images/buttons/yes_button.png";
 	}
@@ -2332,14 +2624,21 @@ function setButtonStatus(button,action,param1,param2) {
 	document.getElementById("b_"+button).onmouseup=down;
 }
 
-function addUndo() {
-	var x = new Array();
-	var prop_name=(currentLev+"_"+curr_topic_title);
-	var undo_ind=(currentLev+"_"+curr_topic_title+"_pos");
 
-	for (var i=0;i<vocArray.length;i++) {
-		x[i]=vocArray[i];
+function addUndo() {
+	var t_array = new Array();
+
+	if (curr_topic_title=="onet_voc") {
+		var prop_name=(curr_topic_title);
+		var undo_ind=(curr_topic_title+"_pos");
+		t_array=getOnetUserVocab();
 	}
+	else {
+		var prop_name=(currentLev+"_"+curr_topic_title);
+		var undo_ind=(currentLev+"_"+curr_topic_title+"_pos");
+		t_array=localStorage[currentLev+"_"+curr_topic_title].split(",");
+	}
+	
 
 	if (undo_obj.hasOwnProperty(prop_name)==false) {
 		undo_obj[prop_name]= new Array();
@@ -2348,7 +2647,7 @@ function addUndo() {
 	if (undo_obj[undo_ind]!="x" && (undo_obj[undo_ind]+1)<undo_obj[prop_name].length) {
 		undo_obj[prop_name].splice((undo_obj[undo_ind]+1),(undo_obj[prop_name].length-(undo_obj[undo_ind]+1)));
 	}
-	undo_obj[prop_name].push(x);
+	undo_obj[prop_name].push(t_array);
 	undo_obj[undo_ind]=undo_obj[prop_name].length-1;
 	setUndoRedo();
 }
@@ -2356,7 +2655,6 @@ function addUndo() {
 
 function adjustUserTopics(id,action){
 	addUndo();
-	var voc = (tempArray[id.substr(6)]);
 	if (action=="clear") {
 		vocArray=new Array ();
 		for (var i=0;i<tempArray.length;i++) {
@@ -2364,26 +2662,84 @@ function adjustUserTopics(id,action){
 			document.getElementById("b_adj_" + i).onclick = function() {adjustUserTopics(this.id,"add");};
 		}
 	}
+
 	if (action=="delete") {
-		var ind = vocArray.indexOf(voc);
+		if (curr_topic_title!="onet_voc") {
+			var voc = (tempArray[id.substr(6)]);
+			var ind = vocArray.indexOf(voc);
+		}
+		else {
+			var voc = tempArray[id.substr(6)].txt;
+			if (typeof voc == "object") {
+				voc = voc.toString();
+			}
+			var tArray=[];
+			for (var j=0; j<vocArray.length; j++) {
+				tArray[j]=vocArray[j].txt;
+				if (typeof tArray[j] == "object") {
+					tArray[j] = tArray[j].toString();
+				}
+			}
+
+			var ind = tArray.indexOf(voc);
+		}
 		vocArray.splice(ind,1);
 		document.getElementById(id).src="images/buttons/no_button.png";
 		document.getElementById(id).onclick = function() {adjustUserTopics(this.id,"add");};
 	}
+	
 	else if (action=="add") {
 		document.getElementById(id).src="images/buttons/yes_button.png";
 		document.getElementById(id).onclick = function() {adjustUserTopics(this.id,"delete");};
-		vocArray.push(voc);
-		vocArray.sort(function (a, b) {
-			return a.toLowerCase().localeCompare(b.toLowerCase());
-		});
+		
+		if (curr_topic_title!="onet_voc") {
+			var voc = (tempArray[id.substr(6)]);
+			vocArray.push(voc);
+			vocArray.sort(function (a, b) {
+				return a.toLowerCase().localeCompare(b.toLowerCase());
+			});
+		}
+		else {
+			var voc = tempArray[id.substr(6)].txt;
+			if (typeof voc == "object") {
+				voc=voc[0];
+			}
+			var tArray=[];
+			for (var j=0; j<vocArray.length; j++) {
+				tArray[j]=vocArray[j].txt;
+				if (typeof tArray[j] == "object") {
+					tArray[j]= tArray[j][0];
+				}
+			}
+			tArray.push(voc);
+			tArray.sort(function (a, b) {
+				return a.toLowerCase().localeCompare(b.toLowerCase());
+			});
+			var ind = tArray.indexOf(voc);
+			voc = tempArray[id.substr(6)];
+			vocArray.splice(ind, 0, voc); 
+		}
+	}
+	
+	if (curr_topic_title!="onet_voc") {
+		localStorage[currentLev+"_"+curr_topic_title]=vocArray;
+		if (localStorage[currentLev+"_"+curr_topic_title]=="") {
+			localStorage[currentLev+"_"+curr_topic_title]=[];
+		}
+	}
+	else {
+		setOnetUserVocab();
 	}
 	setUserData();
 }
 
 function setUndoRedo(caller) {
 
-	if (caller!="topics") {
+	if (curr_topic_title=="onet_voc") {
+		var prop_name=(curr_topic_title);
+		var undo_ind=(curr_topic_title+"_pos");
+	}
+	else if (caller!="topics") {
 		var prop_name=(currentLev+"_"+curr_topic_title);
 		var undo_ind=(currentLev+"_"+curr_topic_title+"_pos");
 	}
@@ -2418,7 +2774,7 @@ function setUndoRedo(caller) {
 
 function setVocChoiceTable(button, clone_lev) {
 	if (curr_topic_title=="multi") {
-		var dir ="";
+		selectTopic(availCats[0]);
 	}
 	else {
 		var dir =curr_topic_dir;
@@ -2427,27 +2783,38 @@ function setVocChoiceTable(button, clone_lev) {
 	var cat=curr_topic_title;
 	var level=currentLev;
 	var vm=voc_mode;
-	var prop_name=(currentLev+"_"+curr_topic_title);
-	var undo_ind=(currentLev+"_"+curr_topic_title+"_pos");
+	if (curr_topic_title=="onet_voc") {
+		var prop_name=(curr_topic_title);
+		var undo_ind=(curr_topic_title+"_pos");
+	}
+	else {
+		var prop_name=(currentLev+"_"+curr_topic_title);
+		var undo_ind=(currentLev+"_"+curr_topic_title+"_pos");
+	}
+		
 
 	switch (button) {
-		case "init":
+
+		case "default":
 			addUndo();
 			setUndoRedo();
-			voc_mode="default";
-			currentLev = "Master";
-			setVocArrays();
-			selectTopic(cat);
-			currentLev=level;
-			setVocArrays();
-			voc_mode=vm;
+			if (curr_topic_title!="onet_voc") {
+				voc_mode="default";
+				setVocArrays();
+				localStorage[currentLev+"_"+curr_topic_title]=vocArray;
+				voc_mode=vm;
+			}
+			else {
+				setOnetVocab();
+				setOnetUserVocab();
+			}
 			setVocChoiceTable("show_selected");
 			voc_table_state="show_topic";
 			return;
 		break;
 
 		case "clone_topic":
-			setMsg("choice_clone","","msg_clone");
+			setMsg("choice_clone","msg_clone");
 			return;
 		break;
 
@@ -2455,43 +2822,48 @@ function setVocChoiceTable(button, clone_lev) {
 			if (currentLev==clone_lev) {
 				return;
 			}
-			currentLev=clone_lev;
-			setUserAvailCats();
-			if (availCats.indexOf(curr_topic_title)!=-1) {
-				currentLev=level;
-				addUndo(); //fix me: undo does not work!!!
-				currentLev=clone_lev;
-				setUserVocArray();
-				tempArray.length=0;
-				for (var i=0; i<vocArray.length; i++) {
-					tempArray[i]=vocArray[i];
-				}
+			if (localStorage[clone_lev+"_"+curr_topic_title]) {
+				localStorage[currentLev+"_"+curr_topic_title]=localStorage[clone_lev+"_"+curr_topic_title];
+				setMsg("clone_success","success",clone_lev);
 			}
 			else {
-				setMsg("err_no_clone");
-				currentLev=level;
+				setMsg("err_no_clone","",clone_lev);
 				return;
 			}
-			currentLev=level;
+
 			setVocChoiceTable("show_selected");
-			setDisplays({modal_back:'none'});
 		break;
 
 		case "show_selected":
-			tempArray=new Array ();
-			for (var m=0;m<vocArray.length;m++) {
-				tempArray[m]=vocArray[m];
+			if (curr_topic_title!= "onet_voc") {
+				if (localStorage[currentLev+"_"+curr_topic_title]=="") {
+					tempArray= new Array();
+				}
+				else {
+					tempArray=localStorage[currentLev+"_"+curr_topic_title].split(",");
+				}
+			}
+			else {
+				tempArray=getOnetUserVocab();
 			}
 			voc_table_state="show_topic";
 		break;
 
 		case "show_topic":
 			setUndoRedo();
-			setVocArrays();
-			tempArray=new Array ();
-			for (var m=0;m<vocArray.length;m++) {
-				tempArray[m]=vocArray[m];
+
+			if (curr_topic_title!= "onet_voc") {
+				voc_mode="default";
+				setVocArrays();
+				dir=curr_topic_dir;
+				voc_mode=vm;
+				tempArray=localStorage[currentLev+"_"+curr_topic_title].split(",");
 			}
+			else {
+				setOnetVocab();
+				tempArray=getOnetUserVocab();
+			}
+			
 			setButtonStatus("show_all",setVocChoiceTable,"show_all");
 			setButtonStatus("show_selected",setVocChoiceTable,"show_selected");
 			voc_table_state="show_topic";
@@ -2499,22 +2871,17 @@ function setVocChoiceTable(button, clone_lev) {
 
 		case "show_all":
 			voc_mode="default";
-			var tempArray2 = new Array ();
-			for (var m=0;m<vocArray.length;m++) {
-				tempArray2[m]=vocArray[m];
+			if (curr_topic_title!="onet_voc") {
+				tempArray = masterVoc();
 			}
-			var level=currentLev;
-			currentLev = "Master";
-			setVocArrays();
-			tempArray=new Array ();
-			for (var m=0;m<vocArray.length;m++) {
-				tempArray[m]=vocArray[m];
+			else {
+				setOnetVocab();
+				tempArray=[];
+				for (var i=0; i<vocArray.length; i++) {
+					tempArray[i]=vocArray[i];
+				}
+				vocArray=getOnetUserVocab();
 			}
-			vocArray=new Array ();
-			for (var m=0;m<tempArray2.length;m++) {
-				vocArray[m]=tempArray2[m];
-			}
-			currentLev=level;
 			voc_mode=vm;
 			setButtonStatus("show_all",setVocChoiceTable,"show_all");
 			setButtonStatus("show_selected",setVocChoiceTable,"show_selected");
@@ -2524,53 +2891,32 @@ function setVocChoiceTable(button, clone_lev) {
 		case "show_all_topics":
 			var level=currentLev;
 			var dir = "titles";
-			var num_topics=0;
-
-			vocArray= new Array ();
-
-			for (var i=0;i<availCats.length;i++) {
-				if (specCats.indexOf(availCats[i])==-1) {
-					vocArray[num_topics]=availCats[i];
-					num_topics++;
-				}
-			}
-			voc_mode="default";
-			currentLev="Master";
-			setAvailCats();
-			tempArray= new Array ();
-			num_topics=0;
-			for (var i=0;i<availCats.length;i++) {
-				if (specCats.indexOf(availCats[i])==-1) {
-					tempArray[num_topics]=availCats[i];
-					num_topics++;
-				}
-			}
-			currentLev=level;
-			voc_mode=vm;
-			setAvailCats();
+			vocArray=localStorage["topics_gen_"+currentLev].split(",");
+			tempArray=topics_all_editable.split(",");
 			voc_table_state="topics";
 		break;
 
 		case "topics":
-			if (vocArray.length<4 && curr_topic_title!="multi") {
+			if (curr_topic_title=="onet_voc") {
+				selectTopic(availCats[0]);
+			}
+			if (vocArray.length<4 && localStorage["topics_gen_" + currentLev].split(",").indexOf(curr_topic_title) != -1) {
 				modUserAvailTopics(curr_topic_title,"delete");
 				return;
 			}
 			var prevRows=document.getElementById("voc_tab").rows.length;
-			var level=currentLev;
 			var dir = "titles";
-			var num_topics=0;
 
 			setUndoRedo("topics");
-			setAvailCats();
-			tempArray.length=0;
-			for (var i=0;i<availCats.length;i++) {
-				if (specCats.indexOf(availCats[i])==-1) {
-					tempArray[num_topics]=availCats[i];
-					num_topics++;
+			tempArray=localStorage["topics_gen_"+currentLev].split(",");
+			for (var i=0;i<tempArray.length;i++) {
+				if (topics_no_edit.indexOf(tempArray[i])!=-1) {
+					tempArray.splice(i,1);
 				}
 			}
-			currentLev=level;
+
+			var num_topics=tempArray.length;
+
 			document.getElementById("voc_tab_div").style.height="8.5em";
 			document.getElementById("lev_tab_div").style.display="block";
 			setButtonStatus("show_all",setVocChoiceTable,"show_all_topics");
@@ -2580,10 +2926,19 @@ function setVocChoiceTable(button, clone_lev) {
 
 		case "select_all":
 			addUndo();
-			vocArray= new Array ();
-			for (var i=0;i<tempArray.length;i++) {
-				vocArray[i]=tempArray[i];
+
+			if (curr_topic_title!="onet_voc") {
+				localStorage[currentLev+"_"+curr_topic_title]=tempArray;
+				vocArray=localStorage[currentLev+"_"+curr_topic_title].split(",");
 			}
+			else {
+				vocArray=[];
+				for (var i=0; i<tempArray.length;i++) {
+					vocArray[i]=tempArray[i];
+				}
+				setOnetUserVocab();
+			}
+			
 			voc_table_state="show_topic";
 			break;
 
@@ -2593,17 +2948,51 @@ function setVocChoiceTable(button, clone_lev) {
 				addUndo();
 				undo_obj[undo_ind]--;
 			}
+			if (undo_obj[prop_name][x]=="") {
+				undo_obj[prop_name][x]=[];
+			}
+			localStorage[prop_name]=(undo_obj[prop_name][x]);
 			var tempArray2 = (undo_obj[prop_name][x]);
-
 			vocArray= new Array();
+
+			if (curr_topic_title=="onet_voc") {
+				var tArray=[];
+				for (var j=0; j<tempArray.length; j++) {
+					tArray[j]=tempArray[j].txt;
+					if (typeof tArray[j] == "object") {
+						tArray[j]= tArray[j][0];
+					}
+				}
+			}
+
 			for (var i=0; i<tempArray2.length;i++) {
 				vocArray[i]=tempArray2[i];
-				if (tempArray.indexOf(vocArray[i])==-1) {
-					tempArray.push(vocArray[i]);
-					tempArray.sort(function (a, b) {
-						return a.toLowerCase().localeCompare(b.toLowerCase());
-					});
+				
+				if (curr_topic_title!="onet_voc") {
+					if (tempArray.indexOf(vocArray[i])==-1) {
+						tempArray.push(vocArray[i]);
+						tempArray.sort(function (a, b) {
+							return a.toLowerCase().localeCompare(b.toLowerCase());
+						});
+					}
 				}
+				else {
+					var voc = vocArray[i].txt;
+					if (typeof voc == "object") {
+						voc=voc[0];
+					}
+					if (tArray.indexOf(voc)==-1) {
+						tArray.push(voc);
+						tArray.sort(function (a, b) {
+							return a.toLowerCase().localeCompare(b.toLowerCase());
+						});
+						var ind = tArray.indexOf(voc);
+						tempArray.splice(ind, 0, vocArray[i]); 
+					}
+				}
+			}
+			if (curr_topic_title=="onet_voc") {
+				setOnetUserVocab();
 			}
 			undo_obj[undo_ind]--;
 			setUndoRedo();
@@ -2611,17 +3000,51 @@ function setVocChoiceTable(button, clone_lev) {
 
 		case "redo":
 			var x = (undo_obj[undo_ind])+2;
+			if (undo_obj[prop_name][x]=="") {
+				undo_obj[prop_name][x]=[];
+			}
+			localStorage[prop_name]=(undo_obj[prop_name][x]);
 			var tempArray2 = (undo_obj[prop_name][x]);
 			undo_obj[undo_ind]++;
 			vocArray= new Array();
+
+			if (curr_topic_title=="onet_voc") {
+				var tArray=[];
+				for (var j=0; j<tempArray.length; j++) {
+					tArray[j]=tempArray[j].txt;
+					if (typeof tArray[j] == "object") {
+						tArray[j]= tArray[j][0];
+					}
+				}
+			}
 			for (var i=0; i<tempArray2.length;i++) {
 				vocArray[i]=tempArray2[i];
-				if (tempArray.indexOf(vocArray[i])==-1) {
-					tempArray.push(vocArray[i]);
-					tempArray.sort(function (a, b) {
-						return a.toLowerCase().localeCompare(b.toLowerCase());
-					});
+
+				if (curr_topic_title!="onet_voc") {
+					if (tempArray.indexOf(vocArray[i])==-1) {
+						tempArray.push(vocArray[i]);
+						tempArray.sort(function (a, b) {
+							return a.toLowerCase().localeCompare(b.toLowerCase());
+						});
+					}
 				}
+				else {
+					var voc = vocArray[i].txt;
+					if (typeof voc == "object") {
+						voc=voc[0];
+					}
+					if (tArray.indexOf(voc)==-1) {
+						tArray.push(voc);
+						tArray.sort(function (a, b) {
+							return a.toLowerCase().localeCompare(b.toLowerCase());
+						});
+						var ind = tArray.indexOf(voc);
+						tempArray.splice(ind, 0, vocArray[i]); 
+					}
+				}
+			}
+			if (curr_topic_title=="onet_voc") {
+				setOnetUserVocab();
 			}
 			setUndoRedo();
 		break;
@@ -2632,9 +3055,11 @@ function setVocChoiceTable(button, clone_lev) {
 		document.getElementById("lev_tab_div").style.display="none";
 		document.getElementById("save_load_grp").style.display="none";
 		document.getElementById("topic_clone_grp").style.display="block";
+		document.getElementById("topic_default_grp").style.display="block";
+		document.getElementById("all_default_grp").style.display="none";
 		setButtonStatus("select_all",setVocChoiceTable,"select_all");
 		setButtonStatus("clear_all",adjustUserTopics,"","clear");
-		setButtonStatus("reset_to_default",setVocChoiceTable,"init");
+		setButtonStatus("reset_to_default",setVocChoiceTable,"default");
 		setButtonStatus("reset_to_saved",loadSetup,document.getElementById("b_reset_to_saved"));
 	}
 	else {
@@ -2643,9 +3068,11 @@ function setVocChoiceTable(button, clone_lev) {
 		setButtonStatus("reset_to_default","");
 		setButtonStatus("reset_to_saved","");
 		document.getElementById("save_load_grp").style.display="block";
+		document.getElementById("all_default_grp").style.display="block";
 		document.getElementById("topic_clone_grp").style.display="none";
+		document.getElementById("topic_default_grp").style.display="none";
 	}
-
+	
 	var imgInd = 0;
 	var txt ="";
 	var img="";
@@ -2653,6 +3080,19 @@ function setVocChoiceTable(button, clone_lev) {
 	var action="";
 	var numRows= (Math.ceil(tempArray.length/5));
 	var prevRows=document.getElementById("voc_tab").rows.length;
+
+	if (curr_topic_title=="onet_voc") {
+		var tempArray3 = new Array();
+		for (var p=0; p<vocArray.length; p++) {
+			if (typeof vocArray[p]=="object") {
+				tempArray3[p]=vocArray[p].txt.toString();
+			}
+			else {
+				tempArray3[p]=vocArray[p].txt;
+			}
+		}
+	}
+	
 
 	for (var k=0;k<prevRows; k++) {
 		document.getElementById("voc_tab").deleteRow(0);
@@ -2662,7 +3102,13 @@ function setVocChoiceTable(button, clone_lev) {
 	 	var imgRow = document.getElementById("voc_tab").insertRow(-1);
 	 	var vocRow = document.getElementById("voc_tab").insertRow(-1);
 	 	for (var j=0; j<5; j++) {
-	 		txt =tempArray[imgInd];
+	 		if (curr_topic_title!="onet_voc") {
+	 			txt =tempArray[imgInd];
+	 		}
+	 		else {
+	 			txt =tempArray[imgInd].txt;
+	 		}
+	 		
 			if (curr_topic_title=="multi") {
 				var slPos = txt.indexOf("/")+1;
 				txt =txt.slice(slPos);
@@ -2677,14 +3123,39 @@ function setVocChoiceTable(button, clone_lev) {
 	 			vocRow.cells[j].innerHTML=txt;
 	 		}
 	 		if (button=="init" || button=="show_all" || button=="undo" || button=="redo" || button=="show_all_topics" ) {
-		 		if (vocArray.indexOf(txt)!=-1){
-		 			yes_no="yes";
-		 			action="'delete'";
-		 		}
-		 		else {
-		 			yes_no="no";
-		 			action="'add'";
-		 		}
+	 			if (curr_topic_title!="onet_voc") {
+	 				if (vocArray.indexOf(txt)!=-1){
+						yes_no="yes";
+						action="'delete'";
+					}
+					else {
+						yes_no="no";
+						action="'add'";
+					}
+	 			}
+	 			else {
+					if (typeof txt == "string") {
+						if (tempArray3.indexOf(txt)!=-1){
+							yes_no="yes";
+							action="'delete'";
+						}
+						else {
+							yes_no="no";
+							action="'add'";
+						}
+					}
+					else {
+						if (tempArray3.indexOf(txt.toString())!=-1){
+							yes_no="yes";
+							action="'delete'";
+						}
+						else {
+							yes_no="no";
+							action="'add'";
+						}
+					}
+	 			}
+					
 		 	}
 		 	else {
 		 		yes_no="yes";
@@ -2692,14 +3163,26 @@ function setVocChoiceTable(button, clone_lev) {
 		 	}
 		 	img=processSubst(txt);
 
-		 	if (button!="topics" && button!="show_all_topics") {
-		 		imgRow.cells[j].innerHTML='<div style="position: relative"><img id="b_adj_'+((i*5)+j)+'" style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" onclick= "adjustUserTopics(this.id,'+action+')" /><img width="100%" src="images/vocab/' + dir +'/' +img+ '.jpg" /></div>';
+		 	if (button!="topics" && button!="show_all_topics" && curr_topic_title!="onet_voc") {
+		 		imgRow.cells[j].innerHTML='<div style="position: relative"><img id="b_adj_'+((i*5)+j)+'" style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" onclick= "adjustUserTopics(this.id,'+action+')" />\
+		 		<img width="100%" src="images/vocab/' + dir +'/' +img+ '.jpg" /></div>';
 		 	}
 		 	else if (button=="topics" || (button=="show_all_topics" && (vocArray.indexOf(txt)!=-1))) {
-		 		imgRow.cells[j].innerHTML='<div style="position: relative"><img id=b_adj_'+((i*5)+j)+' style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" /><img width="100%" src="images/vocab/' + dir +'/' +img+ '.jpg" onclick= "selectTopic(\''+txt+'\');setVocChoiceTable(\'show_topic\')"/></div>';
+		 		imgRow.cells[j].innerHTML='<div style="position: relative"><img id=b_adj_'+((i*5)+j)+' style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" onclick= "setMsg(\'warn_delete_topic\',\'OK_Cancel\',\''+txt+'\')" /><img width="100%" src="images/vocab/' + dir +'/' 
+		 		+img+ '.jpg" onclick= "selectTopic(\''+txt+'\');setVocChoiceTable(\'show_topic\')"/></div>';
 		 	}
 		 	else if (button=="show_all_topics") {
-		 		imgRow.cells[j].innerHTML='<div style="position: relative"><img id=b_adj_'+((i*5)+j)+' style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" /><img width="100%" src="images/vocab/' + dir +'/' +img+ '.jpg" onclick= "modUserAvailTopics(\''+txt+'\',\'add\')"/></div>';
+		 		imgRow.cells[j].innerHTML='<div style="position: relative"><img id=b_adj_'+((i*5)+j)+' style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" onclick= "setMsg(\'choice_add_topic\',\'OK_Cancel\',\''+txt+'\')" /><img width="100%" src="images/vocab/' + dir +'/' 
+		 		+img+ '.jpg" onclick= "modUserAvailTopics(\''+txt+'\',\'add\')"/></div>';
+		 	}
+		 	else if (curr_topic_title=="onet_voc") {
+		 		img=tempArray[imgInd].src;
+		 		if (typeof img == "object") {
+		 			img=img[0];
+		 		}
+
+				imgRow.cells[j].innerHTML='<div style="position: relative"><img id="b_adj_'+((i*5)+j)+'" style="position:absolute;width: 25%;" src="images/buttons/'+yes_no+'_button.png" onclick= "adjustUserTopics(this.id,'+action+')" />\
+				<img width="100%" src ='+ img+' /></div>';
 		 	}
 
 	 		if (imgInd<tempArray.length-1) {
@@ -2710,10 +3193,15 @@ function setVocChoiceTable(button, clone_lev) {
 		 	}
 	 	}
 	 }
-	setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",phonUSelect:"none",score:"none",timer:"block",mainImage:"none",welcomeDiv:"none",attributionDiv:"none", contentSelect:"none",controls_central:"none",order_div:"none",voc_choice_controls:"block", b_reset:"block",user_settings_data:"block",b_help:"none",left_pane:"none",voc_tab:"table"});
+	setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",
+				phonUSelect:"none",score:"none",timer:"block",mainImage:"none",welcomeDiv:"none",attributionDiv:"none", contentSelect:"none",controls_central:"none",order_div:"none",
+				voc_choice_controls:"block", b_reset:"block",user_settings_data:"block",b_help:"none",left_pane:"none",voc_tab:"table",user_level_data:"block",onet_voc_inst:"none",save_onet_grp:"none"});
+	if (curr_topic_title=="onet_voc") {
+		setDisplays({user_level_data:"none",onet_voc_inst:"block",topic_clone_grp:"none",save_onet_grp:"block"});
+	}
 	document.getElementById("voc_tab_div").style.marginLeft="3%";
 
-	if (tempArray.length<5) {
+	if (tempArray.length<5 && tempArray.length>0) {
 		for (var i=tempArray.length; i<5;i++){
 			document.getElementById("voc_tab").rows[0].insertCell(i);
 			document.getElementById("voc_tab").rows[0].cells[i].innerHTML='<img width="100%" src="images/formatting/1000X597clear_spacer.png" />';
@@ -2724,46 +3212,152 @@ function setVocChoiceTable(button, clone_lev) {
 
 
 function setUserData(button,num_topics) {
-	//fixed!!!???
-
 	var total_items=0;
-	var cat=curr_topic_title;
 	var topic_total=0;
-	var lev=currentLev;
+	var tArray=[];
 
-	saveTopic();
+	if (curr_topic_title!="onet_voc") {
+		availCats=localStorage["topics_gen_"+currentLev].split(",");
 
-	for (var i=0;i<availCats.length;i++) {
-		if (specCats.indexOf(availCats[i])==-1) {
-			curr_topic_title=availCats[i];
-			setVocArrays();
-			total_items=total_items+vocArray.length;
+		for (var i=0;i<availCats.length;i++) {
+			if (localStorage[currentLev+"_"+availCats[i]] && localStorage[currentLev+"_"+availCats[i]]!="" && topics_subsets.indexOf(availCats[i])== -1) {
+				tArray=localStorage[currentLev+"_"+availCats[i]].split(",");
+			}
+			else {
+				tArray=[];
+			}
+			total_items=total_items+tArray.length;
 		}
+		
+		tArray=masterVoc(curr_topic_title);
+		topic_total=tArray.length;
+		if (localStorage[currentLev+"_"+curr_topic_title] && localStorage[currentLev+"_"+curr_topic_title]!="") {
+			vocArray=localStorage[currentLev+"_"+curr_topic_title].split(",");
+		}
+		else {
+			vocArray=[];
+		}
+		
+	}
+	else {
+		setOnetVocab();
+		topic_total=vocArray.length;
+		vocArray= getOnetUserVocab();
 	}
 
-	curr_topic_dir=cat;
-	curr_topic_title=cat;
-	voc_mode="default";
-	currentLev="Master";
-
-	setVocArrays();
-
-	topic_total=vocArray.length;
-	voc_mode="user";
-
-	currentLev=lev;
-	curr_topic_dir=cat;
-	curr_topic_title=cat;
-	setVocArrays();
-
 	document.getElementById("user_level_data").innerHTML="<p><b>Total</b> items for:</p><p><img style='width: 4.5em' src='images/buttons/b_"+currentLev+".png' /></p><div style='width:3em; margin-left:auto; margin-right:auto; background-color:black; color:white; font-size: 130%; border: 0.1em ridge #7bd8e8'>"+total_items+"</div>";
-
+	
 	if (button!="topics" && button!="show_all_topics") {
 		document.getElementById("user_topics_data").innerHTML="<p>Number of items in <img style='width:55%; margin-top:0.3em; border: 0.1em ridge' src='images/vocab/titles/"+curr_topic_title+ ".jpg' /></p><div style='width:6em; margin-left:auto; margin-right:auto; background-color:black; color:white; font-size: 130%; border: 0.1em ridge #7bd8e8'>"+vocArray.length+" of "+topic_total+"</div>";
 	}
 	else if (button=="topics") {
 		document.getElementById("user_topics_data").innerHTML="<p>Number of topics:</p><p><img style='width: 4.5em' src='images/buttons/b_"+currentLev+".png' /></p><div style='width:3em; margin-left:auto; margin-right:auto; background-color:black; color:white; font-size: 130%; border: 0.1em ridge #7bd8e8'>"+num_topics+"</div>";
 	}
+}
+
+function masterVoc (title) {
+	
+	if (typeof title=="undefined") {
+		title=curr_topic_title;
+	}
+
+	var arr = [];
+	switch (title) {
+
+		case "actions":
+			arr = "answer,ask,buy,change,check,choose,close,come,cook,count,cry,cut,dig,discuss,draw,drink,drive,eat,finish,fly,forget,give,go,go / goes,guess,help,hop,jump,leave,like,listen,look,make,move,open,paint,play,point,print,pull,push,read,ride,run,say,shake,sing,sit down,sit,skip,sleep,smile,speak,stand,stand up,stop,swim,talk,think,walk,wear,write".split(",");
+		break;
+
+		case "animals":
+			arr = "animals,ant,bat,bear,bee,bird,buffalo,butterfly,calf,cat,cheetah,chicken,chick,cow,crab,crocodile,deer,dog,dolphin,duck,duckling,elephant,fish,fly,fox,frog,gecko,geese,giraffe,goat,goose,grasshopper,hen,hippopotamus,horse,jellyfish,kangaroo,kitten,lamb,lion,meow,monkey,moo,mosquito,mouse,neigh,octopus,oink,panda,parrot,peacock,pig,piglet,quack,rabbit,rat,rhinoceros,seal,shark,sheep,snail,snake,spider,squirrel,starfish,tiger,turtle,whale,woof,zebra".split(",");
+		break;
+
+		case "asean":
+			arr = "Brunei,Cambodia,Indonesia,Laos,Malaysia,Myanmar,Philippines,Singapore,Thailand,Vietnam".split(",");
+		break;
+
+		case "beach":
+			arr = "bench,bin,cement stool,coconut,flag,gazebo,grass,inner tube,island,ladder,light bulb,lighthouse,log,motorbike,palm,pavilion,pier,sand,shell,ship,sign,socket,spirit house,stone circle,stump,swing,table,toilet,tree".split(",");
+		break;
+
+		case "clothes":
+			arr = "belt,blouse,cap,checked,dress,earrings,floral,glasses,gloves,handbag,hat,jackets,jeans,necklace,nightdress,pants,plain,pyjamas,raincoat,ring,rings,scarf,shirt,shoe,shoes,shorts,skirt,sock,socks,spotted,striped,sweater,swimsuit,tie,trainers,T-shirt,underwear,wallet,watch,wig,zip".split(",");
+		break;
+
+		case "days":
+			arr = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday".split(",");
+		break;
+
+		case "describing":
+			arr = "bad food,bad music,big dog,big eyes,black bag,black shirt,curly hair,fast car,good food,good music,happy student,happy teacher,long hair,narrow road,new car,new home,new house,old car,old home,old house,old man,old woman,pink bag,pink shirt,pretty girl,red bag,red shirt,sad student,sad teacher,short girl,short hair,slow car,small dog,small eyes,straight hair,tall girl,white shirt,wide road,young man,young woman".split(",");
+		break;
+
+		case "easy":
+			arr = "and,ant,back,bad,bag,bat,bed,bin,book,bus,but,can,cap,cat,cook,cut,dig,dog,duck,fan,foot,fun,has,hat,hen,hop,hot,hut,in,jam,leg,mat,neck,not,on,pen,pet,pig,run,sack,sad,sick,sit,sock,sun,ten,toe,van".split(",");
+		break;
+
+		case "finding game":
+			arr = "above,aerial,balloon,behind,bottle cap,brushes,button,calendar,drawer,drinking straw,duster,dustpan,file boxes,folder,in front of,in,keyboard,liquid paper,mike,nail,near,next to,on,plastic basket,plasticine,power cord,power socket,printer,scissors,shelves,speakers,that,this,thumbtack,toiletry bag,under".split(",");
+		break;
+
+		case  "location":
+			arr = "above,behind,in,in front of,near,next to,on,this,that,under".split(",");
+		break;
+
+		case "food":
+			arr = "apple,banana,beans,beef,bread,breakfast,butter,cabbage,cake,candy,carrots,cheese,chicken,chilli,chocolate,coconuts,coffee,coke,cookies,corn,cucumber,curry,durian,egg,eggplant,fish,food,fried chicken,fried egg,fried fish,fried rice,fruit,garlic,grapes,guava,hamburger,hot dog,ice cream,iced coffee,iced tea,ice,jam,juice,lemons,limes,lollipop,long beans,lunch,mangoes,mangosteens,milk,noodles,oil,onion,orange,papayas,pineapple,pizza,pomelo,pork,pumpkin,rambutans,rice,rose apple,salad,salt,sandwich,shrimp,soda,soft drinks,soup,strawberries,sugar,sushi,tea,tomato,vinegar,water,watermelon,wine,yoghurt".split(",");
+		break;
+
+		case "free_time":
+			arr = "collect stamps,cook,dance,do gardening,do gymnastics,draw,fly a kite,go camping,go climbing,go fishing,go for a picnic,go horse riding,go jogging,go shopping,go skating,go swimming,listen to music,listen to the radio,paint,play badminton,play basketball,play cards,play chess,play computer games,play darts,play football,play games,play ping-pong,play the guitar,play volleyball,practise judo,practise karate,read comic books,read,ride a bike,sing,watch TV".split(",");
+		break;
+
+		case "grammar":
+			arr = "?,a / the,and,at,be / is / am / are,back,behind,between,but,can,cannot,comma,do / does,do you want ...,exclamation mark,for,have / has,her,his,how many,how much,how,I,in front of,in,into,is / am / are,is / are,it,my,near,next to,no,not,on the left of,on the right of,on,or,question mark,that,the,this,to,under,up,we,what time,what,when,where,which,who,why,you,your".split(",");
+		break;
+
+		case "home":
+			arr = "armchair,basin,basket,bathroom,bed,bedroom,bin,bottle,bowl,box,broom,can,CD,chair,closet,comb,cupboard,cup,dining room,dish,doll,door,electric urn,fan,floor,flower,garden,glass,house,jug,key,kitchen,kite,lamp,living room,lock,lotus,mat,mirror,nest,oven,pan,picture,pillow,pot,refrigerator,robot,room,rose,shelf,sink,soap,sofa,stereo,stove,sunflower,table,teddy bear,top,toy car,toy train,TV,vase,VCDs,wall,wardrobe,window,wok,yo-yo".split(",");
+		break;
+
+		case "months":
+			arr = "January,February,March,April,May,June,July,August,September,October,November,December".split(",");
+		break;
+
+		case "occupations":
+			arr = "actor,actress,barber,boxer,bus driver,butcher,carpenter,chef,cook,dancer,dentist,doctor,dressmaker,farmer,fisherman,fruit seller,gardener,guide,hairdresser,home-maker,librarian,merchants,monk,nurse,policeman,postman,sailor,secretary,singer,soldier,student,taxi driver,teacher,vet,waiter,waitress".split(",");
+		break;
+
+		case "body":
+			arr = "arm,arms,back,body,bone,chest,chin,ear,ears,eyebrows,eye,eyes,face,feet,finger,fingers,foot,hair,hand,hands,head,hip,hips,knee,knees,leg,legs,mouth,nail,nails,neck,nose,shoulder,shoulders,teeth,thumb,toe,toes,tooth".split(",");
+		break;
+
+		case "people":
+			arr = "aunt,baby,boy,brother,cousin,daughter,family,father,friend,girl,granddaughter,grandfather,grandmother,grandson,king,man,mother,nephew,niece,queen,sister,son,uncle,woman".split(",");
+		break;
+
+		case "places_and_transport":
+			arr = "Bandar Seri Begawan,Bangkok,bank,beach,bike,boat,Brunei,bus,Cambodia,car,coffee shop,factory,farm,Hanoi,helicopter,hill,home,hospital,Indonesia,Jakarta,Kuala Lumpur,Laos,Malaysia,Manila,market,motorbike,motorbike taxi,Myanmar,Naypyidaw,on foot,Philippines,Phnom Penh,plane,police station,post office,railway station,restaurant,rice paddy,school,sea,ship,shop,Singapore,studio,supermarket,swimming pool,taxi,temple,Thailand,train,truck,tuk-tuk,van,Vientiene,Vietnam,zoo".split(",");
+		break;
+
+		case "school":
+			arr = "Art,backpack,bag,bell,blackboard,book,bookshelf,calculator,calendar,canteen,chalk,classroom,clock,coloured pencils,computer,computer room,crayons,desk,English,eraser,globe,glue,homework,ink,library,lunch box,map,Math,Music,music room,notebook,paper,P.E.,pencil case,pencil,pencil sharpener,pen,playground,rubber,ruler,school,Science,scissors,Social Studies,toilet,umbrella,violin,waste paper basket,whiteboard".split(",");
+		break;
+
+		case "stationery":
+			arr = "book,chalk,eraser,notebook,paper,pen,pencil,ruler".split(",");
+		break;
+
+		case "time":
+			arr = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,yesterday,today,tomorrow,week,in the morning,at noon,in the afternoon,in the evening,at night,January,February,March,April,May,June,July,August,September,October,November,December,Christmas,Loi Krathong,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม".split(",");
+		break;
+
+		case "weather":
+			arr = "clear,cloudy,cold,foggy,hot,rainy,still,stormy,windy".split(",");
+		break;
+	}
+	return arr;
+
 }
 
 
@@ -2790,50 +3384,29 @@ function saveTopic() {
 }
 
 
-function initUserSettings() {
-	var levArray = new Array ("K2", "P1", "P2", "P3", "P4", "P5", "P6");
-	var topic="";
-
-	for (var i=0; i<levArray.length; i++) {
-		currentLev=(levArray[i]);
-		setAvailCats();
-		topic=levArray[i]+"_availCats";
-		user_settings[topic]=new Array();
-		for (var k=0;k<availCats.length;k++) {
-			user_settings[topic][k]=availCats[k];
-		}
-
-		for (var j=0;j<availCats.length;j++) {
-			curr_topic_title=availCats[j];
-			setVocArrays();
-			topic=levArray[i]+"_"+curr_topic_title;
-			user_settings[topic]=vocArray;
-		}
-	}
-}
-
-
 function saveSetup(save_type) {
 	var file_name = "My English Builder";
 	var file_elem = document.createElement("a");
-	var user_settings_str ="English Builder User Settings Version: 1.0\n";
+	var save_str ="English Builder User Settings Version: 1.0\n";
 	var temp_string ="";
+	var tArray = [];
 
-	var keys = Object.keys(user_settings);
-
-	for (var i=0; i<keys.length; i++){
-		temp_string=keys[i]+"("+user_settings[keys[i]]+")"+"\n";
-		user_settings_str=user_settings_str+temp_string;
-
+	save_str += "ONET_voc(" + localStorage.user_onet_vocab + ")\n";
+	save_str += "K2_availCats(" + localStorage.topics_gen_K2 + ")\n";
+	tArray= localStorage.topics_gen_K2.split(",");
+	for (var i=0;i<tArray.length; i++) {
+		save_str += "K2_"+tArray[i]+ "(" + localStorage["K2_"+tArray[i]]+")\n";
 	}
 
-	if (save_type=="local"){
-		localStorage.setItem("user_vocab", user_settings_str);
-		user_changes=false;
-		return;
+	for (var j=0; j<6; j++) {
+		save_str += "P"+ (j+1) +"_availCats(" + localStorage["topics_gen_P"+ (j+1)] + ")\n";
+		tArray= localStorage["topics_gen_P"+ (j+1)].split(",");
+		for (var k=0;k<tArray.length;k++) {
+			save_str += "P" + (j+1) +"_"  +tArray[k]+ "(" + localStorage["P" + (j+1)+"_"+tArray[k]]+")\n";
+		}
 	}
 
-	var save_blob = new Blob([user_settings_str], {type:'text/plain'});
+	var save_blob = new Blob([save_str], {type:'text/plain'});
 	file_elem.download = file_name;
 	file_elem.href = window.URL.createObjectURL(save_blob);
 	file_elem.style.display = "none";
@@ -2881,13 +3454,9 @@ function loadSetup(caller) {
 	}
 
 	else if (caller.id=="b_reset_all") {
-		if (user_changes==true) {
-			setMsg("choice_load","","OK_Cancel");
-			return;
-		}
-		else {
-			document.getElementById("reset_all").click();
-		}
+		setMsg("choice_load","OK_Cancel");
+		return;
+
 	}
 
 	var file_name = caller.files[0];
@@ -2898,61 +3467,98 @@ function loadSetup(caller) {
 
 	file_reader.onload = function(fileLoadedEvent) {
 		var loaded_text = fileLoadedEvent.target.result;
+		var topics="";
 		var topic="";
-		var voc_set="";
 		var open_brace=0;
 		var close_brace=0;
 		var topic_len=0;
-		var user_settings_arr= new Array();
-
-		user_settings_arr=loaded_text.split("\n");
-		var header = (user_settings_arr[0]);
-
-		if (header.indexOf("English Builder User Settings")== -1) {
-			setMsg("err_file",file_name.name);
+		
+		if  (loaded_text.indexOf("English Builder User Settings")== -1) {
+			setMsg("err_file","",file_name.name);
 			return;
 		}
-		if (parseInt(header.substr(header.indexOf("Version:")+9,1))>1) {
-			setMsg("err_version",file_name.name);
+
+		if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
+			setMsg("err_version","",file_name.name);
 			return;
 		}
+
+		loaded_text=loaded_text.replace(/places and transport/g,"places_and_transport");
+		loaded_text=loaded_text.replace(/free time/g,"free_time");
 
 		if (caller.id=="reset_all") {
-			for (var i=1;i<user_settings_arr.length;i++) {
-				voc_set=(user_settings_arr[i]);
-				open_brace=voc_set.indexOf("(");
-				close_brace=voc_set.indexOf(")");
-				topic_len=(close_brace-open_brace)-1;
-				topic=voc_set.substr(0,open_brace);
-				voc_set=voc_set.substr(open_brace+1,topic_len);
-				voc_set=voc_set.split(",");
-				if (user_settings.hasOwnProperty(topic)) {
-					user_settings[topic].length=0;
-					for (var j=0;j<voc_set.length;j++) {
-						user_settings[topic][j]=voc_set[j];
+			if (loaded_text.indexOf("ONET_voc")!= -1) {
+				topic=loaded_text.substr(loaded_text.indexOf("ONET_voc"));
+				open_brace=topic.indexOf("(");
+				close_brace=topic.indexOf(")");
+				topic=topic.substring(open_brace+1,close_brace);
+				localStorage.user_onet_vocab=topic;
+			}
+			topics=loaded_text.substr(loaded_text.indexOf("K2_availCats"));
+			open_brace=topics.indexOf("(");
+			close_brace=topics.indexOf(")");
+			topics=topics.substring(open_brace+1,close_brace);
+			localStorage.topics_gen_K2=topics;
+			availCats=localStorage.topics_gen_K2.split(",");
+			for (var i=0;i<topics_all.length;i++) {
+				if (localStorage["K2_"+topics_all[i]] && availCats.indexOf(topics_all[i]) == -1) {
+					localStorage.removeItem("K2_"+topics_all[i]);
+				}
+				else if (availCats.indexOf(topics_all[i])!= -1) {
+					topic=loaded_text.substr(loaded_text.indexOf("K2_"+topics_all[i]));
+					open_brace=topic.indexOf("(");
+					close_brace=topic.indexOf(")");
+					topic=topic.substring(open_brace+1,close_brace);
+					localStorage["K2_"+topics_all[i]]=topic;
+				}
+			}
+
+			for (var j=1;j<7;j++) {
+				topics=loaded_text.substr(loaded_text.indexOf("P"+j+"_availCats"));
+				open_brace=topics.indexOf("(");
+				close_brace=topics.indexOf(")");
+				topics=topics.substring(open_brace+1,close_brace);
+				localStorage["topics_gen_P"+j]=topics;
+				availCats=localStorage["topics_gen_P"+j].split(",");
+				for (var k=0;k<topics_all.length;k++) {
+					if (localStorage["P"+ j+ "_"+topics_all[k]] && availCats.indexOf(topics_all[k]) == -1) {
+						localStorage.removeItem("P"+j+"_"+topics_all[k]);
+					}
+					else if (availCats.indexOf(topics_all[k])!= -1) {
+						topic=loaded_text.substr(loaded_text.indexOf("P"+j+"_"+topics_all[k]));
+						open_brace=topic.indexOf("(");
+						close_brace=topic.indexOf(")");
+						topic=topic.substring(open_brace+1,close_brace);
+						localStorage["P"+j+"_"+topics_all[k]]=topic;
 					}
 				}
 			}
-			setVocChoiceTable(voc_table_state);
+			setVocChoiceTable("topics");
+			setMsg("load_all_complete","success",file_name.name);
+		}
+		else if  (caller.id=="reset_topic" && curr_topic_title=="onet_voc") {
+			if (loaded_text.indexOf("ONET_voc")!= -1) {
+				topic=loaded_text.substr(loaded_text.indexOf("ONET_voc"));
+				open_brace=topic.indexOf("(");
+				close_brace=topic.indexOf(")");
+				topic=topic.substring(open_brace+1,close_brace);
+				localStorage.user_onet_vocab=topic;
+				setVocChoiceTable("show_selected");
+				setMsg("load_topic_complete","success",file_name.name);
+			}
 		}
 		else if (caller.id=="reset_topic") {
-			topic=(currentLev+"_"+curr_topic_title);
-			if (loaded_text.indexOf(topic)==-1) {
-				setMsg("err_no_topic",file_name.name);
-				return;
+			if (loaded_text.indexOf(currentLev+"_"+curr_topic_title)!= -1) {
+				topic=loaded_text.substr(loaded_text.indexOf(currentLev+"_"+curr_topic_title));
+				open_brace=topic.indexOf("(");
+				close_brace=topic.indexOf(")");
+				topic=topic.substring(open_brace+1,close_brace);
+				localStorage[currentLev+"_"+curr_topic_title]=topic;
+				setVocChoiceTable("show_selected");
+				setMsg("load_topic_complete","success",file_name.name);
 			}
-			addUndo();
-			open_brace=loaded_text.indexOf("(",(loaded_text.indexOf(topic)));
-			close_brace=loaded_text.indexOf(")",(loaded_text.indexOf(topic)));
-			topic_len=(close_brace-open_brace)-1;
-			loaded_text=loaded_text.substr(open_brace+1,topic_len);
-			voc_set=loaded_text.split(",");
-			if (user_settings.hasOwnProperty(topic)) {
-				user_settings[topic].length=0;
-				for (var j=0;j<voc_set.length;j++) {
-					user_settings[topic][j]=voc_set[j];
-				}
-				setVocChoiceTable(voc_table_state);
+			else {
+				setMsg("err_no_topic","",file_name.name);
 			}
 		}
 		user_changes=false;
@@ -2976,8 +3582,18 @@ function setVocTable(button) {
 		tempArray.length=0;
 
 		if (curr_topic_title!="multi")  {
-			curr_topic_dir= curr_topic_title;
-			setVocArrays();
+			if (curr_topic_title=="onet_voc") {
+				if (voc_mode=="user") {
+					vocArray=getOnetUserVocab();
+				}
+				else {
+					setOnetVocab();
+				}
+			}
+			else {
+				curr_topic_dir= curr_topic_title;
+				setVocArrays();
+			}
 		}
 		else {
 			setAllVocArray();
@@ -2988,8 +3604,18 @@ function setVocTable(button) {
 			vocArray.splice(m,1);
 		}
 		if (curr_topic_title!="multi")  {
-			curr_topic_dir= curr_topic_title;
-			setVocArrays();
+			if (curr_topic_title=="onet_voc") {
+				if (voc_mode=="user") {
+					vocArray=getOnetUserVocab();
+				}
+				else {
+					setOnetVocab();	
+				}
+			}
+			else {
+				curr_topic_dir= curr_topic_title;
+				setVocArrays();
+			}
 		}
 		else {
 			setAllVocArray();
@@ -3069,35 +3695,46 @@ function setVocTable(button) {
 		hideStatus="hideTxt";
 
 		var voc="";
+		var t_array=[];
+		var t_src="";
 		for (var i=0;i<numRows*2;i=i+2){
 			for (var j=0; j<5; j++) {
-				voc =(tempArray[((i/2)*5)+j]);
-				if (typeof voc=="object"){
+				if (typeof document.getElementById("voc_tab").rows[i].cells[j]!="undefined") {
+					voc =(tempArray[((i/2)*5)+j]);
+					if (typeof voc=="object"){
+						if (typeof voc.src == "object") {
+							t_array=voc.src.toString().split(",");
+							shuffle(t_array);
+							t_src=t_array[0];
+						}
+						else {
+							t_src=voc.src;	
+						}
+						document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src="+t_src+" />";
+					}
+					else {
+						voc=processSubst(voc);
+						document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+					}
 
-					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src=voc.src />";
-					//alert(voc.src);
+					document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
+						voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
+						if (typeof voc == "object"){
+							audVoc.src="audio"+voc.src.slice(6,-3)+"mp3";
+							vocEx=voc.txt;
+						}
+						else{
+							voc= splitSubst(voc);
+							audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
+							vocEx=voc;
+						}
+						playVocab();
+					};
+					document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCellHidden";
+					document.getElementById("voc_tab").rows[i+1].cells[j].onclick = function() {
+					document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].className="vocCell";
+					};
 				}
-				else {
-					voc=processSubst(voc);
-					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
-				}
-				
-				document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
-					voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
-					if (typeof voc == "object"){
-						audVoc.src=voc.txt;
-					}
-					else{
-						voc= splitSubst(voc);
-						audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
-						vocEx=voc;
-					}
-					playVocab();
-				};
-				document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCellHidden";
-				document.getElementById("voc_tab").rows[i+1].cells[j].onclick = function() {
-				document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].className="vocCell";
-				};
 			}
 		}
 	}
@@ -3107,22 +3744,45 @@ function setVocTable(button) {
 		document.getElementById("hideTxtButton").src="images/buttons/no_button.png";
 		hideStatus="hideImg";
 		var voc="";
+		var t_array=[];
+		var t_src="";
 		for (var i=0;i<numRows*2;i=i+2){
 			for (var j=0; j<5; j++) {
-				document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/formatting/question mark.jpg' />";
-				document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCell";
-				document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
-					voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
-					voc=processSubst(voc);
-					document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
-					document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].onclick = function() {
+				if (typeof document.getElementById("voc_tab").rows[i].cells[j]!="undefined") {
+					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/formatting/question mark.jpg' />";
+					document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCell";
+					document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
 						voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
-						voc= splitSubst(voc);
-						audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
-						vocEx=voc;
-						playVocab();
+						if (typeof voc=="object"){
+							if (typeof voc.src == "object") {
+								t_array=voc.src.toString().split(",");
+								shuffle(t_array);
+								t_src=t_array[0];
+							}
+							else {
+								t_src=voc.src;	
+							}
+							document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].innerHTML="<img width='100%' src="+t_src+" />";
+						}
+						else {
+							voc=processSubst(voc);
+							document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+						}
+						document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].onclick = function() {
+							voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
+							if (typeof voc == "object"){
+								audVoc.src="audio"+voc.src.slice(6,-3)+"mp3";
+								vocEx=voc.txt;
+							}
+							else{
+								voc= splitSubst(voc);
+								audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
+								vocEx=voc;
+							}
+							playVocab();
+						};
 					};
-				};
+				}
 			}
 		}
 	}
@@ -3133,97 +3793,91 @@ function setVocTable(button) {
 		document.getElementById("hideTxtButton").src="images/buttons/no_button.png";
 		hideStatus="showBoth";
 		var voc="";
+		var t_array=[];
+		var t_src="";
 		for (var i=0;i<numRows*2;i=i+2){
 			for (var j=0; j<5; j++) {
-				voc =(tempArray[((i/2)*5)+j]);
-				if (typeof voc=="object"){
-
-					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src="+voc.src+" />";
-					//alert(voc.src);
-				}
-				else {
-					voc=processSubst(voc);
-					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
-				}
-				document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCell";
-				document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
-					voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
-					if (typeof voc == "object"){
-						vocEx=voc.txt;
-						if (typeof responsiveVoice!="undefined"){
-							var timbre=setTimbre();
-							playRV(vocEx,timbre);
+				if (typeof document.getElementById("voc_tab").rows[i].cells[j]!="undefined") {
+					voc =(tempArray[((i/2)*5)+j]);
+					if (typeof voc=="object"){
+						if (typeof voc.src == "object") {
+							t_array=voc.src.toString().split(",");
+							shuffle(t_array);
+							t_src=t_array[0];
 						}
+						else {
+							t_src=voc.src;	
+						}
+						document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src="+t_src+" />";
 					}
-					else{
-						voc= splitSubst(voc);
-						audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
-						vocEx=voc;
+					else {
+						voc=processSubst(voc);
+						document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+
+					}
+					document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCell";
+					document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
+						voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
+						if (typeof voc == "object"){
+							audVoc.src="audio"+voc.src.slice(6,-3)+"mp3";
+							vocEx=voc.txt;
+						}
+						else{
+							voc= splitSubst(voc);
+							audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
+							vocEx=voc;
+						}
 						playVocab();
-					}
-				};
+					};
+				}
 			}
+					
 		}
 	}
 }
 
 function setUserVocArray() {
-//fixed!!!???
-	var topic=(currentLev+"_"+curr_topic_title);
-
-	vocArray.length=0;
-
-	if (user_settings.hasOwnProperty(topic)) {
-		for (var i=0;i<user_settings[topic].length;i++) {
-			vocArray[i]=user_settings[topic][i];
-		}
-	}
+	if (localStorage[currentLev+"_"+curr_topic_title]) {
+		vocArray=localStorage[currentLev+"_"+curr_topic_title].split(",");
+	} 
 }
 
 
 function modUserAvailTopics(topic,action) {
-//fixed!!!???
 	var user_topic = currentLev+"_availCats";
 
 	if (action=="add") {
-		setMsg("choice1",topic,"OK_Cancel");
+		setMsg("choice_add_topic","OK_Cancel",topic);
 		return;
 	}
-	else if (action=="delete" && curr_topic_dir!="onet_gq") {
-		setMsg("choice_delete_topic",topic,"edit_delete");
+	else if (action=="delete" && curr_topic_dir!="onet_gq" && curr_topic_dir!="onet_voc") {
+		setMsg("choice_delete_topic","edit_delete",topic);
 		return;
 	}
 	else if (action=="add_continue") {
 		availCats.push(topic);
 		availCats.sort(function (a, b) {return a.toLowerCase().localeCompare(b.toLowerCase());});
-		user_settings[user_topic].length=0;
+		localStorage["topics_gen_" + currentLev] = availCats;
+		localStorage[currentLev+"_"+topic] = [];
+		/*user_settings[user_topic].length=0;
 		for (var i=0;i<availCats.length;i++) {
 			user_settings[user_topic][i]=availCats[i];
-		}
+		}*/
 		selectTopic(topic);
 		setVocChoiceTable("show_all");
 	}
 	else if (action=="delete_continue") {
 		availCats.splice(availCats.indexOf(topic),1);
-		user_settings[user_topic].length=0;
-		for (var i=0;i<availCats.length;i++) {
-			user_settings[user_topic][i]=availCats[i];
-		}
+		localStorage["topics_gen_" + currentLev] = availCats;
+		localStorage.removeItem(currentLev+"_"+curr_topic_title);
 		selectTopic(availCats[0]);
-
 		setVocChoiceTable("topics");
 	}
 }
 
 
 function setUserAvailCats() {
-	var topic=(currentLev+"_availCats");
-	availCats.length=0;
-	if (user_settings.hasOwnProperty(topic)) {
-		for (var i=0;i<user_settings[topic].length;i++) {
-			availCats[i]=user_settings[topic][i];
-		}
-	}
+	availCats=localStorage["topics_gen_"+currentLev].split(",");
 	setTopicButtons();
 }
 
@@ -3259,9 +3913,6 @@ function setAvailCats() {
 			break;
 		case "Master":
 			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "describing", "finding game",  "location", "food", "free_time", "grammar", "home", "months", "occupations", "body", "people", "places_and_transport", "school", "stationery", "time", "weather");
-			break;
-		case "Scratch":
-			availCats = new Array("actions", "animals", "beach", "clothes", "days", "describing", "food", "free_time", "grammar", "months", "occupations", "places_and_transport", "body", "school", "stationery", "time");
 			break;
 	}
 }
@@ -3830,170 +4481,6 @@ function setVocArrays() {
 				break;
 		}
 
-	} else if (currentLev == "Master") {
-		switch (curr_topic_title) {
-			case "actions":
-				vocArray = new Array("answer", "ask", "buy", "change", "check", "choose", "close", "come", "cook", "count", "cry", "cut", "dig", "discuss", "draw", "drink", "drive", "eat", "finish", "fly", "forget", "give", "go", "go / goes", "guess", "help", "hop", "jump", "leave", "like", "listen", "look", "make", "move", "open", "paint", "play", "point", "print", "pull", "push", "read", "ride", "run", "say", "shake", "sing", "sit down", "sit", "skip", "sleep", "smile", "speak", "stand", "stand up", "stop", "swim", "talk", "think", "walk", "wear", "write");
-				curr_topic_dir = "actions";
-				break;
-			case "animals":
-				vocArray = new Array("animals", "ant", "bat", "bear", "bee", "bird", "buffalo", "butterfly", "calf", "cat", "cheetah", "chicken", "chick", "cow", "crab", "crocodile", "deer", "dog", "dolphin", "duck", "duckling", "elephant", "fish", "fly", "fox", "frog", "gecko", "geese", "giraffe", "goat", "goose", "grasshopper", "hen", "hippopotamus", "horse", "jellyfish", "kangaroo", "kitten", "lamb", "lion", "meow", "monkey", "moo", "mosquito", "mouse", "neigh", "octopus", "oink", "panda", "parrot", "peacock", "pig", "piglet", "quack", "rabbit", "rat", "rhinoceros", "seal", "shark", "sheep", "snail", "snake", "spider", "squirrel", "starfish", "tiger", "turtle", "whale", "woof", "zebra");
-				curr_topic_dir = "animals";
-				break;
-			case "asean":
-				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places_and_transport";
-				break;
-			case "beach":
-				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
-				curr_topic_dir = "beach";
-				break;
-		case "clothes":
-				vocArray = new Array("belt", "blouse", "cap", "checked", "dress", "earrings", "floral", "glasses", "gloves", "handbag", "hat", "jackets", "jeans", "necklace", "nightdress", "pants", "plain", "pyjamas", "raincoat", "ring", "rings", "scarf", "shirt", "shoe", "shoes", "shorts", "skirt", "sock", "socks", "spotted", "striped", "sweater", "swimsuit", "tie", "trainers", "T-shirt", "underwear", "wallet", "watch", "wig", "zip");
-				curr_topic_dir = "clothes";
-				break;
-			case "days":
-				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
-				curr_topic_dir = "time";
-				break;
-			case "describing":
-				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "black bag", "black shirt", "curly hair", "fast car", "good food", "good music", "happy student", "happy teacher", "long hair", "narrow road", "new car", "new home", "new house", "old car", "old home", "old house", "old man", "old woman", "pink bag", "pink shirt", "pretty girl", "red bag", "red shirt", "sad student", "sad teacher", "short girl", "short hair", "slow car", "small dog", "small eyes", "straight hair", "tall girl", "white shirt", "wide road", "young man", "young woman");
-				curr_topic_dir = "describing";
-				break;
-			case "easy":
-				vocArray = new Array("and", "ant", "back", "bad", "bag", "bat", "bed", "bin", "book", "bus", "but", "can", "cap", "cat", "cook", "cut", "dig", "dog", "duck", "fan", "foot", "fun", "has", "hat", "hen", "hop", "hot", "hut", "in", "jam", "leg", "mat", "neck", "not", "on", "pen", "pet", "pig", "run", "sack", "sad", "sick", "sit", "sock", "sun", "ten", "toe", "van");
-				curr_topic_dir = "easy";
-				break;
-			case "finding game":
-				vocArray = new Array("above", "aerial", "balloon", "behind", "bottle cap", "brushes", "button", "calendar", "drawer", "drinking straw", "duster", "dustpan", "file boxes", "folder", "in front of", "in", "keyboard", "liquid paper", "mike", "nail", "near", "next to", "on", "plastic basket", "plasticine", "power cord", "power socket", "printer", "scissors", "shelves", "speakers", "that", "this", "thumbtack", "toiletry bag", "under");
-				curr_topic_dir = "finding game";
-				break;
-			case  "location":
-				vocArray = new Array("above", "behind", "in", "in front of", "near", "next to", "on", "this", "that", "under");
-				curr_topic_dir = "location";
-				break;
-			case "food":
-				vocArray = new Array("apple", "banana", "beans", "beef", "bread", "breakfast", "butter", "cabbage", "cake", "candy", "carrots", "cheese", "chicken", "chilli", "chocolate", "coconuts", "coffee", "coke", "cookies", "corn", "cucumber", "curry", "durian", "egg", "eggplant", "fish", "food", "fried chicken", "fried egg", "fried fish", "fried rice", "fruit", "garlic", "grapes", "guava", "hamburger", "hot dog", "ice cream", "iced coffee", "iced tea", "ice", "jam", "juice", "lemons", "limes", "lollipop", "long beans", "lunch", "mangoes", "mangosteens", "milk", "noodles", "oil", "onion", "orange", "papayas", "pineapple", "pizza", "pomelo", "pork", "pumpkin", "rambutans", "rice", "rose apple", "salad", "salt", "sandwich", "shrimp", "soda", "soft drinks", "soup", "strawberries", "sugar", "sushi", "tea", "tomato", "vinegar", "water", "watermelon", "wine", "yoghurt");
-				curr_topic_dir = "food";
-				break;
-			case "free_time":
-				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "practise judo", "practise karate", "read comic books", "read", "ride a bike", "sing", "watch TV");
-				curr_topic_dir = "free_time";
-				break;
-			case "grammar":
-				vocArray = new Array("?", "a / the", "and", "at", "be / is / am / are", "back", "behind", "between", "but", "can", "cannot", "comma", "do / does", "do you want ...", "exclamation mark", "for", "have / has", "her", "his", "how many", "how much", "how", "I", "in front of", "in", "into", "is / am / are", "is / are", "it", "my", "near", "next to", "no", "not", "on the left of", "on the right of", "on", "or", "question mark", "that", "the", "this", "to", "under", "up", "we", "what time", "what", "when", "where", "which", "who", "why", "you", "your");
-				curr_topic_dir = "grammar";
-				break;
-			case "home":
-				vocArray = new Array("armchair", "basin", "basket", "bathroom", "bed", "bedroom", "bin", "bottle", "bowl", "box", "broom", "can", "CD", "chair", "closet", "comb", "cupboard", "cup", "dining room", "dish", "doll", "door", "electric urn", "fan", "floor", "flower", "garden", "glass", "house", "jug", "key", "kitchen", "kite", "lamp", "living room", "lock", "lotus", "mat", "mirror", "nest", "oven", "pan", "picture", "pillow", "pot", "refrigerator", "robot", "room", "rose", "shelf", "sink", "soap", "sofa", "stereo", "stove", "sunflower", "table", "teddy bear", "top", "toy car", "toy train", "TV", "vase", "VCDs", "wall", "wardrobe", "window", "wok", "yo-yo");
-				curr_topic_dir = "home";
-				break;
-			case "months":
-				vocArray = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
-				curr_topic_dir = "time";
-				break;
-			case "occupations":
-				vocArray = new Array("actor", "actress", "barber", "boxer", "bus driver", "butcher", "carpenter", "chef", "cook", "dancer", "dentist", "doctor", "dressmaker", "farmer", "fisherman", "fruit seller", "gardener", "guide", "hairdresser", "home-maker", "librarian", "merchants", "monk", "nurse", "policeman", "postman", "sailor", "secretary", "singer", "soldier", "student", "taxi driver", "teacher", "vet", "waiter", "waitress");
-				curr_topic_dir = "occupations";
-				break;
-			case "body":
-				vocArray = new Array("arm", "arms", "back", "body", "bone", "chest", "chin", "ear", "ears", "eyebrows", "eye", "eyes", "face", "feet", "finger", "fingers", "foot", "hair", "hand", "hands", "head", "hip", "hips", "knee", "knees", "leg", "legs", "mouth", "nail", "nails", "neck", "nose", "shoulder", "shoulders", "teeth", "thumb", "toe", "toes", "tooth");
-				curr_topic_dir = "body";
-				break;
-			case "people":
-				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "granddaughter", "grandfather", "grandmother", "grandson", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
-				curr_topic_dir = "people";
-				break;
-			case "places_and_transport":
-				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "home", "hospital", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "train", "truck", "tuk-tuk", "van", "Vientiene", "Vietnam", "zoo");
-				curr_topic_dir = "places_and_transport";
-				break;
-			case "school":
-				vocArray = new Array("Art", "backpack", "bag", "bell", "blackboard", "book", "bookshelf", "calculator", "calendar", "canteen", "chalk", "classroom", "clock", "coloured pencils", "computer", "computer room", "crayons", "desk", "English", "eraser", "globe", "glue", "homework", "ink", "library", "lunch box", "map", "Math", "Music", "music room", "notebook", "paper", "P.E.", "pencil case", "pencil", "pencil sharpener", "pen", "playground", "rubber", "ruler", "school", "Science", "scissors", "Social Studies", "toilet", "umbrella", "violin", "waste paper basket", "whiteboard");
-				curr_topic_dir = "school";
-				break;
-			case "stationery":
-				vocArray = new Array("book", "chalk", "eraser","notebook", "paper", "pen", "pencil", "ruler");
-				curr_topic_dir = "school";
-				break;
-			case "time":
-				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "yesterday", "today", "tomorrow", "week", "in the morning", "at noon", "in the afternoon", "in the evening", "at night", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Christmas", "Loi Krathong", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
-				curr_topic_dir = "time";
-				break;
-			case "weather":
-				vocArray = new Array("clear", "cloudy", "cold", "foggy", "hot", "rainy", "still", "stormy", "windy");
-				curr_topic_dir = "weather";
-				break;
-		}
-
-	}
-	else if (currentLev == "Scratch") {
-		switch (curr_topic_title) {
-			case "actions":
-				vocArray = new Array("close", "fly", "play", "cook", "go / goes", "have / has");
-				curr_topic_dir = "actions";
-				break;
-			case "animals":
-				vocArray = new Array("ant", "bird", "cat", "cow", "dog", "duck", "fish", "horse", "pig", "lion", "snake", "tiger");
-				curr_topic_dir = "animals";
-				break;
-			case "beach":
-				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
-				curr_topic_dir = "beach";
-				break;
-			case "body":
-				vocArray = new Array("arm", "fingers", "head", "legs", "nose", "toe", "arms", "eyes");
-				curr_topic_dir = "body";
-				break;
-			case "clothes":
-				vocArray = new Array("bathing suit", "belt", "blouse", "cap", "checked", "dress", "earrings", "floral", "glasses", "gloves", "handbag", "hat", "jackets", "jeans", "necklace", "nightdress", "plain", "pyjamas", "raincoat");
-				curr_topic_dir = "clothes";
-				break;
-			case "days":
-				vocArray = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
-				curr_topic_dir = "time";
-				break;
-			case "describing":
-				vocArray = new Array("bad food", "bad music", "big dog", "big eyes", "black bag", "black shirt");
-				curr_topic_dir = "describing";
-				break;
-			case "food":
-				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "mangoes", "milk", "orange", "papayas", "rice", "tea");
-				curr_topic_dir = "food";
-				break;
-			case "free_time":
-				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "watch TV");
-				curr_topic_dir = "free_time";
-				break;
-			case "grammar":
-				vocArray = new Array("?", "be / is / am / are", "do / does", "why", "you", "your");
-				curr_topic_dir = "grammar";
-				break;
-			case "months":
-				vocArray = new Array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
-				curr_topic_dir = "time";
-				break;
-			case "places_and_transport":
-				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "Indonesia", "Jakarta", "Naypyidaw", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office");
-				curr_topic_dir = "places_and_transport";
-				break;
-			case "school":
-				vocArray = new Array("backpack", "bell", "bin", "blackboard", "book", "box", "calculator", "calendar", "chair", "chalk", "classroom", "desk", "door", "eraser", "fan", "notebook", "pen");
-				curr_topic_dir = "school";
-				break;
-			case "stationery":
-				vocArray = new Array("book", "chalk", "eraser", "notebook", "paper", "pen", "pencil", "ruler");
-				curr_topic_dir = "school";
-				break;
-			case "occupations":
-				vocArray = new Array("barber", "boxer", "bus driver", "carpenter", "dancer", "dentist", "fisherman", "fruit seller", "gardener", "policeman", "postman", "singer", "soldier", "vet");
-				curr_topic_dir = "occupations";
-				break;
-			case "time":
-				vocArray = new Array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
-				curr_topic_dir = "time";
-				break;
-		}
 	}
 
 	if (curr_topic_title.substr(0,5) == "onet_") {
@@ -4071,7 +4558,7 @@ function setVocArrays() {
 				break;
 			case "d_B_3":
 				vocArray = new Array ("a / the", "and", "bad", "bag", "Ben", "big", "Bud", "bus", "can", "cat", "dog", "Dot", "duck", "fog", "gas", "gem", "guess", "Gus", "has", "hot", "hut", "in", "is / are", "it","Jack", "jam", "jog", "not", "on", "sack", "sit", "what");
-				d_B_ExArray = new Array(7,2,6,7);
+				d_B_ExArray = new Array(7,3,6,7);
 				d_B_Title= "What is in the Bag?";
 				break;
 			case "d_B_4":
@@ -4193,253 +4680,257 @@ function setVocArrays() {
 				break;
 			//Book 3
 			case "d_B_3_1_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Dot  และ  Ben  นั่งอยู่ในหมอก", "Dot  และ  Ben  นั่งอยู่บนโต๊ะ", "Dot  และ  Ben  นั่งอยู่หน้ากระท่อม", "Dot  และ  Ben  นั่งอยู่ในกบ");
+				vocEx="Dot  และ  Ben  นั่งอยู่ในหมอก";
 				break;
 			case "d_B_3_1_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Dot  และ  Ben  ไม่ร้อน", "Dot  และ  Ben  ร้อนมาก", "Dot  และ  Ben  ไม่อยู่ในกระท่อม", "Dot  และ  Ben  ไม่ชอบหมอก");
+				vocEx="Dot  และ  Ben  ไม่ร้อน";
 				break;
 			case "d_B_3_1_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("แมวและเป็ดอยู่ในกระท่อม", "แมวและเป็ดไม่ร้อน", "แมวและเป็ดร้อนมาก", "แมวและเป็ดเป็นเพื่อนกัน");
+				vocEx="แมวและเป็ดอยู่ในกระท่อม";
 				break;
 			case "d_B_3_1_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("แมวชื่อ  Jack  และเป็ดชื่อ  Gus", "Jack  เป็นแมวและ  Gus  เป็นเป็ด", "Jack  และ  Gus  เป็นเพื่อนกัน", "แมวชื่อ  Gus  และเป็ดชื่อ  Jack");
+				vocEx="แมวชื่อ  Jack  และเป็ดชื่อ  Gus";
 				break;
 			case "d_B_3_1_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Jack  และ  Gus  วิ่งเหยาะ  ๆ  ในหมอก", "Jack  และ  Gus  วิ่งเร็ว  ๆ  ในหมอก", "Jack  และ  Gus  ชอบวิ่งในหมอก", "Jack  และ  Gus  วิ่ง  ใกล้  Dot  และ  Ben");
+				vocEx="Jack  และ  Gus  วิ่งเหยาะ  ๆ  ในหมอก";
 				break;
 			case "d_B_3_1_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Dot  และ  Ben  นั่งบนรถเมล์", "Dot  และ  Ben  นั่งอยู่ในหมอก", "Dot  และ  Ben  ต้องการวิ่งด้วย", "Dot  และ  Ben  ดู  Jack  และ  Gus");
+				vocEx="Dot  และ  Ben  นั่งบนรถเมล์";
 				break;
 			case "d_B_3_1_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Ben  ไม่สามารถวิ่งเหยาะ  ๆ  ในหมอก", "Ben  ไม่ชอบวิ่งเหยาะ  ๆ  ในหมอก", "Ben  กลัวอุบัติเหตุ", "แม่ห้าม  Ben  วิ่งเหยาะ  ๆ  ในหมอก");
+				vocEx="Ben  ไม่สามารถวิ่งเหยาะ  ๆ  ในหมอก";
 				break;
 			case "d_B_3_3_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Bud  เป็นหมา", "หมาชื่อ  Bud", "Bud  เป็นม้า", "Bud  มีหมา");
+				vocEx="Bud  เป็นหมา";
 				break;
 			case "d_B_3_3_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Bud  มีกระเป๋า", "Bud  เจอกระเป๋าแล้ว", "Bud  มีถุงผ้า", "Bud  ถือกระเป๋า");
+				vocEx="Bud  มีกระเป๋า";
+				break;
+			case "d_B_3_3_3":
+				vocArray = new Array ("อะไรอยู่ในกระเป๋า  Ben", "Ben  ดูในกระเป๋า", "สุนัขเอาอะไรมา  Ben", "มีหมวกในกระเป๋า  Ben");
+				vocEx="อะไรอยู่ในกระเป๋า  Ben";
 				break;
 			case "d_B_3_5_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เดา", "เปิด", "ชื่อกัส", "ห่าน");
+				vocEx="เดา";
 				break;
 			case "d_B_3_5_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันคือแยมใช่ไหม  Ben  มันคือแยมใช่ไหม", "มันคือแยม  Ben  มันคือแยม", "มันคือขนมปังใช่ไหม  Ben  มันคือขนมปังใช่ไหม", "มันคือขนมปัง  Ben  มันคือขนมปัง");
+				vocEx="มันคือแยมใช่ไหม  Ben  มันคือแยมใช่ไหม";
 				break;
 			case "d_B_3_5_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันไม่ใช่แยม  Dot", "Dot  ไม่ชอบ แยม", "มันเป็นแยม  Dot", "มันร้อน  Dot");
+				vocEx="มันไม่ใช่แยม  Dot";
 				break;
 			case "d_B_3_5_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันไม่เป็นแยมในกระเป๋า", "มันเป็นแยมในกระเป๋า", "มันเป็นแยมร้อนในกระเป๋า", "มันเป็นแยมในกระเป๋าใช่ไหม");
+				vocEx="มันไม่เป็นแยมในกระเป๋า";
 				break;
 			case "d_B_3_5_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันเป็นถุงผ้า", "มันป่วย", "มันเป็นถุงผ้าใช่ไหม", "มันป่วยใช่ไหม");
+				vocEx="มันเป็นถุงผ้า";
 				break;
 			case "d_B_3_5_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("อะไรอยู่ในถุงในกระเป๋า  Dot", "อะไรอยู่ในกระเป๋า  Dot", "มีหมวกในกระเป๋า  Dot", "อะไรอยู่ในถุงผ้า  Dot");
+				vocEx="อะไรอยู่ในถุงในกระเป๋า  Dot";
 				break;
 			case "d_B_3_7_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เดา", "เปิด", "ชื่อกัส", "ห่านเปิด");
+				vocEx="เดา";
 				break;
 			case "d_B_3_7_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันคือแก๊สหรือไม่  Dot", "มันคือแก๊ส  Dot", "มันคือแยมใช่ไหม Dot", "มันคือแยม  Dot");
+				vocEx="มันคือแก๊สหรือไม่  Dot";
 				break;
 			case "d_B_3_7_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันคือแก๊สไม่ดีใช่ไหม", "มันคือแก๊สไม่ดี", "มันคือแก๊สสีเขียวใช่ไหม", "มันคือแก๊สสีเขียว");
+				vocEx="มันคือแก๊สไม่ดีใช่ไหม";
 				break;
 			case "d_B_3_7_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันไม่ใช่แก๊ส  Ben", "มันเป็นแก๊ส  Ben", "มันคือแก๊สใช่ไหม  Ben", "มันคือแก๊สหรือไม่  Ben");
+				vocEx="มันไม่ใช่แก๊ส  Ben";
 				break;
 			case "d_B_3_7_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันไม่ใช่แก๊สไม่ดีในถุงในกระเป๋า", "มันไม่ใช่แก๊สไม่ดีในกระเป๋าในถุง", "มันไม่ใช่แก๊สสีเขียวในถุงในกระเป๋า", "มันคือแก๊สไม่ดีในถุงในกระเป๋าหรือไม่");
+				vocEx="มันไม่ใช่แก๊สไม่ดีในถุงในกระเป๋า";
 				break;
 			case "d_B_3_7_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันคืออัญมณี", "มันคือแยม", "มันคืออัญมณีใช่ไหม", "มันไม่ใช่อัญมณี");
+				vocEx="มันคืออัญมณี";
 				break;
 			case "d_B_3_7_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันคืออัญมณีเม็ดใหญ่", "มันคืออัญมณีแพงมาก", "มันคืออัญมณีสวยมาก", "มันคืออัญมณีเม็ดใหญ่ใช่ไหม");
+				vocEx="มันคืออัญมณีเม็ดใหญ่";
 				break;
 			//Book 4
 			case "d_B_4_1_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Jack  และ  Gus  วิ่งเหยาะ  ๆ  ในหมอก", "Jack  และ  Gus  วิ่งเร็ว  ๆ  ในหมอก", "Jack  และ  Gus  ชอบวิ่งในหมอก", "Jack  และ  Gus  วิ่งใกล้กระท่อม");
+				vocEx="Jack  และ  Gus  วิ่งเหยาะ  ๆ  ในหมอก";
 				break;
 			case "d_B_4_1_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Bud  อยู่บนรถเมล์", "Bud  วิ่งบนรถบัส", "Bud  ยืนบนรถเมล์", "Bud  เล่นบนรถบัส");
+				vocEx="Bud  อยู่บนรถเมล์";
 				break;
 			case "d_B_4_1_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("แต่ว่า  Dot  และ  Ben  อยู่ในกระท่อม", "แต่ว่า  Dot  และ  Ben  นั่งบนรถบัส", "แต่  Dot  และ  Ben  ไม่วิ่ง", "แต่  Dot  และ  Ben  ไม่ร้อน");
+				vocEx="แต่ว่า  Dot  และ  Ben  อยู่ในกระท่อม";
 				break;
 			case "d_B_4_1_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Dot  และ  Ben  ซ่อนเพชรพลอยอยู่ในถุงในกระเป๋า", "Dot  และ  Ben  กลัวขโมย", "Dot  และ  Ben  ซ่อนเพชรพลอยอยู่ในกระเป๋า", "Dot  และ  Ben  ซ่อนในกระท่อม");
+				vocEx="Dot  และ  Ben  ซ่อนเพชรพลอยอยู่ในถุงในกระเป๋า"
 				break;
 			case "d_B_4_1_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Dot  และ  Ben  นั่งบนกระเป๋า", "Dot  และ  Ben  นั่งในกระท่อม", "Dot  และ  Ben  กลัวขโมย", "Dot  และ  Ben  อยู่บนโต๊ะ");
+				vocEx="Dot  และ  Ben  นั่งบนกระเป๋า";
 				break;
 			case "d_B_4_1_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันคืออัญมณีเม็ดใหญ่  Ben", "มันคืออัญมณีแพงมาก  Ben", "มันคืออัญมณีสวยมาก  Ben", "มันคืออัญมณีเม็ดใหญ่ใช่ไหม  Ben");
+				vocEx="มันคืออัญมณีเม็ดใหญ่  Ben";
 				break;
 			case "d_B_4_1_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมสามารถดูมัน  Dot", "ผมดูมันได้ไหม  Dot", "ผมชอบดู  Dot", "ผมมองไม่เห็น  Dot");
+				vocEx="ผมสามารถดูมัน  Dot";
 				break;
 			case "d_B_4_1_8":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันเป็นอัญมณีเม็ดใหญ่ใหญ่ใหญ่", "มันเป็นเพชรพลอยสวยมากมาก  ๆ", "ผมชอบอัญมณีเม็ดใหญ่ใหญ่ใหญ่", "มันคือเพชรพลอยแพงมากมากมาก");
+				vocEx="มันเป็นอัญมณีเม็ดใหญ่ใหญ่ใหญ่";
 				break;
 			case "d_B_4_1_9":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราไม่สามารถรักษาอัญมณี  Ben", "พวกเราสามารถรักษาอัญมณีได้  Ben", "พวกเราต้องการรักษาอัญมณีไหม  Ben", "เราไม่ต้องการรักษาอัญมณี  Ben");
+				vocEx="พวกเราไม่สามารถรักษาอัญมณี  Ben";
 				break;
 			case "d_B_4_1_10":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันสวยแต่เราไม่สามารถรักษามัน", "มันสวยและเราสามารถรักษามัน", "มันสวยมาก  เราสามารถรักษาได้ไหม", "มันสวยแต่ว่าเราไม่ควรจะรักษามัน");
+				vocEx="มันสวยแต่เราไม่สามารถรักษามัน";
 				break;
 			case "d_B_4_3_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Jack  แมวและ  Gus  เป็ดวิ่งเข้ามากระท่อม", "Jack  เป็นแมวและ  Gus  เป็นเป็ดซึ่งชอบวิ่งกัน", "Jack  แมวและ  Gus  เป็ดชอบวิ่งเล่นในกระท่อม", "Jack  เป็นแมวและ  Gus  เป็นเป็ดซึ่งซนมาก");
+				vocEx="Jack  แมวและ  Gus  เป็ดวิ่งเข้ามากระท่อม";
 				break;
 			case "d_B_4_3_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Jack  และ  Gus  เตะอัญมณี", "Jack  และ  Gus  สะดุดอัญมณี", "Jack  และ  Gus  สะดุดอัญมณี", "Jack  และ  Gus  ตีอัญมณี");
+				vocEx="Jack  และ  Gus  เตะอัญมณี";
 				break;
 			case "d_B_4_5_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผู้ชายอยู่บนอัญมณี", "ผู้ชายนั่งบนอัญมณี", "พ่อเฒ่าประจักษ์บนอัญมณี", "ผู้เฒ่านั่งบนอัญมณี");
+				vocEx="ผู้ชายอยู่บนอัญมณี";
 				break;
 			case "d_B_4_5_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผู้ชายมีไม้เท้า  และหนูน่ารัก  2  ตัวอยู่บนเท้า", "ผู้ชายมีน้ำอ้อย  และหนูน่าเกลียด  2  ตัวอยู่บนเท้า", "ผู้ชายมีไม้กายสิทธิ์  และหนูน่ารัก  2  ตัวอยู่บนเท้า", "ผู้ชายมีไม้เท้า  และหนูน่าเกลียด  2  ตัวอยู่บนเท้า");
+				vocEx="ผู้ชายมีไม้เท้า  และหนูน่ารัก  2  ตัวอยู่บนเท้า";
 				break;
 			case "d_B_4_5_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ชื่อของผม  Doctor Zogue", "ผมเป็นหมอจากประเทศ  Zogue", "ผมเป็นสัตวแพทย์ที่สวนสัตว์", "หนูของฉันชื่อ  Doctor Zogue");
+				vocEx="ชื่อของผม  Doctor Zogue";
 				break;
 			case "d_B_4_5_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมเป็นนักปราชญ์", "ผมปลูกสมุนไพร", "ผมชอบกินสมุนไพร", "ผมมีเวทมนต์");
+				vocEx="ผมเป็นนักปราชญ์";
 				break;
 			case "d_B_4_5_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("หนูน่ารักสัตว์เลี้ยงของผมอยู่บนเท้า", "หนู  2  ตัวของผมอยู่บนเท้า", "หนูสัตว์เลี้ยงของผมอยู่บนนิ้วเท้า", "หนู  2  ตัวของผมอยู่บนนิ้วเท้า");
+				vocEx="หนูน่ารักสัตว์เลี้ยงของผมอยู่บนเท้า";
 				break;
 			case "d_B_4_5_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมชื่อ  Joe", "ฉันชอบ  Joe", "ผมไม่มีชื่อ", "ฉันยินดีที่ได้รู้จักคุณ  Joe");
+				vocEx="ผมชื่อ  Joe";
 				break;
 			case "d_B_4_5_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ฉันชื่อ  Sue", "ดิฉันชอบ  Sue", "ฉันไม่มีชื่อ", "ดิฉันยินดีที่ได้รู้จักคุณ  Sue");
+				vocEx="ฉันชื่อ  Sue";
 				break;
 			case "d_B_4_5_8":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราเป็นหนูวิเศษ", "พวกเราเป็นหนูซึ่งพูดได้", "เราเป็นหนูน่ารักซึ่งชอบเวทมนต์", "เราเป็นหนูสัตว์เลี้ยงซึ่งมีเวทมนต์");
+				vocEx="พวกเราเป็นหนูวิเศษ";
 				break;
 			case "d_B_4_5_9":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เราสามารถอบพายและขนมเค้ก", "เราชอบกินพายและขนมเค้ก", "เราสามารถอบขนมเค้กอร่อยมาก", "เราชอบอบพายและขนมเค้กอร่อย");
+				vocEx="เราสามารถอบพายและขนมเค้ก";
 				break;
 			case "d_B_4_7_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("และผมเป็นนักปราชญ์วิเศษ", "และผมเป็นนักธุรกิจ", "และผมเป็นนักปราชซึ่งชอบกินสมุนไพร", "และผมมีสมุนไพรวิเศษ");
+				vocEx="และผมเป็นนักปราชญ์วิเศษ";
 				break;
 			case "d_B_4_7_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ยินดีที่ได้รู้จักคุณ  Doctor Zogue  ค่ะ", "Doctor Zogue  ชอบเจอคนสวย  ค่ะ", "Doctor Zogue  ชอบเจอคนอ่อนโยน  ครับ", "เราชอบเจอคนอ่อนโยน  Doctor Zogue  ค่ะ");
+				vocEx="ยินดีที่ได้รู้จักคุณ  Doctor Zogue  ค่ะ";
 				break;
 			case "d_B_4_7_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ยินดีที่ได้รู้จักคุณ  Sue  และ  Joe", "เราชอบเจอ  Sue  และ  Joe  ซึ่งเป็นตัวอ่อนโยน", "Sue  และ  Joe  ชอบเจอคนสวย", "Sue  และ  Joe  ชอบกินอาหารอร่อย ๆ");
+				vocEx="ยินดีที่ได้รู้จักคุณ  Sue  และ  Joe";
 				break;
 			case "d_B_4_7_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("หนูชื่อ  Dot  ค่ะ", "ดิฉันชื่อ  Ben  ค่ะ", "หนูชื่ออะไรคะ", "น้อง  Dot  ไม่มีเวทมนต์ค่ะ");
+				vocEx="หนูชื่อ  Dot  ค่ะ";
 				break;
 			case "d_B_4_7_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("หนูชื่อ  Ben  ครับ", "ชื่อของผม  Bud  ครับ", "หมาของหนูชื่อ  Ben  ครับ", "หนูของผมชื่อ  Ben  ครับ");
+				vocEx="หนูชื่อ  Ben  ครับ";
 				break;
 			case "d_B_4_7_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เป็ดชื่อ  Gus  และแมวชื่อ  Jack  ครับ", "Gus  เป็นเป็ดและ  Jack  เป็นแมว  ครับ", "Gus  และ  Jack  เป็ดเป็นเพื่อนกัน  ครับ", "แมวชื่อ  Gus  และเป็ดชื่อ  Jack  ครับ");
+				vocEx="เป็ดชื่อ  Gus  และแมวชื่อ  Jack  ครับ";
 				break;
 			case "d_B_4_7_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("และหมาของหนูชื่อ  Bud  ค่ะ", "และหนูของหมาชื่อ  Bud  ค่ะ", "และหมาของหนูชื่อ  Ben  ค่ะ", "และหนูของหมาชื่อ  Ben  ค่ะ");
+				vocEx="และหมาของหนูชื่อ  Bud  ค่ะ";
 				break;
 			case "d_B_4_7_8":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราไม่มีเวทมนต์ค่ะ", "พวกเรามีเวทมนต์ค่ะ", "พวกเรามีเวทมนต์ใช่ไหมค่ะ", "พวกเราร้อน  ไม่มีเวทมนต์ค่ะ");
+				vocEx="พวกเราไม่มีเวทมนต์ค่ะ";
 				break;
 			case "d_B_4_7_9":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ไม้เท้าของผมมีเวทมนต์", "ไม้กายสิทธิ์ของผมมีเวทมนต์", "น้ำอ้อยของผมมีเวทมนต์", "ไม้เท้ามีเวทมนต์");
+				vocEx="ไม้เท้าของผมมีเวทมนต์";
 				break;
 			case "d_B_4_7_10":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมแตะไม้เท้าของผม  และพวกเราสามารถซ่อนอยู่ในอัญมณี", "ผมแตะไม้เท้าของผม  และคุณสามารถซ่อนอยู่ในกระเป๋า", "ผมเคาะไม้กายสิทธิ์ผม  และคุณซ่อนอยู่ในกระท่อมได้", "ผมแตะไม้เท้าของผม  และมีเสียงระเบิดดัง  ๆ");
+				vocEx="ผมแตะไม้เท้าของผม  และพวกเราสามารถซ่อนอยู่ในอัญมณี";
 				break;
 			case "d_B_4_7_11":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("หนูเข้าใจค่ะ", "หนูมองไม่เห็นค่ะ", "หนูไม่เข้าใจค่ะ", "ฉันไม่เข้าใจค่ะ");
+				vocEx="หนูเข้าใจค่ะ";
 				break;
 			case "d_B_4_9_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Sue  และ  Joe  สามารถอบพายและขนมเค้กในกระท่อมได้ไหมครับ", "Sue  และ  Joe  สามารถอบขนมเค้กในกระท่อมได้ไหมครับ", "Sue  และ  Joe  สามารถอบพายในกระท่อมได้ไหมครับ", "Sue  และ  Joe  สามารถอบพายและขนมเค้กเมื่อแสงแดดร้อน");
+				vocEx="Sue  และ  Joe  สามารถอบพายและขนมเค้กในกระท่อมได้ไหมครับ";
 				break;
 			case "d_B_4_9_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("หนูชอบพายและขนมเค้กครับ", "หนูอยากจะกินพายและขนมเค้กครับ", "ผมไม่ชอบพายและขนมเค้กครับ", "ผมไม่อยากจะกินพายและขนมเค้กครับ");
+				vocEx="หนูชอบพายและขนมเค้กครับ";
 				break;
 			case "d_B_4_9_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราไม่สามารถอบในกระท่อม", "พวกเราสามารถอบในกระท่อม", "พวกเราสามารถอบในกระท่อมได้ไหม", "พวกเราไม่สามารถกินในกระท่อม");
+				vocEx="พวกเราไม่สามารถอบในกระท่อม";
 				break;
 			case "d_B_4_9_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("แต่ว่าพวกเราสามารถอบที่บ้าน", "แต่ว่าพวกเราชอบอบที่บ้าน", "แต่ว่าพวกเราชอบกินที่บ้าน", "แต่ว่าพวกเราสามารถกินที่บ้าน");
+				vocEx="แต่ว่าพวกเราสามารถอบที่บ้าน";
 				break;
 			case "d_B_4_9_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("บ้านของผมอยู่ที่ทะเลสาบ", "บ้านของผมอยู่ที่เกาะ", "บ้านของผมอยู่ที่แม่น้ำ", "บ้านของพวกเราอยู่ที่ทะเลสาบ");
+				vocEx="บ้านของผมอยู่ที่ทะเลสาบ";
 				break;
 			case "d_B_4_9_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มันเป็นบ้านสวย", "มันเป็นบ้านแพงมาก", "มันเป็นบ้านที่ทะเลสาบ", "มันเป็นบ้านหลังใหญ่");
+				vocEx="มันเป็นบ้านสวย";
 				break;
 			case "d_B_4_9_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมสามารถส่งคุณไปยังบ้านของผมที่ทะเลสาบ", "ผมสามารถส่งคุณไปยังบ้านของผม", "ผมสามารถส่งคุณไปยังบ้านที่ทะเลสาบ", "ผมอยากจะส่งคุณไปยังบ้านของผมที่ทะเลสาบ");
+				vocEx="ผมสามารถส่งคุณไปยังบ้านของผมที่ทะเลสาบ";
 				break;
 			case "d_B_4_9_8":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมสามารถนำทางคุณ", "ผมสามารถเป็นมัคคุเทศก์", "ผมสามารถส่งคุณ", "คุณอยากจะไปด้วยไหม");
+				vocEx="ผมสามารถนำทางคุณ";
 				break;
 			//Book 5
 			case "d_B_5_1_1":
@@ -4796,11 +5287,35 @@ function setBingoArrays() {
 			bingArray = new Array ("b", "ba", "bed", "bet", "bo", "bus", "buz", "d", "deb", "di", "du", "f", "h", "hod", "hot", "p", "pa", "pet", "po", "s", "sa", "si", "sip", "t", "tab", "tap", "ti", "tu", "z", "za", "ze", "zip");
 			break;
 		case "phon4":
-			bingArray = new Array ("ca", "ce", "ci", "co", "cu", "ke", "ki", "sa", "can", "cam", "cis", "ces", "kis", "kes", "kit", "ket", "kip", "ken", "cup", "cop", "kez", "kib", "duck", "back", "dock", "buck", "sack", "zack", "cub", "cob", "pack", "kid");
+			bingArray = new Array ("back", "buck", "ca", "cam", "can", "ce", "ces", "ci", "cis", "co", "cob", "cop", "cu", "cub", "cup", "dock", "duck", "ke", "ken", "kes", "ket", "kez", "ki", "kib", "kid", "kip", "kis", "kit", "pack", "sa", "sack", "zack");
+			break;
+		case "phon5":
+			bingArray = new Array ("cig", "cog", "fog", "fuj", "ga", "ge", "gem", "gi", "gin", "go", "got", "gu", "gues", "guin", "gus", "gut", "hag", "hej", "ja", "jam", "jaz", "jef", "jo", "jock", "jog", "jot", "ju", "jus", "jut", "maj", "pick", "pig");
+			break;
+		case "phon6":
+			bingArray = new Array ("cite", "node", "mace", "keep", "sick", "cede", "sag", "jut", "home", "hid", "back", "toe", "dude", "hide", "fine", "maze", "feed", "cope", "jute", "bike", "ken", "cop", "sue", "feet", "kite", "bake", "pie", "note", "cane", "time", "gape", "sage");
 			break;
 		case "phon7":
-			bingArray = new Array ("ban", "bang", "bank", "con", "don", "dong", "fang", "fun", "funk", "gong", "henge", "hank", "hung", "junk", "mink", "pin", "ping", "pink", "sing", "sink", "song", "sun", "sung", "sunk", "tack", "tan", "tang", "tank", "ting", "tinge", "zinc", "zing");
+			bingArray = new Array ("ban", "bang", "bank", "con", "don", "dong", "fang", "fun", "funk", "gong", "henge", "honk", "hung", "junk", "mink", "pin", "ping", "pink", "sing", "sink", "song", "sun", "sung", "sunk", "tack", "tan", "tang", "tank", "ting", "tinge", "zinc", "zing");
 			break;
+		case "phon8":
+			bingArray = new Array ("gal", "gel", "lag", "lice", "lid", "lime", "lip", "lob", "lode", "lone", "lope", "luck", "lude", "lung", "lunge", "pal", "pale", "rag", "rage", "reed", "rice", "rid", "rip", "ripe", "rite", "rob", "rode", "rogue", "rope", "rote", "rude", "rung");
+			break;
+		case "phon9":
+			bingArray = new Array ("colt", "cost", "cot", "cusp", "dust", "gent", "guild", "gulp", "had", "hand", "hel", "held", "help", "hulk", "jump", "lamp", "lank", "lift", "lip", "lisp", "list", "lit", "melt", "mil", "milk", "pond", "ramp", "rang", "rank", "soft", "sop", "tent");
+			break;
+		case "phon10":
+			bingArray = new Array ("back", "bank", "black", "blank", "brick", "camp", "cap", "clamp", "clap", "club", "cramp", "crime", "cub", "drag", "flank", "frank", "glaze", "glue", "graze", "log", "pace", "place", "plank", "prank", "rag", "slog", "smack", "smile", "snack", "truck", "trunk", "tuck");
+			break;
+		case "phon11":
+			bingArray = new Array ("bird", "carb", "card", "clown", "cord", "corn", "crowd", "crown", "dirt", "down", "farm", "first", "flint", "flirt", "flit", "floyd", "ford", "fork", "growl", "hood", "hook", "joy", "look", "now", "orb", "ploy", "pork", "rook", "smart", "snarl", "town", "troy");
+			break;
+		case "phon12":
+			bingArray = new Array ("cape", "cold", "cow", "cowl", "coy", "drifting", "park", "plat", "port", "sank", "scale", "scalp", "scape", "scheme", "scold", "scowl", "scrape", "skin", "skirt", "spank", "spilt", "spit", "splat", "sport", "spot", "stank", "stark", "step", "stir", "stood", "tank", "tart");
+			break;
+		case "phon13":
+			bingArray = new Array ("beset", "bisect", "empty", "entry", "first", "lading", "lady", "pi", "pine", "ply", "pry", "slide", "sly", "spite", "sprite", "spry", "spy", "tie", "try", "wad", "want", "ward", "warm", "wart", "wasp", "went", "what", "whirl", "word", "world", "worm", "worst");
+			break;			
 		default:
 			bingArray = new Array ("m", "s", "p", "t", "a", "i", "o", "ma", "mi", "mo", "pa", "pi", "po", "ta", "ti", "to", "sa", "si", "so", "mat", "mop", "mis", "sim", "sop", "sat", "pim", "pas", "pot", "tim", "tos", "tap");
 	}
@@ -4827,11 +5342,35 @@ function setBingoArrays() {
 			bingArray = new Array ("b", "ba", "bed", "bet", "bo", "bus", "buz", "d", "deb", "di", "du", "f", "h", "hod", "hot", "p", "pa", "pet", "po", "s", "sa", "si", "sip", "t", "tab", "tap", "ti", "tu", "z", "za", "ze", "zip");
 			break;
 		case "phon4":
-			bingArray = new Array ("ca", "ce", "ci", "co", "cu", "ke", "ki", "sa", "can", "cam", "cis", "ces", "kis", "kes", "kit", "ket", "kip", "ken", "cup", "cop", "kez", "kib", "duck", "back", "dock", "buck", "sack", "zack", "cub", "cob", "pack", "kid");
+			bingArray = new Array ("back", "buck", "ca", "cam", "can", "ce", "ces", "ci", "cis", "co", "cob", "cop", "cu", "cub", "cup", "dock", "duck", "ke", "ken", "kes", "ket", "kez", "ki", "kib", "kid", "kip", "kis", "kit", "pack", "sa", "sack", "zack");
+			break;
+		case "phon5":
+			bingArray = new Array ("cig", "cog", "fog", "fuj", "ga", "ge", "gem", "gi", "gin", "go", "got", "gu", "gues", "guin", "gus", "gut", "hag", "hej", "ja", "jam", "jaz", "jef", "jo", "jock", "jog", "jot", "ju", "jus", "jut", "maj", "pick", "pig");
+			break;
+		case "phon6":
+			bingArray = new Array ("cite", "node", "mace", "keep", "sick", "cede", "sag", "jut", "home", "hid", "back", "toe", "dude", "hide", "fine", "maze", "feed", "cope", "jute", "bike", "ken", "cop", "sue", "feet", "kite", "bake", "pie", "note", "cane", "time", "gape", "sage");
 			break;
 		case "phon7":
-			bingArray = new Array ("ban", "bang", "bank", "con", "don", "dong", "fang", "fun", "funk", "gong", "henge", "hank", "hung", "junk", "mink", "pin", "ping", "pink", "sing", "sink", "song", "sun", "sung", "sunk", "tack", "tan", "tang", "tank", "ting", "tinge", "zinc", "zing");
+			bingArray = new Array ("ban", "bang", "bank", "con", "don", "dong", "fang", "fun", "funk", "gong", "henge", "honk", "hung", "junk", "mink", "pin", "ping", "pink", "sing", "sink", "song", "sun", "sung", "sunk", "tack", "tan", "tang", "tank", "ting", "tinge", "zinc", "zing");
 			break;
+		case "phon8":
+			bingArray = new Array ("gal", "gel", "lag", "lice", "lid", "lime", "lip", "lob", "lode", "lone", "lope", "luck", "lude", "lung", "lunge", "pal", "pale", "rag", "rage", "reed", "rice", "rid", "rip", "ripe", "rite", "rob", "rode", "rogue", "rope", "rote", "rude", "rung");
+			break;
+		case "phon9":
+			bingArray = new Array ("colt", "cost", "cot", "cusp", "dust", "gent", "guild", "gulp", "had", "hand", "hel", "held", "help", "hulk", "jump", "lamp", "lank", "lift", "lip", "lisp", "list", "lit", "melt", "mil", "milk", "pond", "ramp", "rang", "rank", "soft", "sop", "tent");
+			break;
+		case "phon10":
+			bingArray = new Array ("back", "bank", "black", "blank", "brick", "camp", "cap", "clamp", "clap", "club", "cramp", "crime", "cub", "drag", "flank", "frank", "glaze", "glue", "graze", "log", "pace", "place", "plank", "prank", "rag", "slog", "smack", "smile", "snack", "truck", "trunk", "tuck");
+			break;
+		case "phon11":
+			bingArray = new Array ("bird", "carb", "card", "clown", "cord", "corn", "crowd", "crown", "dirt", "down", "farm", "first", "flint", "flirt", "flit", "floyd", "ford", "fork", "growl", "hood", "hook", "joy", "look", "now", "orb", "ploy", "pork", "rook", "smart", "snarl", "town", "troy");
+			break;
+		case "phon12":
+			bingArray = new Array ("cape", "cold", "cow", "cowl", "coy", "drifting", "park", "plat", "port", "sank", "scale", "scalp", "scape", "scheme", "scold", "scowl", "scrape", "skin", "skirt", "spank", "spilt", "spit", "splat", "sport", "spot", "stank", "stark", "step", "stir", "stood", "tank", "tart");
+			break;
+		case "phon13":
+			bingArray = new Array ("beset", "bisect", "empty", "entry", "first", "lading", "lady", "pi", "pine", "ply", "pry", "slide", "sly", "spite", "sprite", "spry", "spy", "tie", "try", "wad", "want", "ward", "warm", "wart", "wasp", "went", "what", "whirl", "word", "world", "worm", "worst");
+			break;			
 		default:
 			bingArray = new Array ("m", "s", "p", "t", "a", "i", "o", "ma", "mi", "mo", "pa", "pi", "po", "ta", "ti", "to", "sa", "si", "so", "mat", "mop", "mis", "sim", "sop", "sat", "pim", "pas", "pot", "tim", "tos", "tap");
 	}
@@ -4876,7 +5415,7 @@ function setNumBingoSheet () {
 		case "num3":
 			bingArray=new Array ();
 
-			while(bingArray.length<36){
+			while(bingArray.length<32){
 				nIndex=(Math.floor(Math.random()*80))+20;
 				if (bingArray.indexOf(nIndex)==-1) {
 					bingArray.push(nIndex);
@@ -4904,7 +5443,7 @@ function setNumBingoSheet () {
 		case "num6":
 			bingArray=new Array ();
 
-			while(bingArray.length<36){
+			while(bingArray.length<32){
 				if (numOp0_9==false){
 					nIndex=(Math.floor(Math.random()*90)+10);
 				}
@@ -4921,7 +5460,7 @@ function setNumBingoSheet () {
 		case "num7":
 			bingArray=new Array();
 
-			while(bingArray.length<36){
+			while(bingArray.length<32){
 				if (numOp0_99==false){
 					nIndex=(Math.floor(Math.random()*900))+100;
 				}
@@ -4970,19 +5509,6 @@ function setNumBingoSheet () {
 
 function setVocBingSheet () {
 
-	if (vocArray.length<24){
-/*		if (curr_topic_title!="multi") {
-			setMsg("err4");
-			selectTopic('multi');
-		}
-		else {
-			setMsg("err5");
-			setComCats();
-			setAllVocArray();
-			comCatsSelect();
-		}*/
-
-	}
 	bingArray= new Array();
 	for (var k = 0; k < vocArray.length; k++) {
 		bingArray[k]=vocArray[k];
@@ -5231,8 +5757,6 @@ function choices(imgInd) {
 			var choice4 = vocArray[inds[3]];
 		}
 
-
-
 		//This section checks for vocab items that cannot be filenames and substitutes them
 		subst1Ind = substArray.indexOf(choice1);
 		if (subst1Ind !=-1) {
@@ -5335,10 +5859,47 @@ function choices(imgInd) {
 	}
 	else if (uMode == "read_choose" || uMode == "listen_choose") {
 		if (curr_topic_title=="onet_voc") {
-			document.getElementById("imCh1").src = choice1Im.src;
-			document.getElementById("imCh2").src = choice2Im.src;
-			document.getElementById("imCh3").src = choice3Im.src;
-			document.getElementById("imCh4").src = choice4Im.src;
+			var tempIm1=[];
+			var tempIm2=[];
+			var tempIm3=[];
+			var tempIm4=[];
+			if (typeof choice1Im.src == "object") {
+				tempIm1=choice1Im.src.toString().split(",");
+				shuffle(tempIm1);
+				tempIm1=tempIm1[0];
+			}
+			else {
+				tempIm1=choice1Im.src;
+			}
+			if (typeof choice2Im.src == "object") {
+				tempIm2=choice2Im.src.toString().split(",");
+				shuffle(tempIm2);
+				tempIm2=tempIm2[0];
+			}
+			else {
+				tempIm2=choice2Im.src;
+			}
+			if (typeof choice3Im.src == "object") {
+				tempIm3=choice3Im.src.toString().split(",");
+				shuffle(tempIm3);
+				tempIm3=tempIm3[0];
+			}
+			else {
+				tempIm3=choice3Im.src;
+			}
+			if (typeof choice4Im.src == "object") {
+				tempIm4=choice4Im.src.toString().split(",");
+				shuffle(tempIm4);
+				tempIm4=tempIm4[0];
+			}
+			else {
+				tempIm4=choice4Im.src;
+			}
+
+			document.getElementById("imCh1").src = tempIm1;
+			document.getElementById("imCh2").src = tempIm2;
+			document.getElementById("imCh3").src = tempIm3;
+			document.getElementById("imCh4").src = tempIm4;
 		}
 		else if (curr_topic_title!="multi"){
 			document.getElementById("imCh1").src = "images/vocab/" + curr_topic_dir + "/" + choice1Im + ".jpg";
@@ -5546,7 +6107,7 @@ function setTimbreSelect(mode,caller){
 
 function playRV(vE,timbre){
 	var rvStarted=false;
-
+	audVoc.pause();
 	responsiveVoice.speak(vE,timbre, {volume: aud_rv_vol, rate:0.7, onstart:function(){rvStarted=true;}});
 
 	setTimeout(function(){
@@ -5608,28 +6169,52 @@ function setTimbre(){
 		var timbre=timbreArray[timbreInd];
 	}
 
-	if (uMode=="num_bingo"&& timbre=="Ian"){
+	/*if (uMode=="num_bingo"&& timbre=="Ian"){
 		timbre="UK English Female";
-	}
+	}*/
 	/*if (timbre!="Ian"){
 		utterance.voice=voices.filter(function(voice) { return voice.name ==  'Google '+timbre; })[0];
 	}*/
 	return(timbre);
 }
 
+function humanNumPlay(){
+	var remPlayed=false;
+	audVoc.pause();
+	if (typeof responsiveVoice!="undefined") {
+		responsiveVoice.cancel();
+	}
+	var rem=(bingEx-((Math.floor(bingEx/100))*100));
+	if (bingEx <100 || rem==0) {
+		audVoc.src = "audio/numbers/"+bingEx.toString()+ ".mp3";
+		audVoc.play();
+	}
+	else {
+		audVoc.src = "audio/numbers/"+(Math.floor(bingEx/100)).toString()+ "nn.mp3";
+		audVoc.play();
+		remPlayed=false;
+		audVoc.onended = function() {
+			if (remPlayed==false){
+				audVoc.src = "audio/numbers/"+rem.toString()+ ".mp3";
+				audVoc.play();
+				remPlayed=true;
+			}
+		};
+	}
+}
 
 function bingoPlay() {
+	if (stopCount==true){
+		return;
+	}
 	var timbre=setTimbre();
 
 	if (uMode=="num_bingo"){
 		var unit = currentNumUnit;
-		var audaddr = "audio/numbers/bingo/";
-		var nbit ="1.mp3";
 	}
 	else if (uMode=="phon_bingo"){
 		var unit = currentPhonUnit;
 		var audaddr = "audio/phonics/bingo/";
-		var nbit ="1.mp3";
 	}
 	else {
 		var unit = curr_topic_dir;
@@ -5643,54 +6228,22 @@ function bingoPlay() {
 	}
 
 	if (bingRepeat <2 && bingExAud !="") {
-		if (uMode=="num_bingo"){
-			if (stopCount==false){
+		if (uMode=="num_bingo"){		
+			if (timbre=="Ian"){
+				humanNumPlay();
+			}
+			else {
 				playRV(bingEx.toString(),timbre);
-				console.log("Number: "+bingEx);
-				var h = Math.floor(bingEx/100);
-				var t = Math.floor((bingEx-(h*100))/10);
-				var u = (bingEx-(h*100))-(t*10);
-				if (t==0 && u==0) {
-					h=(h*100).toString() + "_f.mp3";
-				}
-				else{
-					h=(h*100).toString()+".mp3";
-				}
-				if (t==1){
-					t=0;
-					u=(u+10);
-					u=u.toString()+".mp3";
-				}
-				if (u==0){
-					t=(t*10).toString()+ "_f.mp3";
-				}
-				else{
-					t=(t*10).toString()+".mp3";
-				}
-				if (u<10){
-					u=u.toString()+".mp3";
-				}
-				if (bingEx==0){
-					u="zero.mp3"
-				}
-				console.log("hundreds: "+h);
-				console.log("tens: "+t);
-				console.log("units: "+u);
-				//responsiveVoice.speak(bingEx.toString(),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
-				/*utterance.text=bingEx.toString();
-				window.speechSynthesis.speak(utterance);*/
 			}
 		}
 		else {
 			audVoc.pause();
-			if ((bingComplete.indexOf(unit))!=-1) {
-				audVoc.src = audaddr+bingExAud+(bingRepeat+2)+ ".mp3";
-			}
-			else {
-				audVoc.currentTime = 0;
-			}
-
 			if (uMode=="phon_bingo"){
+				var bingTone = tempArray.pop();
+				if (currentPhonUnit.slice(4)>12 && bingExAud.length==2 && ["a","e","i","o","u"].indexOf(bingExAud.slice(-1))!= -1) {
+					bingTone=bingTone+3;
+				}
+				audVoc.src = audaddr+bingExAud+(bingTone)+ ".mp3";
 				audVoc.play();
 			}
 			else {
@@ -5718,8 +6271,6 @@ function bingoPlay() {
 		}
 		bingRepeat++;
 	}
-
-
 	else if (bingWords > 1) {
 		var syllInd = Math.floor(Math.random() * bingArray.length);
 		bingEx = bingArray[syllInd];
@@ -5728,9 +6279,11 @@ function bingoPlay() {
 
 		if (uMode=="num_bingo"){
 			bingExAud=bingEx;
-			if (stopCount==false){
+			if (timbre=="Ian"){
+				humanNumPlay();
+			}
+			else {
 				playRV((bingEx.toString()),timbre);
-				//responsiveVoice.speak((bingEx.toString()),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 				/*utterance.text=(bingEx.toString());
 				window.speechSynthesis.speak(utterance);*/
 			}
@@ -5743,6 +6296,13 @@ function bingoPlay() {
 				audVoc.currentTime = 0;
 			}
 			if (uMode=="phon_bingo"){
+				tempArray=[1,2,3];
+				shuffle (tempArray);
+				var bingTone = tempArray.pop();
+				if (currentPhonUnit.slice(4)>12 && bingExAud.length==2 && ["a","e","i","o","u"].indexOf(bingExAud.slice(-1))!= -1) {
+					bingTone=bingTone+3;
+				}
+				audVoc.src = audaddr+bingExAud+(bingTone)+ ".mp3";				
 				audVoc.play();
 			}
 			else {
@@ -5755,13 +6315,11 @@ function bingoPlay() {
 				else {
 					if (curr_topic_title!="multi"){
 						playRV(bingExAud,timbre);
-						//responsiveVoice.speak(bingExAud,timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 						/*utterance.text=(bingExAud);
 						window.speechSynthesis.speak(utterance);*/
 					}
 					else {
 						playRV(bingExAud.substr(bingExAud.indexOf("/")+1),timbre);
-						//responsiveVoice.speak(bingExAud.substr(bingExAud.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 						/*utterance.text=(bingExAud.substr(bingExAud.indexOf("/")+1));
 						window.speechSynthesis.speak(utterance);*/
 
@@ -5791,13 +6349,13 @@ function bingoCheck(ch) {
 	if (bingCorrect.indexOf(ch)!= -1) {
 		return;
 	}
-     if (syllcheck == bingEx) {
-     bingRepeat=2;
+    if (syllcheck == bingEx) {
+    	bingRepeat=2;
 		document.getElementById(ch+"X").src="images/formatting/bingoX.png";
 		points++;
 		document.getElementById("score").innerHTML = "Score: " + Math.floor(points)+pointsTxt;
 		bingCorrect.push(ch);
-		bingoPlay();
+		//bingoPlay();
      }
      else if (bingCalled.indexOf(syllcheck) != -1) {
      	document.getElementById(ch+"X").src="images/formatting/bingoX.png";
@@ -5843,6 +6401,9 @@ function bingoCheck(ch) {
 			}
 		}
 		bingCalled.splice(bingCalled.indexOf(syllcheck),1);
+	}
+	if (stopCount == false){
+		bingoPlay();
 	}
 }
 
@@ -6068,15 +6629,18 @@ function upcmnErrs(vocItem) {
 			var obj = vocArray.filter(function ( obj ) {
 				return obj.txt === vocItem;
 			})[0];
-			console.log("obj.src: "+obj.src);
-			vocItem=obj.src;
+			if (typeof obj.src == "object") {
+				vocItem=obj.src[0];
+			}
+			else {
+				vocItem=obj.src;
+			}
 			vocItem=vocItem.slice(13);
 			var a = vocItem.indexOf(".jpg")
 			vocItem=vocItem.substring(0,a);
 		}
 		else if (curr_topic_title!="multi"){
 			vocItem = curr_topic_dir + "/" + vocItem;
-			console.log(vocItem);
 		}
 		if (cmnErrs [0][0] == "") {
 			cmnErrs[0] = [vocItem, 1];
@@ -6296,8 +6860,44 @@ function activity(button){
       multi_part_item--;
     }
   }
+	else if (button=="phon_bingo_class_cont") {
+		shuffle(bingArray);
+		localStorage.bing_back=bingArray;
+		tempArray.length=0;
+		tempArray[0]=bingArray[0];
+		document.getElementById("bing_index").innerHTML= "1. ";
+		document.getElementById("bing_current").innerHTML=bingArray[0];
+		document.getElementById("bing_items_1").innerHTML="<span style='background:yellow; color:black'>"+bingArray[0]+"</span><br>";
+		vocArray.length=0;
+		localStorage.bing_back_ind=0;
+		localStorage.bing_back_unit=currentPhonUnit;
+	}
 
-  else{
+	else if (uMode=="phon_bingo_class") {
+		document.getElementById("bing_class_controls").style.display = "block";
+		document.getElementById("b_start").style.display = "none";
+		document.getElementById("b_help").style.display = "none";
+		document.getElementById("b_reset").style.display = "block";
+		document.getElementById("phonDisplay").style.display="none";
+		document.getElementById("imageDiv").style.display="none";
+		document.getElementById("welcomeDiv").style.display="none";
+		document.getElementById("contentSelect").style.display="none";
+		document.getElementById("bing_class_display").style.display="block";
+		document.getElementById("bing_items_1").innerHTML="";
+		document.getElementById("bing_items_2").innerHTML="";
+		document.getElementById("bing_items_3").innerHTML="";
+		document.getElementById("bing_items_4").innerHTML="";
+		document.getElementById("bing_index").innerHTML="";
+		document.getElementById("bing_current").innerHTML="&nbsp;";
+		if (localStorage.bing_back) {
+			setMsg("bing_back","new_continue");
+		}
+		else {
+			activity("phon_bingo_class_cont");
+		}
+	}
+
+  	else{
 		newImage(button);
 	}
 }
@@ -6415,6 +7015,109 @@ function newNumber(button) {
 		var totPoints=points+pronPoints;
 		document.getElementById("total").innerHTML = "Total: " + totPoints;
 	}
+}
+
+function bingClassProc(caller) {
+	
+	if (caller=="next") {
+		if (tempArray.length==bingArray.length) {
+			return;
+		}
+
+		var n = tempArray.length;
+
+		tempArray[n]=bingArray[n];
+		tempArray.sort();
+		document.getElementById("bing_index").innerHTML= (n+1) + ". ";
+		document.getElementById("bing_current").innerHTML= bingArray[n];
+		localStorage.bing_back_ind=n;
+	}
+	else if (caller=="back") {
+		var n = bingArray.indexOf(document.getElementById("bing_current").innerHTML);
+		if (n>0) {
+			document.getElementById("bing_index").innerHTML= (n) + ". ";
+			document.getElementById("bing_current").innerHTML=bingArray[n-1];
+		}
+	}
+	else if (caller=="fwd") {
+		var n = bingArray.indexOf(document.getElementById("bing_current").innerHTML);
+		if (n<tempArray.length-1) {
+			document.getElementById("bing_index").innerHTML= (n+2) + ". ";
+			document.getElementById("bing_current").innerHTML=bingArray[n+1];
+		}
+	}
+	else if (caller=="backup") {
+		vocArray=[];
+		tempArray=[];
+		bingArray=localStorage.bing_back.split(",");
+		for (var i=0;i<localStorage.bing_back_ind;i++) {
+			tempArray[i]=bingArray[i];
+		}
+		tempArray.sort();
+		setDisplays({modal_back:'none'});
+		document.getElementById("panelCont").src="images/buttons/b_"+localStorage.bing_back_unit+".png";
+		document.getElementById("panelCont2").src="images/buttons/b_"+localStorage.bing_back_unit+".png";
+		document.getElementById("panelLev").src="images/labels/l_"+localStorage.bing_back_unit+"_p.png";
+		document.getElementById("panelLev2").src="images/labels/l_"+localStorage.bing_back_unit+"_p.png";
+		bingClassProc("next");
+	}
+			
+	document.getElementById("bing_items_1").innerHTML="";
+	document.getElementById("bing_items_2").innerHTML="";
+	document.getElementById("bing_items_3").innerHTML="";
+	document.getElementById("bing_items_4").innerHTML="";
+
+	for (var i=0; i<tempArray.length;i++) {
+
+		if (i<8) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+				document.getElementById("bing_items_1").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+			}
+			else {
+				document.getElementById("bing_items_1").innerHTML+= tempArray[i]+"<br>";
+			}
+		}
+		else if (i<16) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+				document.getElementById("bing_items_2").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+			}
+			else {
+				document.getElementById("bing_items_2").innerHTML+= tempArray[i]+"<br>";
+			}
+		}
+		else if (i<24) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+				document.getElementById("bing_items_3").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+			}
+			else {
+				document.getElementById("bing_items_3").innerHTML+= tempArray[i]+"<br>";
+			}
+		}
+		else {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+				document.getElementById("bing_items_4").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+			}
+			else {
+				document.getElementById("bing_items_4").innerHTML+= tempArray[i]+"<br>";
+			}
+		}
+	}
+}
+
+
+function BingClassPlay() {
+
+	if (vocArray.length==0) {
+		vocArray=new Array (1,2,3);
+		shuffle (vocArray);
+	}
+	var bingTone = vocArray.pop();
+	if (currentPhonUnit.slice(4)>12 && document.getElementById("bing_current").innerHTML.length==2 && ["a","e","i","o","u"].indexOf(document.getElementById("bing_current").innerHTML.slice(-1))!= -1) {
+		bingTone=bingTone+3;
+	}
+	audVoc.pause();
+	audVoc.src ="audio/phonics/bingo/" + document.getElementById("bing_current").innerHTML + bingTone +".mp3";
+	audVoc.play();
 }
 
 
@@ -6870,7 +7573,6 @@ function tabooCheck() {
 	function unit12() {
 
 		setIndices (37,12,29,5,6,12,3);
-		console.log(initC);
 
 		var igraph=iArray[iIndex];
 		var vgraph=vArray[vIndex];
@@ -6948,9 +7650,8 @@ function tabooCheck() {
 
 
 function setAllVocArray(){
-
-	all_voc_array.length=0;
-
+	all_voc_array= [];
+	
 	for (var i=0; i<comCats.length; i++){
 		curr_topic_title=comCats[i];
 		setVocArrays();
@@ -6973,11 +7674,11 @@ function newImage(trigger) {
 		document.getElementById("b_start").style.display = "none";
 		document.getElementById("b_help").style.display = "none";
 		document.getElementById("b_reset").style.display = "block";
-		//document.getElementById("optDiv").style.display = "none";
 		document.getElementById("contentSelect").style.display = "none";
-		if (uMode!="phon_bingo" && uMode!="voc_bingo" && uMode!="num_bingo"){
+		if (uMode!="phon_bingo" && uMode!="voc_bingo" && uMode!="num_bingo" && uMode!="phon_bingo_class"){
 				document.getElementById("imageDiv").style.display="block";
 		}
+
 		document.getElementById("welcomeDiv").style.display="none";
 		document.getElementById("attributionDiv").style.display="none";
 		if (uMode == "say_word") {
@@ -7062,6 +7763,17 @@ function newImage(trigger) {
 			}
 		}
 		strikes = 0;
+		if (uMode=="book_trans") {
+			dot_ben_fb.pause;
+			dot_ben_fb.src = "audio/correct.mp3";
+			dot_ben_fb.play();
+			if (document.getElementById("book_trans_fb_img").src.indexOf("ben_incorrect")!= -1 || document.getElementById("book_trans_fb_img").src.indexOf("dot_correct")!= -1) {
+				document.getElementById("book_trans_fb_img").src="images/labels/ben_correct.jpg";
+			}
+			else {
+				document.getElementById("book_trans_fb_img").src="images/labels/dot_correct.jpg";
+			}
+		}
 	}
 	else if (trigger == "clear") {
 		if (scoreSplit==false){
@@ -7088,7 +7800,15 @@ function newImage(trigger) {
 		}
 	}
 	else if (trigger == "wrong_trans"){
-
+		dot_ben_fb.pause;
+		dot_ben_fb.src = "audio/incorrect.mp3";
+		dot_ben_fb.play()
+		if (document.getElementById("book_trans_fb_img").src.indexOf("ben_correct")!= -1  || document.getElementById("book_trans_fb_img").src.indexOf("dot_incorrect")!= -1 ) {
+			document.getElementById("book_trans_fb_img").src="images/labels/ben_incorrect.jpg";
+		}
+		else {
+			document.getElementById("book_trans_fb_img").src="images/labels/dot_incorrect.jpg";
+		}
 	}
 
 	if (scoreSplit==false){
@@ -7177,12 +7897,18 @@ function newImage(trigger) {
 				document.getElementById("finishedButton").style.display = "block";
 				finished = true;
 				stopCount= true;
-				document.getElementById("mainImage").src = "images/vocab/titles/d_B_"+currentBook.substr(4)+"_end.jpg";
-				document.getElementById("book_overlay").src = "images/vocab/titles/d_B_congrats.gif";
-				document.getElementById("d_B_Score").style.display="block";
-				document.getElementById("d_B_Score").innerHTML="<b>"+points+" points</b>";
-				audVoc.src = "audio/cheer.mp3";
-				audVoc.play();
+				setTimeout(function() {
+					var questions = d_B_ExArray.reduce(function(d_B_ExArray, b) { return d_B_ExArray + b; }, 0);
+					var perc = Math.round((points/questions)*100); 
+					document.getElementById("score").innerHTML = "Score: " + perc +"%";
+					cheer.play();
+					document.getElementById("book_trans_fb_img").src = "images/labels/dot_correct.jpg";
+					document.getElementById("mainImage").src = "images/vocab/titles/d_B_"+currentBook.substr(4)+"_end.jpg";
+					document.getElementById("book_overlay").src = "images/vocab/titles/d_B_congrats.gif";
+					document.getElementById("d_B_Score").style.display="block";
+					document.getElementById("d_B_Score").innerHTML=points+" points from<br>" + questions+ " questions<br>= "+perc+"%";
+				},2500);
+
 				return;
 			}
 			document.getElementById("mainImage").src = "images/vocab/dot_and_Ben/sentences/d_B_"+currentBook.substr(4)+"_"+DBPageNum+".jpg";
