@@ -17,6 +17,7 @@ var	bingoTime = 0;
 var	bingRepeat = 0;
 var	bingSheetArray =new Array ();
 var	bingTestArray = new Array ("");
+var bing_setup=false;
 var	bingWords = 25;
 var	cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
 var	comCats = new Array ("actions", "animals", "body", "clothes", "describing", "food", "occupations", "places_and_transport", "school", "time");
@@ -117,7 +118,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9102";
+var version_num="0.9200";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -1543,6 +1544,10 @@ function selectActivity(mode) {
 				setVocBingSheet();
 			break;
 
+			case "voc_bingo_class":
+				selectScoreSplit(false);
+			break;
+
 			case "read_say":
 				document.getElementById("panelCont").src="images/buttons/b_"+currentPhonUnit+".png";
 				document.getElementById("panelCont2").src="images/buttons/b_"+currentPhonUnit+".png";
@@ -1640,6 +1645,10 @@ function setActivityDisplays() {
 			break;
 		case "voc_bingo":
 			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"block",timer:"block"});
+		break;
+
+		case "voc_bingo_class":
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",bing_class_display:"none",score:"none",timer:"none"});
 		break;
 
 		case "read_say":
@@ -1894,10 +1903,6 @@ function selectTopic(topic,caller) {
         				document.getElementById("l_onet_topic").src="images/buttons/"+topic+".jpg";
         			}
         		}
-
-				//preloadAudio();
-				//preLoadImages();
-				//monPreload();
 			}
 		}
 
@@ -2428,6 +2433,10 @@ function topicTitle(title) {
 		case "location":
 			return("Location");
 		break;
+
+		case "multi":
+			return("Multi Topics");
+		break;
 		
 		case "occupations":
 			return("Occupations");
@@ -2785,7 +2794,10 @@ function setUndoRedo(caller) {
 }
 
 
-function setVocChoiceTable(button, clone_lev) {
+function setVocChoiceTable(button, data_1) {
+	if (data_1=="voc_bingo") {
+		bing_setup=true;
+	}
 	if (curr_topic_title=="multi") {
 		selectTopic(availCats[0]);
 	}
@@ -2832,15 +2844,15 @@ function setVocChoiceTable(button, clone_lev) {
 		break;
 
 		case "clone_topic_cont":
-			if (currentLev==clone_lev) {
+			if (currentLev==data_1) {
 				return;
 			}
-			if (localStorage[clone_lev+"_"+curr_topic_title]) {
-				localStorage[currentLev+"_"+curr_topic_title]=localStorage[clone_lev+"_"+curr_topic_title];
-				setMsg("clone_success","success",clone_lev);
+			if (localStorage[data_1+"_"+curr_topic_title]) {
+				localStorage[currentLev+"_"+curr_topic_title]=localStorage[data_1+"_"+curr_topic_title];
+				setMsg("clone_success","success",data_1);
 			}
 			else {
-				setMsg("err_no_clone","",clone_lev);
+				setMsg("err_no_clone","",data_1);
 				return;
 			}
 
@@ -3063,7 +3075,7 @@ function setVocChoiceTable(button, clone_lev) {
 		break;
 	}
 
-	if (button!="topics" && button!="show_all_topics") {
+	if (button!="topics" && button!="show_all_topics" && button!="voc_bingo") {
 		document.getElementById("voc_tab_div").style.height="10.73em";
 		document.getElementById("lev_tab_div").style.display="none";
 		document.getElementById("save_load_grp").style.display="none";
@@ -3208,10 +3220,17 @@ function setVocChoiceTable(button, clone_lev) {
 	 }
 	setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",
 				phonUSelect:"none",score:"none",timer:"block",mainImage:"none",welcomeDiv:"none",attributionDiv:"none", contentSelect:"none",controls_central:"none",order_div:"none",
-				voc_choice_controls:"block", b_reset:"block",user_settings_data:"block",b_help:"none",left_pane:"none",voc_tab:"table",user_level_data:"block",onet_voc_inst:"none",save_onet_grp:"none"});
+				voc_choice_controls:"block", b_reset:"block",user_settings_data:"block",b_help:"none",left_pane:"none",voc_tab:"table",onet_voc_inst:"none",save_onet_grp:"none"});
 	if (curr_topic_title=="onet_voc") {
 		setDisplays({user_level_data:"none",onet_voc_inst:"block",topic_clone_grp:"none",save_onet_grp:"block"});
 	}
+	if (bing_setup) {
+		setDisplays({bing_class_display:"none",user_level_data:"none",voc_bingo_setup:"block"});
+	}
+	else{
+		setDisplays({user_level_data:"block",voc_bingo_setup:"none"});
+	}
+	
 	document.getElementById("voc_tab_div").style.marginLeft="3%";
 
 	if (tempArray.length<5 && tempArray.length>0) {
@@ -3221,6 +3240,757 @@ function setVocChoiceTable(button, clone_lev) {
 		}
 	}
 	setUserData(button,num_topics);
+}
+
+function makeVocBingoSheets (caller) {
+
+	if (caller=="new") {
+		var title="Vocabulary Bingo: "+currentLev+" "+topicTitle(curr_topic_title);
+		var doc_title="Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+game_code+".pdf";
+		var game_code=Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+"_"+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString();
+		var game_id="VB_"+currentLev+"_"+curr_topic_title+"_"+game_code;
+
+		setVocBingSheet();
+
+		if (!localStorage.voc_bing_games) {
+			localStorage.voc_bing_games=game_id;
+		}
+		else {
+			var t_array_games=localStorage.voc_bing_games.split(",");
+			t_array_games.push(game_id);
+			t_array_games.sort();
+			localStorage.voc_bing_games=t_array_games;
+		}
+		localStorage[game_id]="English Builder Vocabulary Bingo Version: 1.0\ngame_id: ("+game_id+")\nbingArray: ("+bingArray+")";
+	}
+	else {
+		var t_string=localStorage[localStorage.curr_vb_game];
+		var t_start=t_string.indexOf("bingArray")+12;
+		var t_end=t_string.lastIndexOf(")");
+		t_string=t_string.slice(t_start,t_end);
+		bingArray=t_string.split(",");
+
+		t_string=localStorage.curr_vb_game;
+		var title="Vocabulary Bingo: "+t_string.slice(3,5)+" "+topicTitle(t_string.slice(6,-10));
+		var game_id=t_string;
+		//alert(title);
+
+		//return;
+	}
+
+	var font_sizes={};
+	for (var i=0;i<bingArray.length;i++) {
+		document.getElementById('voc_width_tester').innerHTML=bingArray[i];
+		if (bingArray[i].indexOf(" ")!= -1 || document.getElementById('voc_width_tester').offsetWidth<97) {
+			font_sizes[bingArray[i]]=21;
+		}
+		else {
+			font_sizes[bingArray[i]]=Math.round(21*(97/document.getElementById('voc_width_tester').offsetWidth));
+		}
+	}
+
+	var t_array1 = bingArray.toString().split(",");
+	shuffle(t_array1);
+	var t_array2 = bingArray.toString().split(",");
+	shuffle(t_array2);
+	var t_array3 = bingArray.toString().split(",");
+	shuffle(t_array3);
+	var t_array4 = bingArray.toString().split(",");
+	shuffle(t_array4);
+	var t_array5 = bingArray.toString().split(",");
+	shuffle(t_array5);
+	var t_array6 = bingArray.toString().split(",");
+	shuffle(t_array6);
+	var t_array7 = bingArray.toString().split(",");
+	shuffle(t_array7);
+	var t_array8 = bingArray.toString().split(",");
+	shuffle(t_array8);
+	var t_array9 = bingArray.toString().split(",");
+	shuffle(t_array9);
+	var t_array10 = bingArray.toString().split(",");
+	shuffle(t_array10);
+	var t_array11 = bingArray.toString().split(",");
+	shuffle(t_array11);
+	var t_array12 = bingArray.toString().split(",");
+	shuffle(t_array12);
+	var t_array13 = bingArray.toString().split(",");
+	shuffle(t_array13);
+	var t_array14 = bingArray.toString().split(",");
+	shuffle(t_array14);
+	var t_array15 = bingArray.toString().split(",");
+	shuffle(t_array15);
+	var t_array16 = bingArray.toString().split(",");
+	shuffle(t_array16);
+	var t_array17 = bingArray.toString().split(",");
+	shuffle(t_array17);
+	var t_array18 = bingArray.toString().split(",");
+	shuffle(t_array18);
+	var t_array19 = bingArray.toString().split(",");
+	shuffle(t_array19);
+	var t_array20 = bingArray.toString().split(",");
+	shuffle(t_array20);
+	var t_array21 = bingArray.toString().split(",");
+	shuffle(t_array21);
+	var t_array22 = bingArray.toString().split(",");
+	shuffle(t_array22);
+	var t_array23 = bingArray.toString().split(",");
+	shuffle(t_array23);
+	var t_array24 = bingArray.toString().split(",");
+	shuffle(t_array24);
+	var t_array25 = bingArray.toString().split(",");
+	shuffle(t_array25);
+	var t_array26 = bingArray.toString().split(",");
+	shuffle(t_array26);
+	var t_array27 = bingArray.toString().split(",");
+	shuffle(t_array27);
+	var t_array28 = bingArray.toString().split(",");
+	shuffle(t_array28);
+	var t_array29 = bingArray.toString().split(",");
+	shuffle(t_array29);
+	var t_array30 = bingArray.toString().split(",");
+	shuffle(t_array30);
+	var t_array31 = bingArray.toString().split(",");
+	shuffle(t_array31);
+	var t_array32 = bingArray.toString().split(",");
+	shuffle(t_array32);
+
+	pdfMake.fonts = {
+		Nunito: {
+			normal: "Nunito-Regular.ttf",
+		  	bold: "Nunito-Bold.ttf"
+	  	},
+	  	Comic: {
+	  		normal: "ComicNeue-Regular.ttf",
+	  		bold: "ComicNeue-Bold.ttf"
+	  	}
+	}
+
+	var bing_pdf = { 
+		pageSize: 'A4',
+		background: {image: 'bing_back.jpg', width:594},
+		info: {
+			title: title,
+			author: 'Ian Smith',
+		},
+		content: [
+			{	table: {
+					headerRows: 7,
+					widths:[15,"*",15],
+					body: [
+						[{ text: title, fontSize: 14, margin: [0, 0, 0, 2],fillColor: 'white',colSpan: 3}],
+						[{ text: "Game ID: "+game_id, fontSize: 12, margin: [0, 0, 0, 8],fillColor: 'white',colSpan: 3}],
+						[{text: "Information here about how to load this game normally.",fontSize: 11, margin: [0, 0, 0, 8],fillColor: 'white',colSpan: 3}],
+						[{text: "If this game gets deleted, or if you want to play this game on another computer, copy the following into a new text file:",fillColor: 'white',colSpan: 3}],
+						[{fillColor:"#fff"},{text: "English Builder Vocabulary Bingo Version: 1.0\n"+"game_id: ("+game_id+")\nbingArray: ("+bingArray+")",fillColor: "#eee"},{fillColor:"#fff"}],
+						[{text: "Then you can load that file into the game.",fillColor: 'white',colSpan: 3}],
+						[{text: "",fillColor: '#fff',margin:[0,0,0,500],colSpan: 3}]
+					]	
+				},
+				layout: 'noBorders',
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array1[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[0]]}, {text: t_array1[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[1]]}, {text: t_array1[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[2]]}, {text: t_array1[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[3]]}, {text: t_array1[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[4]]}],
+						[ {text: t_array1[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[5]]}, {text: t_array1[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[6]]}, {text: t_array1[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[7]]}, {text: t_array1[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[8]]}, {text: t_array1[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[9]]}],
+						[ {text: t_array1[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[10]]}, {text: t_array1[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[11]]}, {text: 'Set 1',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array1[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[12]]}, {text: t_array1[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[13]]}],
+						[ {text: t_array1[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[14]]}, {text: t_array1[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[15]]}, {text: t_array1[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[16]]}, {text: t_array1[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[17]]}, {text: t_array1[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[18]]}],
+						[ {text: t_array1[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[19]]}, {text: t_array1[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[20]]}, {text: t_array1[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[21]]}, {text: t_array1[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[22]]}, {text: t_array1[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array2[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[0]]}, {text: t_array2[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[1]]}, {text: t_array2[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[2]]}, {text: t_array2[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[3]]}, {text: t_array2[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[4]]}],
+						[ {text: t_array2[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[5]]}, {text: t_array2[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[6]]}, {text: t_array2[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[7]]}, {text: t_array2[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[8]]}, {text: t_array2[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[9]]}],
+						[ {text: t_array2[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[10]]}, {text: t_array2[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[11]]}, {text: 'Set 2',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array2[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[12]]}, {text: t_array2[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[13]]}],
+						[ {text: t_array2[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[14]]}, {text: t_array2[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[15]]}, {text: t_array2[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[16]]}, {text: t_array2[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[17]]}, {text: t_array2[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[18]]}],
+						[ {text: t_array2[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[19]]}, {text: t_array2[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[20]]}, {text: t_array2[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[21]]}, {text: t_array2[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[22]]}, {text: t_array2[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array3[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[0]]}, {text: t_array3[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[1]]}, {text: t_array3[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[2]]}, {text: t_array3[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[3]]}, {text: t_array3[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[4]]}],
+						[ {text: t_array3[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[5]]}, {text: t_array3[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[6]]}, {text: t_array3[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[7]]}, {text: t_array3[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[8]]}, {text: t_array3[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[9]]}],
+						[ {text: t_array3[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[10]]}, {text: t_array3[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[11]]}, {text: 'Set 3',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array3[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[12]]}, {text: t_array3[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[13]]}],
+						[ {text: t_array3[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[14]]}, {text: t_array3[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[15]]}, {text: t_array3[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[16]]}, {text: t_array3[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[17]]}, {text: t_array3[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[18]]}],
+						[ {text: t_array3[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[19]]}, {text: t_array3[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[20]]}, {text: t_array3[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[21]]}, {text: t_array3[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[22]]}, {text: t_array3[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array4[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[0]]}, {text: t_array4[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[1]]}, {text: t_array4[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[2]]}, {text: t_array4[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[3]]}, {text: t_array4[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[4]]}],
+						[ {text: t_array4[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[5]]}, {text: t_array4[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[6]]}, {text: t_array4[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[7]]}, {text: t_array4[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[8]]}, {text: t_array4[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[9]]}],
+						[ {text: t_array4[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[10]]}, {text: t_array4[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[11]]}, {text: 'Set 4',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array4[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[12]]}, {text: t_array4[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[13]]}],
+						[ {text: t_array4[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[14]]}, {text: t_array4[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[15]]}, {text: t_array4[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[16]]}, {text: t_array4[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[17]]}, {text: t_array4[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[18]]}],
+						[ {text: t_array4[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[19]]}, {text: t_array4[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[20]]}, {text: t_array4[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[21]]}, {text: t_array4[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[22]]}, {text: t_array4[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array5[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[0]]}, {text: t_array5[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[1]]}, {text: t_array5[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[2]]}, {text: t_array5[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[3]]}, {text: t_array5[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[4]]}],
+						[ {text: t_array5[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[5]]}, {text: t_array5[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[6]]}, {text: t_array5[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[7]]}, {text: t_array5[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[8]]}, {text: t_array5[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[9]]}],
+						[ {text: t_array5[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[10]]}, {text: t_array5[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[11]]}, {text: 'Set 5',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array5[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[12]]}, {text: t_array5[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[13]]}],
+						[ {text: t_array5[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[14]]}, {text: t_array5[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[15]]}, {text: t_array5[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[16]]}, {text: t_array5[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[17]]}, {text: t_array5[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[18]]}],
+						[ {text: t_array5[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[19]]}, {text: t_array5[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[20]]}, {text: t_array5[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[21]]}, {text: t_array5[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[22]]}, {text: t_array5[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array6[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[0]]}, {text: t_array6[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[1]]}, {text: t_array6[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[2]]}, {text: t_array6[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[3]]}, {text: t_array6[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[4]]}],
+						[ {text: t_array6[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[5]]}, {text: t_array6[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[6]]}, {text: t_array6[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[7]]}, {text: t_array6[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[8]]}, {text: t_array6[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[9]]}],
+						[ {text: t_array6[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[10]]}, {text: t_array6[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[11]]}, {text: 'Set 6',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array6[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[12]]}, {text: t_array6[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[13]]}],
+						[ {text: t_array6[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[14]]}, {text: t_array6[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[15]]}, {text: t_array6[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[16]]}, {text: t_array6[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[17]]}, {text: t_array6[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[18]]}],
+						[ {text: t_array6[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[19]]}, {text: t_array6[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[20]]}, {text: t_array6[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[21]]}, {text: t_array6[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[22]]}, {text: t_array6[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array7[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[0]]}, {text: t_array7[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[1]]}, {text: t_array7[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[2]]}, {text: t_array7[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[3]]}, {text: t_array7[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[4]]}],
+						[ {text: t_array7[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[5]]}, {text: t_array7[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[6]]}, {text: t_array7[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[7]]}, {text: t_array7[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[8]]}, {text: t_array7[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[9]]}],
+						[ {text: t_array7[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[10]]}, {text: t_array7[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[11]]}, {text: 'Set 7',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array7[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[12]]}, {text: t_array7[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[13]]}],
+						[ {text: t_array7[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[14]]}, {text: t_array7[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[15]]}, {text: t_array7[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[16]]}, {text: t_array7[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[17]]}, {text: t_array7[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[18]]}],
+						[ {text: t_array7[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[19]]}, {text: t_array7[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[20]]}, {text: t_array7[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[21]]}, {text: t_array7[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[22]]}, {text: t_array7[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array8[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[0]]}, {text: t_array8[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[1]]}, {text: t_array8[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[2]]}, {text: t_array8[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[3]]}, {text: t_array8[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[4]]}],
+						[ {text: t_array8[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[5]]}, {text: t_array8[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[6]]}, {text: t_array8[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[7]]}, {text: t_array8[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[8]]}, {text: t_array8[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[9]]}],
+						[ {text: t_array8[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[10]]}, {text: t_array8[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[11]]}, {text: 'Set 8',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array8[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[12]]}, {text: t_array8[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[13]]}],
+						[ {text: t_array8[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[14]]}, {text: t_array8[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[15]]}, {text: t_array8[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[16]]}, {text: t_array8[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[17]]}, {text: t_array8[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[18]]}],
+						[ {text: t_array8[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[19]]}, {text: t_array8[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[20]]}, {text: t_array8[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[21]]}, {text: t_array8[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[22]]}, {text: t_array8[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array9[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[0]]}, {text: t_array9[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[1]]}, {text: t_array9[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[2]]}, {text: t_array9[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[3]]}, {text: t_array9[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[4]]}],
+						[ {text: t_array9[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[5]]}, {text: t_array9[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[6]]}, {text: t_array9[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[7]]}, {text: t_array9[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[8]]}, {text: t_array9[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[9]]}],
+						[ {text: t_array9[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[10]]}, {text: t_array9[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[11]]}, {text: 'Set 9',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array9[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[12]]}, {text: t_array9[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[13]]}],
+						[ {text: t_array9[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[14]]}, {text: t_array9[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[15]]}, {text: t_array9[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[16]]}, {text: t_array9[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[17]]}, {text: t_array9[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[18]]}],
+						[ {text: t_array9[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[19]]}, {text: t_array9[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[20]]}, {text: t_array9[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[21]]}, {text: t_array9[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[22]]}, {text: t_array9[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array10[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[0]]}, {text: t_array10[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[1]]}, {text: t_array10[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[2]]}, {text: t_array10[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[3]]}, {text: t_array10[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[4]]}],
+						[ {text: t_array10[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[5]]}, {text: t_array10[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[6]]}, {text: t_array10[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[7]]}, {text: t_array10[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[8]]}, {text: t_array10[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[9]]}],
+						[ {text: t_array10[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[10]]}, {text: t_array10[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[11]]}, {text: 'Set 10',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array10[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[12]]}, {text: t_array10[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[13]]}],
+						[ {text: t_array10[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[14]]}, {text: t_array10[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[15]]}, {text: t_array10[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[16]]}, {text: t_array10[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[17]]}, {text: t_array10[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[18]]}],
+						[ {text: t_array10[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[19]]}, {text: t_array10[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[20]]}, {text: t_array10[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[21]]}, {text: t_array10[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[22]]}, {text: t_array10[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array11[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[0]]}, {text: t_array11[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[1]]}, {text: t_array11[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[2]]}, {text: t_array11[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[3]]}, {text: t_array11[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[4]]}],
+						[ {text: t_array11[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[5]]}, {text: t_array11[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[6]]}, {text: t_array11[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[7]]}, {text: t_array11[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[8]]}, {text: t_array11[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[9]]}],
+						[ {text: t_array11[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[10]]}, {text: t_array11[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[11]]}, {text: 'Set 11',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array11[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[12]]}, {text: t_array11[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[13]]}],
+						[ {text: t_array11[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[14]]}, {text: t_array11[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[15]]}, {text: t_array11[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[16]]}, {text: t_array11[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[17]]}, {text: t_array11[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[18]]}],
+						[ {text: t_array11[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[19]]}, {text: t_array11[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[20]]}, {text: t_array11[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[21]]}, {text: t_array11[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[22]]}, {text: t_array11[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array12[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[0]]}, {text: t_array12[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[1]]}, {text: t_array12[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[2]]}, {text: t_array12[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[3]]}, {text: t_array12[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[4]]}],
+						[ {text: t_array12[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[5]]}, {text: t_array12[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[6]]}, {text: t_array12[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[7]]}, {text: t_array12[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[8]]}, {text: t_array12[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[9]]}],
+						[ {text: t_array12[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[10]]}, {text: t_array12[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[11]]}, {text: 'Set 12',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array12[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[12]]}, {text: t_array12[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[13]]}],
+						[ {text: t_array12[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[14]]}, {text: t_array12[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[15]]}, {text: t_array12[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[16]]}, {text: t_array12[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[17]]}, {text: t_array12[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[18]]}],
+						[ {text: t_array12[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[19]]}, {text: t_array12[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[20]]}, {text: t_array12[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[21]]}, {text: t_array12[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[22]]}, {text: t_array12[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array13[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[0]]}, {text: t_array13[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[1]]}, {text: t_array13[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[2]]}, {text: t_array13[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[3]]}, {text: t_array13[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[4]]}],
+						[ {text: t_array13[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[5]]}, {text: t_array13[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[6]]}, {text: t_array13[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[7]]}, {text: t_array13[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[8]]}, {text: t_array13[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[9]]}],
+						[ {text: t_array13[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[10]]}, {text: t_array13[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[11]]}, {text: 'Set 13',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array13[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[12]]}, {text: t_array13[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[13]]}],
+						[ {text: t_array13[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[14]]}, {text: t_array13[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[15]]}, {text: t_array13[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[16]]}, {text: t_array13[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[17]]}, {text: t_array13[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[18]]}],
+						[ {text: t_array13[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[19]]}, {text: t_array13[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[20]]}, {text: t_array13[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[21]]}, {text: t_array13[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[22]]}, {text: t_array13[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array14[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[0]]}, {text: t_array14[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[1]]}, {text: t_array14[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[2]]}, {text: t_array14[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[3]]}, {text: t_array14[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[4]]}],
+						[ {text: t_array14[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[5]]}, {text: t_array14[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[6]]}, {text: t_array14[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[7]]}, {text: t_array14[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[8]]}, {text: t_array14[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[9]]}],
+						[ {text: t_array14[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[10]]}, {text: t_array14[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[11]]}, {text: 'Set 14',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array14[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[12]]}, {text: t_array14[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[13]]}],
+						[ {text: t_array14[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[14]]}, {text: t_array14[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[15]]}, {text: t_array14[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[16]]}, {text: t_array14[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[17]]}, {text: t_array14[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[18]]}],
+						[ {text: t_array14[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[19]]}, {text: t_array14[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[20]]}, {text: t_array14[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[21]]}, {text: t_array14[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[22]]}, {text: t_array14[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array15[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[0]]}, {text: t_array15[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[1]]}, {text: t_array15[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[2]]}, {text: t_array15[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[3]]}, {text: t_array15[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[4]]}],
+						[ {text: t_array15[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[5]]}, {text: t_array15[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[6]]}, {text: t_array15[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[7]]}, {text: t_array15[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[8]]}, {text: t_array15[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[9]]}],
+						[ {text: t_array15[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[10]]}, {text: t_array15[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[11]]}, {text: 'Set 15',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array15[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[12]]}, {text: t_array15[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[13]]}],
+						[ {text: t_array15[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[14]]}, {text: t_array15[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[15]]}, {text: t_array15[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[16]]}, {text: t_array15[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[17]]}, {text: t_array15[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[18]]}],
+						[ {text: t_array15[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[19]]}, {text: t_array15[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[20]]}, {text: t_array15[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[21]]}, {text: t_array15[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[22]]}, {text: t_array15[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array16[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[0]]}, {text: t_array16[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[1]]}, {text: t_array16[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[2]]}, {text: t_array16[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[3]]}, {text: t_array16[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[4]]}],
+						[ {text: t_array16[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[5]]}, {text: t_array16[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[6]]}, {text: t_array16[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[7]]}, {text: t_array16[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[8]]}, {text: t_array16[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[9]]}],
+						[ {text: t_array16[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[10]]}, {text: t_array16[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[11]]}, {text: 'Set 16',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array16[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[12]]}, {text: t_array16[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[13]]}],
+						[ {text: t_array16[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[14]]}, {text: t_array16[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[15]]}, {text: t_array16[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[16]]}, {text: t_array16[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[17]]}, {text: t_array16[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[18]]}],
+						[ {text: t_array16[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[19]]}, {text: t_array16[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[20]]}, {text: t_array16[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[21]]}, {text: t_array16[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[22]]}, {text: t_array16[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: "t_array17[0]",style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[0]]}, {text: t_array17[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[1]]}, {text: t_array17[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[2]]}, {text: t_array17[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[3]]}, {text: t_array17[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[4]]}],
+						[ {text: t_array17[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[5]]}, {text: t_array17[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[6]]}, {text: t_array17[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[7]]}, {text: t_array17[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[8]]}, {text: t_array17[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[9]]}],
+						[ {text: t_array17[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[10]]}, {text: t_array17[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[11]]}, {text: 'Set 17',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array17[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[12]]}, {text: t_array17[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[13]]}],
+						[ {text: t_array17[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[14]]}, {text: t_array17[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[15]]}, {text: t_array17[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[16]]}, {text: t_array17[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[17]]}, {text: t_array17[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[18]]}],
+						[ {text: t_array17[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[19]]}, {text: t_array17[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[20]]}, {text: t_array17[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[21]]}, {text: t_array17[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[22]]}, {text: t_array17[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array18[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[0]]}, {text: t_array18[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[1]]}, {text: t_array18[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[2]]}, {text: t_array18[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[3]]}, {text: t_array18[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[4]]}],
+						[ {text: t_array18[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[5]]}, {text: t_array18[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[6]]}, {text: t_array18[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[7]]}, {text: t_array18[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[8]]}, {text: t_array18[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[9]]}],
+						[ {text: t_array18[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[10]]}, {text: t_array18[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[11]]}, {text: 'Set 18',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array18[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[12]]}, {text: t_array18[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[13]]}],
+						[ {text: t_array18[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[14]]}, {text: t_array18[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[15]]}, {text: t_array18[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[16]]}, {text: t_array18[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[17]]}, {text: t_array18[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[18]]}],
+						[ {text: t_array18[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[19]]}, {text: t_array18[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[20]]}, {text: t_array18[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[21]]}, {text: t_array18[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[22]]}, {text: t_array18[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array19[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[0]]}, {text: t_array19[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[1]]}, {text: t_array19[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[2]]}, {text: t_array19[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[3]]}, {text: t_array19[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[4]]}],
+						[ {text: t_array19[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[5]]}, {text: t_array19[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[6]]}, {text: t_array19[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[7]]}, {text: t_array19[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[8]]}, {text: t_array19[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[9]]}],
+						[ {text: t_array19[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[10]]}, {text: t_array19[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[11]]}, {text: 'Set 19',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array19[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[12]]}, {text: t_array19[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[13]]}],
+						[ {text: t_array19[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[14]]}, {text: t_array19[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[15]]}, {text: t_array19[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[16]]}, {text: t_array19[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[17]]}, {text: t_array19[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[18]]}],
+						[ {text: t_array19[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[19]]}, {text: t_array19[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[20]]}, {text: t_array19[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[21]]}, {text: t_array19[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[22]]}, {text: t_array19[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array20[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[0]]}, {text: t_array20[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[1]]}, {text: t_array20[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[2]]}, {text: t_array20[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[3]]}, {text: t_array20[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[4]]}],
+						[ {text: t_array20[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[5]]}, {text: t_array20[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[6]]}, {text: t_array20[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[7]]}, {text: t_array20[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[8]]}, {text: t_array20[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[9]]}],
+						[ {text: t_array20[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[10]]}, {text: t_array20[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[11]]}, {text: 'Set 20',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array20[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[12]]}, {text: t_array20[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[13]]}],
+						[ {text: t_array20[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[14]]}, {text: t_array20[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[15]]}, {text: t_array20[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[16]]}, {text: t_array20[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[17]]}, {text: t_array20[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[18]]}],
+						[ {text: t_array20[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[19]]}, {text: t_array20[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[20]]}, {text: t_array20[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[21]]}, {text: t_array20[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[22]]}, {text: t_array20[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array21[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[0]]}, {text: t_array21[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[1]]}, {text: t_array21[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[2]]}, {text: t_array21[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[3]]}, {text: t_array21[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[4]]}],
+						[ {text: t_array21[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[5]]}, {text: t_array21[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[6]]}, {text: t_array21[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[7]]}, {text: t_array21[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[8]]}, {text: t_array21[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[9]]}],
+						[ {text: t_array21[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[10]]}, {text: t_array21[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[11]]}, {text: 'Set 21',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array21[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[12]]}, {text: t_array21[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[13]]}],
+						[ {text: t_array21[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[14]]}, {text: t_array21[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[15]]}, {text: t_array21[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[16]]}, {text: t_array21[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[17]]}, {text: t_array21[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[18]]}],
+						[ {text: t_array21[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[19]]}, {text: t_array21[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[20]]}, {text: t_array21[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[21]]}, {text: t_array21[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[22]]}, {text: t_array21[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array22[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[0]]}, {text: t_array22[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[1]]}, {text: t_array22[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[2]]}, {text: t_array22[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[3]]}, {text: t_array22[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[4]]}],
+						[ {text: t_array22[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[5]]}, {text: t_array22[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[6]]}, {text: t_array22[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[7]]}, {text: t_array22[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[8]]}, {text: t_array22[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[9]]}],
+						[ {text: t_array22[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[10]]}, {text: t_array22[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[11]]}, {text: 'Set 22',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array22[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[12]]}, {text: t_array22[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[13]]}],
+						[ {text: t_array22[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[14]]}, {text: t_array22[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[15]]}, {text: t_array22[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[16]]}, {text: t_array22[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[17]]}, {text: t_array22[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[18]]}],
+						[ {text: t_array22[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[19]]}, {text: t_array22[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[20]]}, {text: t_array22[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[21]]}, {text: t_array22[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[22]]}, {text: t_array22[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array23[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[0]]}, {text: t_array23[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[1]]}, {text: t_array23[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[2]]}, {text: t_array23[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[3]]}, {text: t_array23[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[4]]}],
+						[ {text: t_array23[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[5]]}, {text: t_array23[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[6]]}, {text: t_array23[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[7]]}, {text: t_array23[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[8]]}, {text: t_array23[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[9]]}],
+						[ {text: t_array23[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[10]]}, {text: t_array23[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[11]]}, {text: 'Set 23',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array23[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[12]]}, {text: t_array23[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[13]]}],
+						[ {text: t_array23[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[14]]}, {text: t_array23[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[15]]}, {text: t_array23[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[16]]}, {text: t_array23[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[17]]}, {text: t_array23[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[18]]}],
+						[ {text: t_array23[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[19]]}, {text: t_array23[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[20]]}, {text: t_array23[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[21]]}, {text: t_array23[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[22]]}, {text: t_array23[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array24[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[0]]}, {text: t_array24[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[1]]}, {text: t_array24[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[2]]}, {text: t_array24[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[3]]}, {text: t_array24[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[4]]}],
+						[ {text: t_array24[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[5]]}, {text: t_array24[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[6]]}, {text: t_array24[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[7]]}, {text: t_array24[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[8]]}, {text: t_array24[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[9]]}],
+						[ {text: t_array24[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[10]]}, {text: t_array24[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[11]]}, {text: 'Set 24',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array24[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[12]]}, {text: t_array24[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[13]]}],
+						[ {text: t_array24[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[14]]}, {text: t_array24[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[15]]}, {text: t_array24[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[16]]}, {text: t_array24[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[17]]}, {text: t_array24[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[18]]}],
+						[ {text: t_array24[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[19]]}, {text: t_array24[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[20]]}, {text: t_array24[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[21]]}, {text: t_array24[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[22]]}, {text: t_array24[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array25[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[0]]}, {text: t_array25[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[1]]}, {text: t_array25[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[2]]}, {text: t_array25[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[3]]}, {text: t_array25[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[4]]}],
+						[ {text: t_array25[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[5]]}, {text: t_array25[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[6]]}, {text: t_array25[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[7]]}, {text: t_array25[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[8]]}, {text: t_array25[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[9]]}],
+						[ {text: t_array25[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[10]]}, {text: t_array25[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[11]]}, {text: 'Set 25',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array25[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[12]]}, {text: t_array25[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[13]]}],
+						[ {text: t_array25[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[14]]}, {text: t_array25[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[15]]}, {text: t_array25[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[16]]}, {text: t_array25[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[17]]}, {text: t_array25[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[18]]}],
+						[ {text: t_array25[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[19]]}, {text: t_array25[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[20]]}, {text: t_array25[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[21]]}, {text: t_array25[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[22]]}, {text: t_array25[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array26[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[0]]}, {text: t_array26[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[1]]}, {text: t_array26[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[2]]}, {text: t_array26[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[3]]}, {text: t_array26[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[4]]}],
+						[ {text: t_array26[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[5]]}, {text: t_array26[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[6]]}, {text: t_array26[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[7]]}, {text: t_array26[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[8]]}, {text: t_array26[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[9]]}],
+						[ {text: t_array26[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[10]]}, {text: t_array26[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[11]]}, {text: 'Set 26',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array26[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[12]]}, {text: t_array26[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[13]]}],
+						[ {text: t_array26[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[14]]}, {text: t_array26[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[15]]}, {text: t_array26[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[16]]}, {text: t_array26[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[17]]}, {text: t_array26[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[18]]}],
+						[ {text: t_array26[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[19]]}, {text: t_array26[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[20]]}, {text: t_array26[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[21]]}, {text: t_array26[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[22]]}, {text: t_array26[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array27[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[0]]}, {text: t_array27[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[1]]}, {text: t_array27[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[2]]}, {text: t_array27[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[3]]}, {text: t_array27[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[4]]}],
+						[ {text: t_array27[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[5]]}, {text: t_array27[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[6]]}, {text: t_array27[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[7]]}, {text: t_array27[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[8]]}, {text: t_array27[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[9]]}],
+						[ {text: t_array27[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[10]]}, {text: t_array27[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[11]]}, {text: 'Set 27',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array27[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[12]]}, {text: t_array27[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[13]]}],
+						[ {text: t_array27[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[14]]}, {text: t_array27[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[15]]}, {text: t_array27[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[16]]}, {text: t_array27[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[17]]}, {text: t_array27[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[18]]}],
+						[ {text: t_array27[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[19]]}, {text: t_array27[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[20]]}, {text: t_array27[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[21]]}, {text: t_array27[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[22]]}, {text: t_array27[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array28[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[0]]}, {text: t_array28[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[1]]}, {text: t_array28[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[2]]}, {text: t_array28[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[3]]}, {text: t_array28[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[4]]}],
+						[ {text: t_array28[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[5]]}, {text: t_array28[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[6]]}, {text: t_array28[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[7]]}, {text: t_array28[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[8]]}, {text: t_array28[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[9]]}],
+						[ {text: t_array28[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[10]]}, {text: t_array28[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[11]]}, {text: 'Set 28',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array28[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[12]]}, {text: t_array28[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[13]]}],
+						[ {text: t_array28[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[14]]}, {text: t_array28[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[15]]}, {text: t_array28[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[16]]}, {text: t_array28[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[17]]}, {text: t_array28[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[18]]}],
+						[ {text: t_array28[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[19]]}, {text: t_array28[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[20]]}, {text: t_array28[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[21]]}, {text: t_array28[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[22]]}, {text: t_array28[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array29[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[0]]}, {text: t_array29[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[1]]}, {text: t_array29[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[2]]}, {text: t_array29[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[3]]}, {text: t_array29[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[4]]}],
+						[ {text: t_array29[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[5]]}, {text: t_array29[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[6]]}, {text: t_array29[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[7]]}, {text: t_array29[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[8]]}, {text: t_array29[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[9]]}],
+						[ {text: t_array29[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[10]]}, {text: t_array29[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[11]]}, {text: 'Set 29',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array29[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[12]]}, {text: t_array29[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[13]]}],
+						[ {text: t_array29[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[14]]}, {text: t_array29[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[15]]}, {text: t_array29[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[16]]}, {text: t_array29[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[17]]}, {text: t_array29[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[18]]}],
+						[ {text: t_array29[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[19]]}, {text: t_array29[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[20]]}, {text: t_array29[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[21]]}, {text: t_array29[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[22]]}, {text: t_array29[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array30[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[0]]}, {text: t_array30[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[1]]}, {text: t_array30[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[2]]}, {text: t_array30[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[3]]}, {text: t_array30[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[4]]}],
+						[ {text: t_array30[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[5]]}, {text: t_array30[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[6]]}, {text: t_array30[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[7]]}, {text: t_array30[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[8]]}, {text: t_array30[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[9]]}],
+						[ {text: t_array30[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[10]]}, {text: t_array30[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[11]]}, {text: 'Set 30',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array30[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[12]]}, {text: t_array30[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[13]]}],
+						[ {text: t_array30[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[14]]}, {text: t_array30[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[15]]}, {text: t_array30[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[16]]}, {text: t_array30[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[17]]}, {text: t_array30[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[18]]}],
+						[ {text: t_array30[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[19]]}, {text: t_array30[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[20]]}, {text: t_array30[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[21]]}, {text: t_array30[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[22]]}, {text: t_array30[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array31[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[0]]}, {text: t_array31[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[1]]}, {text: t_array31[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[2]]}, {text: t_array31[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[3]]}, {text: t_array31[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[4]]}],
+						[ {text: t_array31[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[5]]}, {text: t_array31[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[6]]}, {text: t_array31[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[7]]}, {text: t_array31[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[8]]}, {text: t_array31[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[9]]}],
+						[ {text: t_array31[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[10]]}, {text: t_array31[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[11]]}, {text: 'Set 31',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array31[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[12]]}, {text: t_array31[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[13]]}],
+						[ {text: t_array31[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[14]]}, {text: t_array31[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[15]]}, {text: t_array31[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[16]]}, {text: t_array31[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[17]]}, {text: t_array31[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[18]]}],
+						[ {text: t_array31[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[19]]}, {text: t_array31[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[20]]}, {text: t_array31[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[21]]}, {text: t_array31[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[22]]}, {text: t_array31[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array32[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[0]]}, {text: t_array32[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[1]]}, {text: t_array32[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[2]]}, {text: t_array32[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[3]]}, {text: t_array32[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[4]]}],
+						[ {text: t_array32[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[5]]}, {text: t_array32[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[6]]}, {text: t_array32[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[7]]}, {text: t_array32[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[8]]}, {text: t_array32[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[9]]}],
+						[ {text: t_array32[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[10]]}, {text: t_array32[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[11]]}, {text: 'Set 32',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array32[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[12]]}, {text: t_array32[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[13]]}],
+						[ {text: t_array32[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[14]]}, {text: t_array32[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[15]]}, {text: t_array32[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[16]]}, {text: t_array32[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[17]]}, {text: t_array32[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[18]]}],
+						[ {text: t_array32[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[19]]}, {text: t_array32[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[20]]}, {text: t_array32[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[21]]}, {text: t_array32[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[22]]}, {text: t_array32[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[23]]}]
+					]
+				},
+			},
+		],
+		pageMargins: [ 28, 46, 28, 28 ],
+		styles: {
+			t_cell: {
+				font: 'Comic',
+				fontSize: 21,
+				margin: [0,0,0,0],
+				bold: true,
+				alignment: 'center'
+			},
+			pad_cell: {
+				fontSize:1,
+				margin: [0,0,0,64]	
+			},
+			sheet_id: {
+				font: 'Nunito',
+				fontSize: 29,
+				bold: true,
+				alignment: 'center',		
+			},
+		},
+		defaultStyle: {
+			font: 'Nunito'
+		}
+	};
+	pdfMake.createPdf(bing_pdf).download(doc_title);
+	//pdfMake.createPdf(bing_pdf).open();
 }
 
 
@@ -6915,19 +7685,52 @@ function activity(button){
       multi_part_item--;
     }
   }
+
 	else if (button=="phon_bingo_class_cont") {
 		shuffle(bingArray);
 		localStorage.bing_back=bingArray;
 		tempArray.length=0;
 		tempArray[0]=bingArray[0];
+		document.getElementById("bing_items_1").innerHTML="";
+		document.getElementById("bing_items_2").innerHTML="";
+		document.getElementById("bing_items_3").innerHTML="";
+		document.getElementById("bing_items_4").innerHTML="";
 		document.getElementById("bing_index").innerHTML= "1. ";
 		document.getElementById("bing_current").innerHTML=bingArray[0];
 		document.getElementById("bing_items_1").innerHTML="<span style='background:yellow; color:black'>"+bingArray[0]+"</span><br>";
-		vocArray.length=0;
+		audArray.length=0;
 		localStorage.bing_back_ind=0;
 		localStorage.bing_back_unit=currentPhonUnit;
 	}
 
+  	else if (uMode=="voc_bingo_class") {
+  		document.getElementById("bing_class_controls").style.display = "block";
+		document.getElementById("b_start").style.display = "none";
+		document.getElementById("b_help").style.display = "none";
+		document.getElementById("b_reset").style.display = "block";
+		document.getElementById("phonDisplay").style.display="none";
+		document.getElementById("imageDiv").style.display="none";
+		document.getElementById("welcomeDiv").style.display="none";
+		document.getElementById("contentSelect").style.display="none";
+		document.getElementById("bing_class_phon").style.display="none";
+		document.getElementById("bing_class_display").style.display="block";
+		document.getElementById("bing_class_voc").style.display="block";
+		document.getElementById("bing_items_1").innerHTML="";
+		document.getElementById("bing_items_2").innerHTML="";
+		document.getElementById("bing_items_3").innerHTML="";
+		document.getElementById("bing_items_4").innerHTML="";
+		document.getElementById("voc_bing_list").innerHTML="";
+		document.getElementById("bing_index").innerHTML="";
+		document.getElementById("bing_current").innerHTML="&nbsp;";
+		document.getElementById("bing_game_topics").innerHTML=topicTitle(curr_topic_title);
+
+		if (localStorage.show_vb_games) {
+			show_vb_games(localStorage.show_vb_games);
+		}
+		else {
+			show_vb_games("all");
+		}
+  	}
 	else if (uMode=="phon_bingo_class") {
 		document.getElementById("bing_class_controls").style.display = "block";
 		document.getElementById("b_start").style.display = "none";
@@ -6937,7 +7740,9 @@ function activity(button){
 		document.getElementById("imageDiv").style.display="none";
 		document.getElementById("welcomeDiv").style.display="none";
 		document.getElementById("contentSelect").style.display="none";
+		document.getElementById("bing_class_voc").style.display="none";
 		document.getElementById("bing_class_display").style.display="block";
+		document.getElementById("bing_class_phon").style.display="block";
 		document.getElementById("bing_items_1").innerHTML="";
 		document.getElementById("bing_items_2").innerHTML="";
 		document.getElementById("bing_items_3").innerHTML="";
@@ -6956,6 +7761,77 @@ function activity(button){
 		newImage(button);
 	}
 }
+
+function procVocBingGame(game_id,action) {
+
+	if (game_id!="") {
+		localStorage.curr_vb_game=game_id.innerHTML;
+		hiVocBingGame();
+	}
+	if (action=='open') {
+		document.getElementById("vb_game_actions").style.display="block";
+		document.getElementById("vb_game_instr").style.display="none";
+		var t_string=localStorage[game_id.innerHTML];
+		var t_start=t_string.indexOf("bingArray")+12;
+		var t_end=t_string.lastIndexOf(")");
+		t_string=t_string.slice(t_start,t_end);
+		bingArray=t_string.split(",");
+	}
+	else if (action=='start') {
+		activity("phon_bingo_class_cont");
+	}
+	else if (action=='actions') {
+		document.getElementById("show_vb_info").className="optSelect";
+		document.getElementById("show_vb_actions").className="optSelected";
+		document.getElementById("vb_game_actions").style.display="block";
+		document.getElementById("vb_game_instr").style.display="none";
+	}
+	else if (action=='info') {
+		document.getElementById("show_vb_actions").className="optSelect";
+		document.getElementById("show_vb_info").className="optSelected";
+		document.getElementById("vb_game_actions").style.display="none";
+		document.getElementById("vb_game_instr").style.display="block";
+	}
+}
+
+
+function hiVocBingGame() {
+	for (var i=0; i<document.getElementById('voc_bing_list').childNodes.length;i++) {
+		if (document.getElementById('voc_bing_list').childNodes[i].innerHTML == localStorage.curr_vb_game) {
+			document.getElementById('voc_bing_list').childNodes[i].style.background="#2f5";
+		}
+		else {
+			document.getElementById('voc_bing_list').childNodes[i].style.background="";
+		}
+	}
+}
+
+
+function show_vb_games(opt){
+
+	var bing_games=localStorage.voc_bing_games.split(",");
+
+	if (opt=="all") {
+		document.getElementById("show_vb_games_topic").className="optSelect";
+		document.getElementById("show_vb_games_all").className="optSelected";
+	}
+	else {
+		for (var k=bing_games.length-1; k > -1;k--) {
+			if (bing_games[k].indexOf(curr_topic_title)==-1) {
+				bing_games.splice(bing_games.indexOf(bing_games[k]),1);
+			}
+		}
+		document.getElementById("show_vb_games_all").className="optSelect";
+		document.getElementById("show_vb_games_topic").className="optSelected";
+	}
+	document.getElementById("voc_bing_list").innerHTML="";
+	for (var i=0; i<bing_games.length;i++) {
+		document.getElementById("voc_bing_list").innerHTML+='<div class="voc_bing_li" onclick="procVocBingGame(this,\'open\')">'+bing_games[i]+'</div>';
+	}
+	localStorage.show_vb_games=opt;
+	hiVocBingGame()
+}
+
 
 function newNumber(button) {
 	if (button == "start") {
@@ -7088,21 +7964,21 @@ function bingClassProc(caller) {
 		localStorage.bing_back_ind=n;
 	}
 	else if (caller=="back") {
-		var n = bingArray.indexOf(document.getElementById("bing_current").innerHTML);
+		var n= parseInt(document.getElementById("bing_index").innerHTML)-1;
 		if (n>0) {
 			document.getElementById("bing_index").innerHTML= (n) + ". ";
 			document.getElementById("bing_current").innerHTML=bingArray[n-1];
 		}
 	}
 	else if (caller=="fwd") {
-		var n = bingArray.indexOf(document.getElementById("bing_current").innerHTML);
+		var n= parseInt(document.getElementById("bing_index").innerHTML)-1;
 		if (n<tempArray.length-1) {
 			document.getElementById("bing_index").innerHTML= (n+2) + ". ";
 			document.getElementById("bing_current").innerHTML=bingArray[n+1];
 		}
 	}
 	else if (caller=="backup") {
-		vocArray=[];
+		audArray=[];
 		tempArray=[];
 		bingArray=localStorage.bing_back.split(",");
 		for (var i=0;i<localStorage.bing_back_ind;i++) {
@@ -7116,41 +7992,75 @@ function bingClassProc(caller) {
 		document.getElementById("panelLev2").src="images/labels/l_"+localStorage.bing_back_unit+"_p.png";
 		bingClassProc("next");
 	}
+	else if (caller=="font_inc") {
+		if (parseInt(document.getElementById('bing_font_size').innerHTML)<100) {
+			var fs = parseInt(document.getElementById('bing_font_size').innerHTML)+5;
+			document.getElementById('bing_font_size').innerHTML= fs;
+			document.getElementById('bing_items_1').style.fontSize=fs+"%";
+			document.getElementById('bing_items_2').style.fontSize=fs+"%";
+			document.getElementById('bing_items_3').style.fontSize=fs+"%";
+			document.getElementById('bing_items_4').style.fontSize=fs+"%";
+			document.getElementById('bing_index').style.fontSize=fs*1.5+"%";
+			document.getElementById('bing_current').style.fontSize=fs*1.5+"%";
+		}
+	}
+	else if (caller=="font_dec") {
+		if (parseInt(document.getElementById('bing_font_size').innerHTML)>40) {
+			var fs =parseInt(document.getElementById('bing_font_size').innerHTML)-5;
+			document.getElementById('bing_font_size').innerHTML= fs;
+			document.getElementById('bing_items_1').style.fontSize=fs+"%";
+			document.getElementById('bing_items_2').style.fontSize=fs+"%";
+			document.getElementById('bing_items_3').style.fontSize=fs+"%";
+			document.getElementById('bing_items_4').style.fontSize=fs+"%";
+			document.getElementById('bing_index').style.fontSize=fs*1.5+"%";
+			document.getElementById('bing_current').style.fontSize=fs*1.5+"%"
+		}
+	}
+	else if (caller=="display") {
+		tempArray=bingArray.toString().split(",");
+		tempArray.sort();
+	}
 			
 	document.getElementById("bing_items_1").innerHTML="";
 	document.getElementById("bing_items_2").innerHTML="";
 	document.getElementById("bing_items_3").innerHTML="";
 	document.getElementById("bing_items_4").innerHTML="";
 
+	var fl = false;
 	for (var i=0; i<tempArray.length;i++) {
+		
 
 		if (i<8) {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
 				document.getElementById("bing_items_1").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+				fl=true;
 			}
 			else {
 				document.getElementById("bing_items_1").innerHTML+= tempArray[i]+"<br>";
 			}
 		}
 		else if (i<16) {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
 				document.getElementById("bing_items_2").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+				fl=true;
 			}
 			else {
 				document.getElementById("bing_items_2").innerHTML+= tempArray[i]+"<br>";
 			}
 		}
 		else if (i<24) {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
 				document.getElementById("bing_items_3").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+				fl=true;
 			}
 			else {
 				document.getElementById("bing_items_3").innerHTML+= tempArray[i]+"<br>";
 			}
 		}
 		else {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
 				document.getElementById("bing_items_4").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
+				fl=true;
 			}
 			else {
 				document.getElementById("bing_items_4").innerHTML+= tempArray[i]+"<br>";
@@ -7161,17 +8071,22 @@ function bingClassProc(caller) {
 
 
 function BingClassPlay() {
-
-	if (vocArray.length==0) {
-		vocArray=new Array (1,2,3);
-		shuffle (vocArray);
+	if (uMode=="phon_bingo_class") {
+		if (audArray.length==0) {
+			audArray=new Array (1,2,3);
+			shuffle (audArray);
+		}
+		var bingTone = audArray.pop();
+		if (currentPhonUnit.slice(4)>12 && document.getElementById("bing_current").innerHTML.length==2 && ["a","e","i","o","u"].indexOf(document.getElementById("bing_current").innerHTML.slice(-1))!= -1) {
+			bingTone=bingTone+3;
+		}
+		audVoc.pause();
+		audVoc.src ="audio/phonics/bingo/" + document.getElementById("bing_current").innerHTML + bingTone +".mp3";
+	} 
+	else {
+		var dir=localStorage.curr_vb_game.slice(6,-10);
+		audVoc.src ="audio/vocab/" +dir+"/"+document.getElementById("bing_current").innerHTML +".mp3";
 	}
-	var bingTone = vocArray.pop();
-	if (currentPhonUnit.slice(4)>12 && document.getElementById("bing_current").innerHTML.length==2 && ["a","e","i","o","u"].indexOf(document.getElementById("bing_current").innerHTML.slice(-1))!= -1) {
-		bingTone=bingTone+3;
-	}
-	audVoc.pause();
-	audVoc.src ="audio/phonics/bingo/" + document.getElementById("bing_current").innerHTML + bingTone +".mp3";
 	audVoc.play();
 }
 
