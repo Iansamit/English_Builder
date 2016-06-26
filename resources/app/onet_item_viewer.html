@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>Cloze Tester</title>
+		<meta name="description" content="Vocabulary">
+		<meta name="author" content="Ian Smith">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!--Import CSS stylesheet-->
+		<link rel="stylesheet" href="tpf_styles.css" type="text/css" />
+
+		<!--Scripts all the neat stuff! --><script type="text/javascript" src="tpf_scripts.js"></script>
+
+ 		<!--Tester for html panes --><script id="thing" type="text/javascript" src="onet_item_maker.js"></script>
+      	<!--Tester for html panes --><script id="thing" type="text/javascript" src="onet_items.js"></script>
+		<style>
+			* {
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: -moz-none;
+				-o-user-select: none;
+				user-select: none;
+			}
+			* {
+				margin: 0
+			}
+		</style>
+
+	</head>
+
+	<body style="font:60px 'Nunito', sans-serif; margin: 0px" onload="resize();setValues()"  onresize="resize()" oncontextmenu="return false">
+        <div id="outerDiv" style="position: absolute; width: 1600px; height:780px; background: #fff; font:inherit">
+
+
+            <div id="innerDiv" style="position:absolute; z-index:200; width: 78%; margin-top:6%; margin-left: 6%; height: 24em; font-family:'FreeSerif'; font-size:38%; border: solid #ddd 0.2em">
+            
+            </div>
+            <div style="position: absolute; bottom:0.3em; margin-left:10em; margin-right:auto; height:1.5em">
+            	<div style="position:relative; bottom:0; float:left; width:1.5em;">
+            		<img style="width:1.5em; display:block; margin-left:auto; margin-right:auto" src="images/buttons/b_back.png" onmousedown="b_press(this)" onclick="processButtons('back')"/>
+            	</div>
+            	<div style="position:relative; bottom:0; float:left; width:1.5em; ">
+            		<img style="width:1.49em; display:block; margin-left:auto; margin-right:auto" src="images/buttons/reset_button.png" onmousedown="b_press(this)" onclick="reLoad()"/>
+				</div>
+            	<div style="position:relative; bottom:0; float:left; width:1.5em;">
+            		<img style="width:1.5em; display:block; margin-left:auto; margin-right:auto" src="images/buttons/b_forward.png" onmousedown="b_press(this)" onclick="processButtons('forward')"/>
+            	</div>
+            </div>
+
+            <div style="position: absolute; right:2em; top:7em; width:9.5em; padding-left:1em; text-align:left; font-family:'FreeSerif'; font-size:30%">
+            	<div><select id=qType style="font:inherit; background:#a98" onchange="setInnerDiv()";>
+					<option value="single">Single</option>
+					<option value="pass">Passage</option>
+					<option value="cloze">Cloze</option>
+				</select>
+            	<input id="itemNo" type="number" min=1 style="font:inherit; background:#a98; width:3em;" onchange="value=pad(value,3);setInnerDiv()"></div>
+            </div>
+
+             <div style="position: absolute; right:2em; top:9em; width:8em; padding-left:1em; border:ridge 0.2em;
+              background:#a98; text-align:left; font-family:'FreeSerif'; font-size:30%">
+				<p ><div style="float:left;width:5em">Questions:</div><div id="qs">0</div></p>
+				<p><div style="float:left;width:5em">Gaps:</div><div id="gaps">0</div></p>
+				<p><b>Answer Key</b></p>
+				<div id="a1_lab" style="float:left;width:2em">Q1: </div><div id="a1">0</div>
+
+				<div id="a2_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q2: 
+					</div>
+					<div id="a2">
+						0</div>
+				</div>
+
+				<div id="a3_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q3:
+					</div>
+					<div id="a3">
+						0
+					</div>
+				</div>
+				<div id="a4_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q4:
+					</div>
+					<div id="a4">
+						0
+					</div>
+				</div>
+				<div id="a5_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q5:
+					</div>
+					<div id="a5">
+						0
+					</div>
+				</div>
+				<div id="a6_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q6:
+					</div>
+				<div id="a6">
+					0</div>
+				</div>
+				<div id="a7_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q7:
+					</div>
+				<div id="a7">
+					0</div>
+				</div>
+				<div id="a8_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q8: 
+					</div>
+				<div id="a8">
+					0</div>
+				</div>
+				<div id="a9_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q9:</div>
+					<div id="a9">
+						0
+					</div>
+				</div>
+				<div id="a10_lab" style="display:none">
+					<div style="float:left;width:2em">
+						Q10:
+					</div>
+					<div id="a10">
+						0
+					</div>
+				</div>
+             </div>
+        </div>
+
+    </body>
+    <script>
+		function setValues(){
+			var values = window.location.search.substring(1);
+			qType.value=values.substr(0,values.indexOf("_"));
+			itemNo.value=values.substr(values.indexOf("_")+1);
+			setInnerDiv();
+		}
+		function reLoad(){
+			window.location.search="?"+document.getElementById("qType").value+"_"+document.getElementById("itemNo").value;
+		}
+    	function processButtons(button){
+    		if (button=="back" && document.getElementById("itemNo").value>1){
+    			itemNo.value--;
+    			itemNo.value=pad((itemNo.value),3);
+    			setInnerDiv();
+    		}
+    		else if (button=="forward" && window[qType.value  + pad(parseInt(itemNo.value)+1,3)]){
+    			itemNo.value++;
+				itemNo.value=pad((itemNo.value),3);
+				setInnerDiv();
+    		}
+    		else {
+    			itemNo.style.background="#f60";
+    			setTimeout(function(){itemNo.style.background="#a98";}, 300);
+    		}
+    	}
+		function setInnerDiv(){
+			
+    		q=qType.value + itemNo.value;
+    		if (window[q]){
+    			document.getElementById("innerDiv").innerHTML=	window[q].html;
+    			document.getElementById("qs").innerHTML=	window[q].qs;
+    			document.getElementById("gaps").innerHTML=	window[q].gaps;
+
+    			for (var i=1;i<11;i++){
+    				if (window[q]["a"+i]){
+    					document.getElementById("a"+i+"_lab").style.display="block";
+    					document.getElementById("a"+i).innerHTML=	window[q]["a"+i];
+    					if (document.getElementById(window[q].name+"_ans_"+i)){
+    						document.getElementById(window[q].name+"_ans_"+i).innerHTML= i;
+    					}
+    				}
+    				else{
+    					document.getElementById("a"+i+"_lab").style.display="none";
+    				}
+    				if (document.getElementById(window[q].name+"_gap_"+i)){
+						document.getElementById(window[q].name+"_gap_"+i).innerHTML="("+i+")";
+    				}
+    			}
+    		}
+    		else {
+    			document.getElementById("innerDiv").innerHTML="<div style='width:100%; text-align:center; font-size:200%; margin-top:6em' >Sorry! No Item Made Yet</div>";
+    		}
+		}
+
+   		function pad(num, size){ 
+   			return ('000000000' + num).substr(-size); 
+   		}
+   		document.getElementById("itemNo").value=pad(1, 3);
+        document.getElementById("innerDiv").innerHTML=singlennn.html;
+
+    </script>
+</html>
