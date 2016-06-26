@@ -118,7 +118,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9210";
+var version_num="0.9211";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -8184,6 +8184,7 @@ function procVocBingGame(game_id,action) {
 
 
 function  startVocBingGame () {
+	shuffle(bingArray);
 	if (localStorage[localStorage.curr_vb_game].indexOf("game_ind")== -1) {
 		localStorage[localStorage.curr_vb_game]=localStorage[localStorage.curr_vb_game].replace("bingArray","game_ind: (0)\nbingArray");
 	}
