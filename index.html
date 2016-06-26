@@ -89,11 +89,14 @@
 					</div>
 				</div>
 				<div id="msg_new_continue" style="position:relative; width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.2em">
-					<div style="position:absolute; left:0; width:50%; bottom:0.4em">
+					<div style="position:absolute; left:0; width:25%; bottom:0.4em">
 						<img id="msg_new" style="display:block; margin-left:auto; margin-right:auto; width: 4.2em" src="images/buttons/new.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
-					<div style="position:absolute; right:0; width:50%; bottom:0.4em">
+					<div style="position:absolute; left:5em; width:35%; bottom:0.4em">
 						<img id="msg_continue" style="display:block; margin-left:auto; margin-right:auto; width: 6em" src="images/buttons/continue2.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div style="position:absolute; right:0; width:40%; bottom:0.4em">
+						<img id="msg_load" style="display:block; margin-left:auto; margin-right:auto; width: 7.3em" src="images/buttons/load_game.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 				</div>
 				<div id="msg_edit_delete" style="position:relative; width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.5em">
@@ -2473,17 +2476,17 @@
 									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('forward')"/>
 							</div>
 						</div>
-						<div id="bing_class_controls" style="display:none; position:relative; height:1.5em">
-							<div style="position: absolute; width:2.7em; bottom: 0; left: 1.5em">
+						<div id="bing_class_controls" style="display:none; position:relative; height:1.5em; width:12em;">
+							<div style="position: absolute; width:2.7em; bottom: 0; left: 0.7em">
 								<img id="bing_next_button" style="display:block; width:2.7em; margin-left:auto; margin-right:auto" src='images/buttons/next_button.png' 
 									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="bingClassProc('next')"/>
 							</div>
-							<div style="position: absolute; width:1.9em; bottom: 0; left: 4.8em">
+							<div style="position: absolute; width:1.9em; bottom: 0; left: 3.8em">
 								<img id="bing_play_button" style="display:block; width:1.9em; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png' 
 									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="BingClassPlay()"/>
 							</div>
 							
-							<div style="position:absolute; top:0.1em; right:0.1em; width: 2.6em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
+							<div style="position:absolute; top:0.1em; right:3.2em; width: 2.6em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
 								<div style="margin-top:-0.2em; font-size:30%; text-align:center">
 									Review
 								</div>
@@ -2494,6 +2497,17 @@
 								<div style="position: absolute; width:1.2em; bottom: 0; right: 0.1em">
 									<img id="bing_fwd_button" style="display:block; width:1.1em; margin-left:auto; margin-right:auto" src='images/buttons/b_forward.png' 
 										onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="bingClassProc('fwd')"/>
+								</div>
+							</div>
+							<div  style="position:absolute; top:0.1em; right:0.1em; width: 2.6em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
+								<div style="position:absolute; left:0; width:100%; bottom:0.65em">
+									<input type="file" id="input_phon_bingo" onchange="loadSetup(this)" style="display: none">
+									<img style="display:block; margin-left:auto; margin-right:auto; width: 2.2em" src='images/buttons/load_game.png' onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" 
+												onclick="document.getElementById('input_phon_bingo').click()" />
+								</div>
+								<div style="position:absolute; left:0; width:100%; bottom:0.05em	">
+									<img style="display:block; margin-left:auto; margin-right:auto; width: 2.2em" src='images/buttons/save_game.png' onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" 
+												onclick="saveSetup('phon_bingo')" />
 								</div>
 							</div>
 						</div>

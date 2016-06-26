@@ -117,7 +117,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9100";
+var version_num="0.9102";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -133,7 +133,10 @@ if (!Array.prototype.indexOf) {
       if ( this === undefined || this === null ) {
         throw new TypeError( '"this" is null or not defined' );
   }
-
+if (!localStorage.version) {
+		localStorage.clear();
+		localStorage.version=0.91;
+	}
   var length = this.length >>> 0; // Hack to convert object.length to a UInt32
 
       fromIndex = +fromIndex || 0;
@@ -160,6 +163,10 @@ if (!Array.prototype.indexOf) {
 
 
 function init() {
+	if (!localStorage.version) {
+		localStorage.clear();
+		localStorage.version=0.91;
+	}
 	document.onkeydown = function(event) {processKey(event);};
 	window.ondragstart=function(){return false;};
 
@@ -2134,9 +2141,11 @@ function setMsg(content,response_type,string_1,string_2) {
 	switch (content) {
 
 		case "bing_back":
-			msg_box.innerHTML='Would you like to start a new game or continue the previous one?';
+			msg_box.innerHTML='<p>Would you like to:</p><p style="text-indent:2em">Start a <span style="color:#64FFFF; font-weight:bold">new</span> game?</p><p style="text-indent:2em">\
+								<span style="color:#64FFFF; font-weight:bold">Continue</span> the previous game?</p><p style="text-indent:2em"><span style="color:#64FFFF; font-weight:bold">Load</span> a game from a saved file?</p>';
 			document.getElementById("msg_new").onclick= function() {activity("phon_bingo_class_cont");setDisplays({modal_back:'none'})};
 			document.getElementById("msg_continue").onclick= function() {bingClassProc("backup");};
+			document.getElementById("msg_load").onclick= function() {document.getElementById('input_phon_bingo').click();};
 		break;
 
 		case "err_pron_points":
@@ -2163,8 +2172,12 @@ function setMsg(content,response_type,string_1,string_2) {
 		break;
 
 		case "err_file":
+			if (string_1.indexOf(".txt")!= -1) {
+				string_1=string_1.slice(0,string_1.indexOf(".txt"));
+			}
 			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%;\
-								">Sorry</span></p><p style="margin-bottom: 0.5em"><span style="color:#64FFFF; font-weight:bold">'+string_1+'</span> could not be loaded.</p><p style="margin-bottom: 0.5em">It is not an English Builder file.</p>';
+								">Sorry</span></p><p style="margin-bottom: 0.5em"><span style="color:#64FFFF; font-weight:bold">'+string_1+'</span> could not be loaded.</p><p style="margin-bottom: 0.5em">\
+								It is <span style="font-weight:bold; color:red">not</span> an English Builder <span style="color:#64FFFF; font-weight:bold">'+string_2+'</span> file.</p>';
 		break;
 
 		case "err_version":
@@ -3385,27 +3398,39 @@ function saveTopic() {
 
 
 function saveSetup(save_type) {
-	var file_name = "My English Builder";
-	var file_elem = document.createElement("a");
-	var save_str ="English Builder User Settings Version: 1.0\n";
-	var temp_string ="";
-	var tArray = [];
-
-	save_str += "ONET_voc(" + localStorage.user_onet_vocab + ")\n";
-	save_str += "K2_availCats(" + localStorage.topics_gen_K2 + ")\n";
-	tArray= localStorage.topics_gen_K2.split(",");
-	for (var i=0;i<tArray.length; i++) {
-		save_str += "K2_"+tArray[i]+ "(" + localStorage["K2_"+tArray[i]]+")\n";
+	if (save_type == "phon_bingo") {
+		var file_name = "EB Phonics Bingo";
+		var file_elem = document.createElement("a");
+		var save_str ="English Builder Phonics Bingo Version: 1.0\n";
+		var temp_string ="";
+		var tArray = [];
+		save_str += "bingArray: ("+bingArray+")\n";
+		save_str += "bing_back_ind: (" +localStorage.bing_back_ind+")\n";
+		save_str += "bing_back_unit: (" +localStorage.bing_back_unit+")\n";
 	}
+	else {
+		var file_name = "EB Vocabulary";
+		var file_elem = document.createElement("a");
+		var save_str ="English Builder User Settings Version: 1.0\n";
+		var temp_string ="";
+		var tArray = [];
 
-	for (var j=0; j<6; j++) {
-		save_str += "P"+ (j+1) +"_availCats(" + localStorage["topics_gen_P"+ (j+1)] + ")\n";
-		tArray= localStorage["topics_gen_P"+ (j+1)].split(",");
-		for (var k=0;k<tArray.length;k++) {
-			save_str += "P" + (j+1) +"_"  +tArray[k]+ "(" + localStorage["P" + (j+1)+"_"+tArray[k]]+")\n";
+		save_str += "ONET_voc(" + localStorage.user_onet_vocab + ")\n";
+		save_str += "K2_availCats(" + localStorage.topics_gen_K2 + ")\n";
+		tArray= localStorage.topics_gen_K2.split(",");
+		for (var i=0;i<tArray.length; i++) {
+			save_str += "K2_"+tArray[i]+ "(" + localStorage["K2_"+tArray[i]]+")\n";
+		}
+
+		for (var j=0; j<6; j++) {
+			save_str += "P"+ (j+1) +"_availCats(" + localStorage["topics_gen_P"+ (j+1)] + ")\n";
+			tArray= localStorage["topics_gen_P"+ (j+1)].split(",");
+			for (var k=0;k<tArray.length;k++) {
+				save_str += "P" + (j+1) +"_"  +tArray[k]+ "(" + localStorage["P" + (j+1)+"_"+tArray[k]]+")\n";
+			}
 		}
 	}
-
+		
 	var save_blob = new Blob([save_str], {type:'text/plain'});
 	file_elem.download = file_name;
 	file_elem.href = window.URL.createObjectURL(save_blob);
@@ -3458,10 +3483,9 @@ function loadSetup(caller) {
 		return;
 
 	}
-
-	var file_name = caller.files[0];
+	
 	var file_reader = new FileReader();
-
+	var file_name = caller.files[0];
 	file_reader.readAsText(file_name, "UTF-8");
 	caller.value="";
 
@@ -3473,18 +3497,46 @@ function loadSetup(caller) {
 		var close_brace=0;
 		var topic_len=0;
 		
-		if  (loaded_text.indexOf("English Builder User Settings")== -1) {
-			setMsg("err_file","",file_name.name);
+		if (caller.id=="input_phon_bingo") {
+			if  (loaded_text.indexOf("English Builder Phonics Bingo")== -1) {
+				setMsg("err_file","",file_name.name,"Bingo");
+				return;
+			}
+			if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
+				setMsg("err_version","",file_name.name);
+				return;
+			}
+			topic=loaded_text.substr(loaded_text.indexOf("bingArray"));
+			open_brace=topic.indexOf("(");
+			close_brace=topic.indexOf(")");
+			topic=topic.substring(open_brace+1,close_brace);
+			localStorage.bing_back=topic;
+			topic=loaded_text.substr(loaded_text.indexOf("bing_back_ind"));
+			open_brace=topic.indexOf("(");
+			close_brace=topic.indexOf(")");
+			topic=topic.substring(open_brace+1,close_brace);
+			localStorage.bing_back_ind=topic;
+			topic=loaded_text.substr(loaded_text.indexOf("bing_back_unit"));
+			open_brace=topic.indexOf("(");
+			close_brace=topic.indexOf(")");
+			topic=topic.substring(open_brace+1,close_brace);
+			localStorage.bing_back_unit=topic;
+			bingClassProc("backup");
 			return;
 		}
+		else {
+			if  (loaded_text.indexOf("English Builder User Settings")== -1) {
+				setMsg("err_file","",file_name.name,"Vocabulary");
+				return;
+			}
 
-		if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
-			setMsg("err_version","",file_name.name);
-			return;
+			if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
+				setMsg("err_version","",file_name.name);
+				return;
+			}
+			loaded_text=loaded_text.replace(/places and transport/g,"places_and_transport");
+			loaded_text=loaded_text.replace(/free time/g,"free_time");
 		}
-
-		loaded_text=loaded_text.replace(/places and transport/g,"places_and_transport");
-		loaded_text=loaded_text.replace(/free time/g,"free_time");
 
 		if (caller.id=="reset_all") {
 			if (loaded_text.indexOf("ONET_voc")!= -1) {
@@ -3560,6 +3612,9 @@ function loadSetup(caller) {
 			else {
 				setMsg("err_no_topic","",file_name.name);
 			}
+		}
+		else if (caller=="phon_bingo") {
+
 		}
 		user_changes=false;
 	};
