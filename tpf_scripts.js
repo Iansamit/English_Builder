@@ -19,10 +19,9 @@ var	bingSheetArray =new Array ();
 var	bingTestArray = new Array ("");
 var	bingWords = 25;
 var	cmnErrs = new Array(["", 0], ["", 0], ["", 0]);
-var	comCats = new Array ("actions", "animals", "body", "clothes", "describing", "food", "occupations", "places and transport", "school", "time");
+var	comCats = new Array ("actions", "animals", "body", "clothes", "describing", "food", "occupations", "places_and_transport", "school", "time");
 var	comCatsBoxes = "closed";
 var	countSet = 3;
-var count_set_norm;
 var	countTime = 180;
 var	currentBook = "";
 var curr_attr = "audio";
@@ -74,6 +73,7 @@ var	numOpZero=true;
 var onet_test=new Array();
 var multi_part_item =1;
 var onet_test_item =0;
+var onet_test_set="onet_rand";
 var onet_prev_item;
 var onet_ready=false;
 var	oSCont=true;
@@ -100,15 +100,15 @@ var	tabSylls = new Array ("fuck", "pis", "cock", "tit", "cunt");
 var	tempArray = new Array;
 var	tickFast;
 var	tickTock="tick";
-var timbreArray = new Array ("US English Female","UK English Female","UK English Male","Ian");
+var timbreArray = new Array ("Ian");
 var timbreInd=0;
 var timbre_select="random";
 var	timePenalty=true;
 var	topicList="genVocab";
-var	topics_all = new Array("actions", "asean", "animals", "beach", "clothes", "days", "easy", "describing", "finding game", "food", "free time", "grammar", "health", "home", "months", "occupations", "people", "places and transport",  "location", "body", "school", "socialising", "stationery", "time", "weather", "onet_pass");
+var	topics_all = new Array("actions", "asean", "animals", "beach", "clothes", "days", "easy", "describing", "finding game", "food", "free_time", "grammar", "health", "home", "months", "occupations", "people", "places_and_transport",  "location", "body", "school", "socialising", "stationery", "time", "weather", "onet_pass", "onet_cloze");
 var topics_no_audio = new Array ("finding game", "location");
-var topics_no_multi = new Array ("asean", "beach", "days", "easy", "finding game", "months", "stationery",  "location", "onet_inst", "onet_q_a", "onet_gq", "onet_soc", "onet_shop", "onet_phon", "onet_pass", "onet_cloze", "onet_full");
-var topics_onet = new Array ("onet_inst", "onet_q_a", "onet_gq", "onet_soc", "onet_shop", "onet_phon", "onet_cloze", "onet_full");
+var topics_no_multi = new Array ("asean", "beach", "days", "easy", "finding game", "months", "stationery",  "location", "onet_inst", "onet_q_a", "onet_gq", "onet_soc", "onet_voc", "onet_phon", "onet_pass", "onet_cloze", "onet_full");
+var topics_onet = new Array ("onet_voc", "onet_inst", "onet_q_a", "onet_gq", "onet_soc", "onet_phon", "onet_full");
 var	uMode = "read_choose";
 var undo_obj =  {};
 var user_settings= {};
@@ -156,8 +156,6 @@ if (!Array.prototype.indexOf) {
 
 
 function init() {
-	//document.addEventListener('touchmove', function(event){ event.stopPropagation(); event.preventDefault(); });
-
 	document.onkeydown = function(event) {processKey(event);};
 	window.ondragstart=function(){return false;};
 
@@ -167,12 +165,9 @@ function init() {
     	thumbs[i].addEventListener("touchmove", touch2Mouse);
     	thumbs[i].addEventListener("touchend", touch2Mouse);
 	}
-	//document.getElementById("optPanel").addEventListener("touchstart",function(event){return true;event.stopPropagation();});
-	//document.getElementById("optPanel").addEventListener("touchmove", function(event){ event.stopPropagation(); event.preventDefault(); });
-	
-	//document.getElementById("optGrp_volume").addEventListener("touchstart",function(){console.log();event.stopPropagation();});
 	document.getElementById("optGrp_volume").addEventListener("touchmove", function(event){ event.stopPropagation(); event.preventDefault(); });
-	//document.getElementById("optGrp_volume").addEventListener("touchend",function(){console.log();event.stopPropagation();});
+	document.getElementById("choiceTable").addEventListener("touchstart", function(event){ event.stopPropagation(); event.preventDefault(); });
+	document.getElementById("imChoiceDiv").addEventListener("touchstart", function(event){ event.stopPropagation(); event.preventDefault(); });
 
 	initAudio();
 	initUserSettings();
@@ -189,11 +184,11 @@ function init() {
 	var plImg5 = new Image();
 	plImg5.src = "images/vocab/titles/food.jpg";
 	var plImg6 = new Image();
-	plImg6.src = "images/vocab/titles/free time.jpg";
+	plImg6.src = "images/vocab/titles/free_time.jpg";
 	var plImg7 = new Image();
 	plImg7.src = "images/vocab/titles/occupations.jpg";
 	var plImg8 = new Image();
-	plImg8.src = "images/vocab/titles/places and transport.jpg";
+	plImg8.src = "images/vocab/titles/places_and_transport.jpg";
 	var plImg9 = new Image();
 	plImg9.src = "images/vocab/titles/school.jpg";
 	var plImg10 = new Image();
@@ -210,40 +205,44 @@ function init() {
 		if (electron==false){
 			audCtrls(startup, "play");
 		}
+		else{
+			var ipc = require('ipc');
+			ipc.send('tickVol', 0.6);
+		}
 	},400);	
 }
 
 
 function touch2Mouse(e) {
-  var theTouch = e.changedTouches[0];
-  var mouseEv;
+	var theTouch = e.changedTouches[0];
+	var mouseEv;
 
-  switch(e.type) {
-    case "touchstart":
-    	mouseEv="mousedown";
-    break;  
+	switch(e.type) {
+    	case "touchstart":
+	    	mouseEv="mousedown";
+    	break;  
 
-    case "touchend":
-    	mouseEv="mouseup";
-    break;
+	    case "touchend":
+    		mouseEv="mouseup";
+	    break;
 
-    case "touchmove":
-    	mouseEv="mousemove";
-    break;
+	    case "touchmove":
+    		mouseEv="mousemove";
+   		break;
 
-    default: return;
-  }
+	    default: return;
+	}
 
 	var mouseEvent = document.createEvent("MouseEvent");
-  mouseEvent.initMouseEvent(mouseEv, true, true, window, 1, theTouch.screenX, theTouch.screenY, theTouch.clientX, theTouch.clientY, false, false, false, false, 0, null);
-  theTouch.target.dispatchEvent(mouseEvent);
+  	mouseEvent.initMouseEvent(mouseEv, true, true, window, 1, theTouch.screenX, theTouch.screenY, theTouch.clientX, theTouch.clientY, false, false, false, false, 0, null);
+  	theTouch.target.dispatchEvent(mouseEvent);
 
  	e.preventDefault();
  	e.stopPropagation();
 }
 
 function initOptions(){
-	return;
+
 	if (localStorage.settings) {
 
 		var tempArr = new Array ("optGrp_vocab","optGrp_timer","optGrp_scoring","optGrp_feedback","optGrp_book","optGrp_controls","optGrp_volume");
@@ -408,7 +407,6 @@ function resize() {
 
 	var bodFontsize = Math.floor((w / 1600) * 60);
 	document.body.style.cssText = "background: none repeat scroll 0% 0% rgb(0, 0, 0); font: " + bodFontsize + "px 'Nunito',sans-serif;";
-	//alert(bodFontsize);
 	document.getElementById("outerDiv").style.width = w+"px";
 	document.getElementById("outerDiv").style.height = h+"px";
 
@@ -455,6 +453,33 @@ function initAudio() {
 			aswitch = new Audio("audio/switch.ogg");
 
 		}
+
+		function loadRV() {
+			console.log("Trying to load RV");
+			inject.js('https://code.responsivevoice.org/responsivevoice.js', function() {
+				if (typeof responsiveVoice!="undefined"){
+					clearInterval(net_check);
+					console.log("RV loaded");
+					timbreArray= new Array ("US English Female","UK English Female","UK English Male","Ian");
+					document.getElementById("vox_Ian_toggle").style.display="table-cell";
+					document.getElementById("vox_UK English Female_toggle").style.display="table-cell";
+					document.getElementById("vox_UK English Male_toggle").style.display="table-cell";
+					document.getElementById("vox_US English Female_toggle").style.display="table-cell";
+					document.getElementById("vox_none").style.display="none";
+					adjustVolume("vox",localStorage.vox*10);
+					document.getElementById("sli_vox").style.top=((1-localStorage.vox)*5)+"em";
+				}
+				else {
+					console.log("RV load failed");
+				}
+			});
+		}
+		
+		var net_check =setInterval(function(){
+			loadRV();
+		},60000);
+		loadRV();
+
 		adjustVolume("music",localStorage.music*10);
 		document.getElementById("sli_music").style.top=((1-localStorage.music)*5)+"em";
 		adjustVolume("clicks",localStorage.clicks*10);
@@ -466,20 +491,6 @@ function initAudio() {
 		if (localStorage.bells){
 			adjustVolume("bells",localStorage.bells*10);
 			document.getElementById("sli_bells").style.top=((1-localStorage.bells)*5)+"em";
-		}
-		if (typeof responsiveVoice!="undefined"){
-			//utterance.rate = 0.7;
-			adjustVolume("vox",localStorage.vox*10);
-			document.getElementById("sli_vox").style.top=((1-localStorage.vox)*5)+"em";
-		}
-		else{
-			timbreArray.length=0;
-			timbreArray[0]="Ian";
-			document.getElementById("vox_Ian_toggle").style.display="none";
-			document.getElementById("vox_UK English Female_toggle").style.display="none";
-			document.getElementById("vox_UK English Male_toggle").style.display="none";
-			document.getElementById("vox_US English Female_toggle").style.display="none";
-			document.getElementById("vox_none").style.display="table-cell";
 		}
 		
 		// Code below could replace responsiveVoice code if/when other browsers get their act together!!!
@@ -709,6 +720,8 @@ function countDown(){
 	var ipc = require('ipc');
 	tick = new Audio("audio/tick_slow.mp3");
 	tock = new Audio("audio/tock_slow.mp3");
+	audCtrls(tick,"volume",0.1);
+	audCtrls(tock,"volume",0.1);
 	audCtrls(tick,"play");
 	setTimeout(function() {document.getElementById("counter").innerHTML=9; audCtrls(tick,"pause");audCtrls(tock,"play");}, 1000);
 	setTimeout(function() {document.getElementById("counter").innerHTML=8; audCtrls(tock,"pause");audCtrls(tick,"play");}, 2000);
@@ -797,20 +810,17 @@ function leadZero(i) {
 }
 
 function setCountDown(min) {
-  if (min<11 && countSet<11) {
-	  document.getElementById("cDS"+countSet).className = "optSelect";
-  }
-  else if (countSet<11) {
-    count_set_norm=countSet;
-  }
-	countSet = min;
-	countTime = min*60;
+	if (min<11 && countSet<11) {
+		document.getElementById("cDS"+countSet).className = "optSelect";
+		countSet = min;
+  	}
+	countTime = min*60;	
 	var initMin = Math.floor(countTime / 60);
 	initMin = leadZero(initMin);
 	document.getElementById('timer').innerHTML = initMin + ":00";
-  if (min<11) {
-	  document.getElementById("cDS"+min).className = "optSelected";
-  }
+ 	if (min<11) {
+		document.getElementById("cDS"+min).className = "optSelected";
+  	}
 }
 
 
@@ -837,9 +847,9 @@ function resetScore(caller) {
 		audCtrls(tickFast, "rewind");
 	}, 100);
 
-	setCountDown(countSet);
+	
 	setActivityDisplays();
-	setDisplays({finishedButton:"none",b_replay:"none",imChoiceDiv:"none",b_start:"block",b_reset:"none",b_help:"block",controls_central:"block"});
+	setDisplays({finishedButton:"none",b_replay:"none",imChoiceDiv:"none",b_start:"block",b_reset:"none",b_help:"block",controls_central:"block", b_submit:"none"});
 	document.getElementById("timer").style.color = "#fff";
 	document.getElementById("score").innerHTML = "Score: 0";
 	document.getElementById("correct").innerHTML = "Words: " + points;
@@ -859,10 +869,13 @@ function resetScore(caller) {
 	}
   	else if (curr_topic_title=="onet_full") {
 		if (onet_ready==false){
-			document.getElementById('onet_answer_sheet').innerHTML ="";
-			setupONET();
+			setupONET(onet_test.length);
+			if (onet_test_set=="onet_rand"){
+				SetOnetFullRand();
+			}
 		}
 		document.getElementById("mainImage").src = "images/vocab/titles/" + curr_topic_title + ".jpg";
+		setCountDown(50);
 	}
 	else if (curr_topic_dir!="dot_and_Ben"){
 		document.getElementById("mainImage").src = "images/vocab/titles/" + curr_topic_title + ".jpg";
@@ -872,13 +885,14 @@ function resetScore(caller) {
 	}
 	if (curr_topic_title!="onet_full") {
 		setDisplays ({choice_onet:"none"});
+		setCountDown(countSet);
   	}
 	document.getElementById("phonDisplay").style.fontSize="300%";
 	if (uMode=="read_say" || uMode=="phon_bingo") {
-		document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img src='images/labels/l_"+currentPhonUnit+"_p.png' />";
+		document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img style='width:1em' src='images/labels/l_"+currentPhonUnit+"_p.png' />";
 	}
 	else if (uMode=="numbers" || uMode == "num_bingo"){
-		document.getElementById("phonDisplay").innerHTML = "</br>Numbers Unit <img src='images/labels/l_"+currentNumUnit+"_p.png' />";
+		document.getElementById("phonDisplay").innerHTML = "</br>Numbers Unit <img style='width:1em' src='images/labels/l_"+currentNumUnit+"_p.png' />";
 	}
 
 	lives=10;
@@ -941,6 +955,12 @@ function b_press(b) {
 		b.style.width = w +s;
 		b.onmouseout = function () {};
 	};
+	b.ontouchend = function () {
+		w = (parseFloat(b.style.width)/0.96);
+		b.style.width = w +s;
+		b.onmouseout = function () {};
+		b.click();
+	};
 }
 
 
@@ -962,6 +982,12 @@ function selectPhonUnit(unit) {
 		currentPhonUnit=unit;
 		document.getElementById("phonDisplay").style.fontSize = "300%";
 		setPhonicsArrays();
+		document.getElementById("b_initC").src="images/buttons/b_all.png";
+		initC="all";
+		document.getElementById("b_vowel").src="images/buttons/b_all.png";
+		vowel="all";
+		document.getElementById("b_finalC").src="images/buttons/b_all.png";
+		finalC="all";
 		newSyllable("ex");
 		resetScore();
 	}
@@ -1057,7 +1083,7 @@ function setVocMode(mode) {
 }
 
 function iSet () {
-	if (parseInt(currentPhonUnit.substring(4))<10) {
+	if (parseInt(currentPhonUnit.substring(4))<10 || parseInt(currentPhonUnit.substring(4))>11) {
 		if (initC=="all"){
 			document.getElementById("b_initC").src="images/buttons/b_new.png";
 			initC="new";
@@ -1081,10 +1107,13 @@ function iSet () {
 			initC="single";
 		}
 		else if (initC=="single"){
+			document.getElementById("b_initC").src="images/buttons/b_none.png";
+			initC="none";
+		}
+		else if (initC=="none"){
 			document.getElementById("b_initC").src="images/buttons/b_all.png";
 			initC="all";
 		}
-
 	}
 	newSyllable("ex");
 }
@@ -1132,6 +1161,10 @@ function fSet () {
 			finalC="single";
 		}
 		else if (finalC=="single"){
+			document.getElementById("b_finalC").src="images/buttons/b_none.png";
+			finalC="none";
+		}
+		else if (finalC=="none"){
 			document.getElementById("b_finalC").src="images/buttons/b_all.png";
 			finalC="all";
 		}
@@ -1199,24 +1232,37 @@ function selectActivityGroup(group){
 
 		switch (group){
 			case "vocab":
-				setDisplays ({phonUSelect:"none",vocSelect:"block",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"block",reader_act_title:"none",book_trans_icon:"none",list_choose_icon:"block",say_word_icon:"block",onet_activities:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"block",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"block",reader_act_title:"none",onet_act_title:"none",read_choose_icon:"block",book_trans_icon:"none",look_choose_icon:"block",list_choose_icon:"block",play_learn_icon:"block",say_word_icon:"block",voc_bingo_icon:"block",onet_act_icon:"none"});
 				selectActivity("read_choose");
+				document.getElementById("panelLev").src="images/buttons/b_"+currentLev+".png";
+				document.getElementById("panelLev2").src="images/buttons/b_"+currentLev+".png";
 			break;
 			case "phonics":
-				setDisplays ({phonUSelect:"table",vocSelect:"none",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"none",phonics_activities:"block",numbers_activities:"none",onet_activities:"none"});
+				setDisplays ({phonUSelect:"table",vocSelect:"none",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"none",phonics_activities:"block",numbers_activities:"none"});
 				selectActivity("read_say");
+				document.getElementById("panelCont").src="images/buttons/b_"+currentPhonUnit+".png";
+				document.getElementById("panelCont2").src="images/buttons/b_"+currentPhonUnit+".png";
+				document.getElementById("panelLev").src="images/labels/l_"+currentPhonUnit+"_p.png";
+				document.getElementById("panelLev2").src="images/labels/l_"+currentPhonUnit+"_p.png";
 			break;
 			case "numbers":
-				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"table",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"none",phonics_activities:"none",numbers_activities:"block",onet_activities:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"table",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"none",phonics_activities:"none",numbers_activities:"block"});
 				selectActivity("numbers");
+				document.getElementById("panelCont").src="images/buttons/b_"+currentNumUnit+".png";
+				document.getElementById("panelCont2").src="images/buttons/b_"+currentNumUnit+".png";
+				document.getElementById("panelLev").src="images/labels/l_"+currentNumUnit+"_p.png";
+				document.getElementById("panelLev2").src="images/labels/l_"+currentNumUnit+"_p.png";
 			break;
 			case "readers":
-				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"block",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"block",book_trans_icon:"block",list_choose_icon:"none",say_word_icon:"none",onet_activities:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"block",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"block",onet_act_title:"none",book_trans_icon:"block",read_choose_icon:"block",look_choose_icon:"block",list_choose_icon:"none",play_learn_icon:"block",say_word_icon:"none",voc_bingo_icon:"block",onet_act_icon:"none"});
 				selectActivity("book_trans");
 			break;
 			case "onet":
-				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"none",ONETSelect:"block",optDiv:"none",vocab_activities:"none",phonics_activities:"none",numbers_activities:"none",onet_activities:"block"});
-				selectTopic("onet_inst");
+				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"none",ONETSelect:"block",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"none",onet_act_title:"block",book_trans_icon:"none",look_choose_icon:"none",list_choose_icon:"none",say_word_icon:"none",voc_bingo_icon:"none"});
+				selectTopic("onet_voc");
+				selectActivity("read_choose");
+				document.getElementById("panelLev").src="images/buttons/b_P6.png";
+				document.getElementById("panelLev2").src="images/buttons/b_P6.png";
 			break;
 		}
 	}
@@ -1393,11 +1439,15 @@ function setActivityDisplays() {
 		break;
 
 		case "look_choose":
-      if (curr_topic_title!="onet_full") {	  setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"block",phonDisplay:"none",score:"block",timer:"block"});
-      }
-      else {
-setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"none",timer:"block",choice_onet:"block"});
-      }
+      		if (curr_topic_title!="onet_full") {	  
+      			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"block",imageDiv:"block",livesDispTop:"block",phonDisplay:"none",score:"block",timer:"block"});
+			}
+			else {
+				setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",choiceDiv:"block",errDiv:"none",imageDiv:"block",livesDispTop:"none",phonDisplay:"none",score:"none",timer:"block",choice_onet:"block"});
+			}
+			if (curr_topic_title=="onet_gq"){
+				setDisplays({errDiv:"none"});
+			}
 		break;
 
 		case "book_trans":
@@ -1629,10 +1679,32 @@ function selectTopic(topic,caller) {
 				document.getElementById("panelCont2").src="images/buttons/"+topic+".jpg";
 				document.getElementById("panelLev").src="images/buttons/b_"+currentLev+".png";
 				document.getElementById("panelLev2").src="images/buttons/b_"+currentLev+".png";
-        curr_topic_title = topic;
+
+        		curr_topic_title = topic;
 				curr_topic_dir=topic;
-				setVocArrays();
-				resetScore();
+				      		
+        		if (topic=="onet_voc"){
+					setOnetVocab();
+        		}
+        		else {
+					setVocArrays();
+        		}
+        		resetScore();
+        		
+        		if (topic.slice(0,4)=="onet"){
+        			if (topic=="onet_voc"){
+						setDisplays ({read_choose_icon:"block",play_learn_icon:"block",onet_act_icon:"none",onet_full_select:"none"});
+        			}
+					else if (topic=="onet_full"){
+						setDisplays ({read_choose_icon:"none",play_learn_icon:"none",onet_act_icon:"block",onet_full_select:"block"});
+						document.getElementById("l_onet_topic").src="images/buttons/"+topic+".jpg";
+					}
+        			else {
+        				setDisplays ({read_choose_icon:"none",play_learn_icon:"none",onet_act_icon:"block",onet_full_select:"none"});
+        				document.getElementById("l_onet_topic").src="images/buttons/"+topic+".jpg";
+        			}
+        		}
+
 				//preloadAudio();
 				//preLoadImages();
 				//monPreload();
@@ -1659,66 +1731,14 @@ function shuffle(array) {
 }
 
 
-function setupONET(){
+function setupONET(item_count){
 
-  setCountDown(40);
-  onet_test=new Array();
+	document.getElementById('onet_answer_sheet').innerHTML ="";
 
-  curr_topic_title="onet_full_2";
-  setVocArrays();
-  shuffle(vocArray);
-
-  var items=39;
-  var k=0;
-
-	while (items>24) {
-		for (var i=items;i>items-vocArray[k].qs;i--){
-		  onet_test[i]=vocArray[k];
-		}
-		items=items-vocArray[k].qs;
-		while (k<vocArray.length-1){
-
-			k++;
-
-			if (((items)-(vocArray[k].qs))>24){
-				break;
-			}
-		}
-		if (k==vocArray.length-1) {
-			break;
-		}
-	}
-
- 	curr_topic_title="onet_full";
-  	setVocArrays();
-  	shuffle(vocArray);
-
-	var j=0;
-	
-    while (items> -1) {
-    	var next=items-vocArray[j].qs;
-			
-      	for (items=items;items>next;items--){
-      		onet_test[items]=vocArray[j];
-    	}
-		vocArray.splice(j,1);
-		while(vocArray[j].qs>items && items>0) {
-			if (j<vocArray.length-1){
-				j++;
-			}
-			else{
-				j=0;
-			}
-		}
-  	}
-
-  //console.log(onet_test);
-
-
-	for (var i=0; i<40; i++){
+	for (var i=0; i<item_count; i++){
 		document.getElementById('onet_answer_sheet').innerHTML += '\
 		<div id="onet_num_'+i+'" style="height:1.5em; padding:0.1em; clear:both; font: inherit; font-size: 120%;"\
-    onClick="selectOnetItem(this)">\
+    		onClick="selectOnetItem(this)">\
 			<div  style="float: left; width: 2em; margin-left: 2em; text-align: right" >'+(i+1)+'.</div>\
 			<img id="onet_ans_'+i+'_1'+'" style="float: left; width: 1em; margin-left: 0.5em; padding-top:0.2em" src="images/labels/onet_1.png"\
 			onClick="chAnswer(\'onet\',\''+i+'_1\',this)" />\
@@ -1728,63 +1748,66 @@ function setupONET(){
 			onClick="chAnswer(\'onet\',\''+i+'_3\',this)" />\
 			<img id="onet_ans_'+i+'_4'+'" style="float: left; width: 1em; margin-left: 0.5em; padding-top:0.2em" src="images/labels/onet_4.png"\
 			onClick="chAnswer(\'onet\',\''+i+'_4\',this)" />\
-      <img id="onet_grade_'+i+'" style="float: left; width: 2em; margin-left: 1.5em; margin-top: -0.1em; display:none" src="images/buttons/no_button.png"\
+      		<img id="onet_grade_'+i+'" style="float: left; width: 2em; margin-left: 1.5em; margin-top: -0.1em; display:none" src="images/buttons/no_button.png"\
 			 />\
 		</div>';
 	}
-  onet_ready=true;
+	onet_ready=true;
 }
 
 function selectOnetItem(item) {
-  if (finished==true){
-    for (var i=0;i<40;i++){
-     document.getElementById("onet_num_"+i).style.backgroundColor="";
-    }
-    onet_test_item=(parseInt((item.id.substr(item.id.lastIndexOf("_")+1)))-1);
-    activity ("forward");
-  }
+	if (finished==true &&onet_ready==false){
+    	document.getElementById("onet_num_"+onet_test_item).style.backgroundColor="";
+		onet_test_item=parseInt((item.id.substr(item.id.lastIndexOf("_")+1)));
+		document.getElementById("onet_num_"+onet_test_item).style.backgroundColor="yellow";
+		newImage();
+  	}
 }
 
 function submitONET(){
 
-  var j=1;
+	var j=1;
 
-  for (var i=0;i<40;i++){
-    document.getElementById("onet_grade_"+i).style.display="block";
-    if (document.getElementById("onet_grade_"+i).src.indexOf("yes")!= -1){
-      points++;
-    }
-    else{
-
-
-      document.getElementById("onet_ans_"+i+"_"+onet_test[i]["a"+j]).src="images/labels/onet_correct.png";
-
-      if (onet_test[i].qs>j){
-        j++;
-      }
-      else {
-        j=1;
-      }
-      for (k=0;k<4;k++){
-        if (document.getElementById("onet_ans_"+i+"_"+(k+1)).src.indexOf("fill")!= -1){
-          document.getElementById("onet_ans_"+i+"_"+(k+1)).src="images/labels/onet_incorrect.png";
-        }
-      }
-    }
-  }
-  finished=true;
-  stopCount=true;
-  points=(points*2.5);
-  setCountDown(countSet);
-  document.getElementById("b_submit").style.display="none";
-  document.getElementById("score").innerHTML = "Score: " + points;
-  document.getElementById("score").style.display="block";
-  document.getElementById("b_reset").style.display="block";
-  document.getElementById("onet_num_0").scrollIntoView();
-  onet_prev_item=onet_test_item;
-  newImage();
-  onet_ready=false;
-
+  	for (var i=0;i<onet_test.length;i++){
+  		document.getElementById("onet_grade_"+i).style.display="block";
+    	if (document.getElementById("onet_grade_"+i).src.indexOf("yes")!= -1){
+    		if (onet_test_set=="onet_53"){
+				if (i<20){
+					points=points+2;
+				}
+				else{
+					points=points+4;
+				}
+    		}
+    		else {
+    			points=points+2.5;
+    		}
+    	}
+    	else{
+    		document.getElementById("onet_ans_"+i+"_"+onet_test[i]["a"+j]).src="images/labels/onet_correct.png";
+    		if (onet_test[i].qs>j){
+        		j++;
+      		}
+      		else {
+        		j=1;
+      		}
+      		for (k=0;k<4;k++){
+        		if (document.getElementById("onet_ans_"+i+"_"+(k+1)).src.indexOf("fill")!= -1){
+          			document.getElementById("onet_ans_"+i+"_"+(k+1)).src="images/labels/onet_incorrect.png";
+        		}
+      		}
+    	}
+  	}
+  	finished=true;
+  	stopCount=true;
+  
+  	document.getElementById("b_submit").style.display="none";
+  	document.getElementById("score").innerHTML = "Score: " + points +"%";
+  	document.getElementById("score").style.display="block";
+  	document.getElementById("b_reset").style.display="block";
+  	document.getElementById("onet_num_0").scrollIntoView();
+  	onet_prev_item=onet_test_item;
+  	onet_ready=false;
 }
 
 function moveHelpBox (event,box) {
@@ -2030,14 +2053,14 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 		case "food":
 			document.getElementById("helpBox").innerHTML="Food and Drinks";
 			break;
-		case "free time":
+		case "free_time":
 			document.getElementById("helpBox").innerHTML="Free Time";
 			break;
 		case "occupations":
 			document.getElementById("helpBox").innerHTML="Occupations";
 			break;
-		case "places and transport":
-			document.getElementById("helpBox").innerHTML="Places and Transport";
+		case "places_and_transport":
+			document.getElementById("helpBox").innerHTML="places_and_transport";
 			break;
 		case "school":
 			document.getElementById("helpBox").innerHTML="School";
@@ -2098,7 +2121,7 @@ function topicTitle(title) {
 		case "food":
 			return("Food and Drinks");
 			break;
-		case "free time":
+		case "free_time":
 			return("Free Time");
 			break;
 		case "grammar":
@@ -2116,7 +2139,7 @@ function topicTitle(title) {
 		case "people":
 			return("People");
 			break;
-		case "places and transport":
+		case "places_and_transport":
 			return("Places and Transport");
 			break;
 		case "school":
@@ -2288,8 +2311,6 @@ function setButtonStatus(button,action,param1,param2) {
 	var click=function() {};
 	var down=function() {};
 	var ghosted="_g";
-
- // alert(button);
 
 	if (action != "") {
 		if (param2) {
@@ -3004,16 +3025,21 @@ function setVocTable(button) {
 		 	var imgRow = document.getElementById("voc_tab").insertRow(-1);
 		 	var vocRow = document.getElementById("voc_tab").insertRow(-1);
 		 	for (var j=0; j<5; j++) {
-		 		txt =tempArray[imgInd];
-				if (curr_topic_title=="multi") {
-					var slPos = txt.indexOf("/")+1;
-					txt =txt.slice(slPos);
-				}
+		 		if (typeof tempArray[imgInd]=="object") {
+					txt=tempArray[imgInd].txt;
+		 		}
+		 		else {
+		 			txt =tempArray[imgInd];
+					if (curr_topic_title=="multi") {
+						var slPos = txt.indexOf("/")+1;
+						txt =txt.slice(slPos);
+					}
+		 		}
 		 		imgRow.insertCell(j);
-		 		vocRow.insertCell(j);
-		 		vocRow.cells[j].className="vocCell";
-		 		imgRow.cells[j].className="vocImgCell";
-		 		vocRow.cells[j].innerHTML=txt;
+				vocRow.insertCell(j);
+				vocRow.cells[j].className="vocCell";
+				imgRow.cells[j].className="vocImgCell";
+				vocRow.cells[j].innerHTML=txt;
 		 		if (imgInd<tempArray.length-1) {
 			 		imgInd++;
 			 	}
@@ -3046,18 +3072,31 @@ function setVocTable(button) {
 		for (var i=0;i<numRows*2;i=i+2){
 			for (var j=0; j<5; j++) {
 				voc =(tempArray[((i/2)*5)+j]);
-				voc=processSubst(voc);
-				document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+				if (typeof voc=="object"){
+
+					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src=voc.src />";
+					//alert(voc.src);
+				}
+				else {
+					voc=processSubst(voc);
+					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+				}
+				
 				document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
 					voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
-					voc= splitSubst(voc);
-					audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
-					vocEx=voc;
+					if (typeof voc == "object"){
+						audVoc.src=voc.txt;
+					}
+					else{
+						voc= splitSubst(voc);
+						audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
+						vocEx=voc;
+					}
 					playVocab();
 				};
 				document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCellHidden";
 				document.getElementById("voc_tab").rows[i+1].cells[j].onclick = function() {
-					document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].className="vocCell";
+				document.getElementById("voc_tab").rows[this.parentNode.rowIndex].cells[this.cellIndex].className="vocCell";
 				};
 			}
 		}
@@ -3097,15 +3136,31 @@ function setVocTable(button) {
 		for (var i=0;i<numRows*2;i=i+2){
 			for (var j=0; j<5; j++) {
 				voc =(tempArray[((i/2)*5)+j]);
-				voc=processSubst(voc);
-				document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+				if (typeof voc=="object"){
+
+					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src="+voc.src+" />";
+					//alert(voc.src);
+				}
+				else {
+					voc=processSubst(voc);
+					document.getElementById("voc_tab").rows[i].cells[j].innerHTML="<img width='100%' src='images/vocab/" + dir +"/" +voc+ ".jpg' />";
+				}
 				document.getElementById("voc_tab").rows[i+1].cells[j].className="vocCell";
 				document.getElementById("voc_tab").rows[i].cells[j].onclick = function() {
 					voc =(tempArray[((this.parentNode.rowIndex/2)*5)+this.cellIndex]);
-					voc= splitSubst(voc);
-					audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
-					vocEx=voc;
-					playVocab();
+					if (typeof voc == "object"){
+						vocEx=voc.txt;
+						if (typeof responsiveVoice!="undefined"){
+							var timbre=setTimbre();
+							playRV(vocEx,timbre);
+						}
+					}
+					else{
+						voc= splitSubst(voc);
+						audVoc.src="audio/vocab/"+ dir +"/" +voc+ ".mp3";
+						vocEx=voc;
+						playVocab();
+					}
 				};
 			}
 		}
@@ -3182,31 +3237,31 @@ function setAvailCats() {
 
 	switch (currentLev) {
 		case "K2":
-			availCats = new Array("actions", "animals", "beach", "body", "clothes", "days", "describing", "easy", "food", "occupations", "places and transport", "school", "time");
+			availCats = new Array("actions", "animals", "beach", "body", "clothes", "days", "describing", "easy", "food", "occupations", "places_and_transport", "school", "time");
 			break;
 		case "P1":
 			availCats = new Array("actions", "animals", "beach", "clothes", "days", "easy", "food", "home", "occupations", "body", "people", "school", "stationery", "time");
 			break;
 		case "P2":
-			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "food", "grammar", "home", "months", "occupations", "body", "people", "places and transport", "school", "stationery", "time");
+			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "food", "grammar", "home", "months", "occupations", "body", "people", "places_and_transport", "school", "stationery", "time");
 			break;
 		case "P3":
-		availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "finding game", "food", "grammar", "home", "months", "occupations", "body", "people", "places and transport", "location", "school", "stationery", "time");
+		availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "finding game", "food", "grammar", "home", "months", "occupations", "body", "people", "places_and_transport", "location", "school", "stationery", "time");
 			break;
 		case "P4":
-		availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "finding game", "food", "grammar", "home", "months", "occupations", "body", "people", "places and transport",  "location", "school", "stationery", "time");
+		availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "finding game", "food", "grammar", "home", "months", "occupations", "body", "people", "places_and_transport",  "location", "school", "stationery", "time");
 			break;
 		case "P5":
-			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "describing", "finding game",  "location", "food", "free time", "grammar", "health", "home", "months", "occupations", "body", "people", "places and transport", "school", "stationery", "time", "weather");
+			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "describing", "finding game",  "location", "food", "free_time", "grammar", "health", "home", "months", "occupations", "body", "people", "places_and_transport", "school", "stationery", "time", "weather");
 			break;
 		case "P6":
-			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "describing", "food", "free time", "grammar", "health", "home", "months", "occupations", "body", "people", "places and transport", "school", "socialising", "stationery", "time", "weather");
+			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "describing", "food", "free_time", "grammar", "health", "home", "months", "occupations", "body", "people", "places_and_transport", "school", "socialising", "stationery", "time", "weather");
 			break;
 		case "Master":
-			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "describing", "finding game",  "location", "food", "free time", "grammar", "home", "months", "occupations", "body", "people", "places and transport", "school", "stationery", "time", "weather");
+			availCats = new Array("actions", "animals", "asean", "beach", "clothes", "days", "easy", "describing", "finding game",  "location", "food", "free_time", "grammar", "home", "months", "occupations", "body", "people", "places_and_transport", "school", "stationery", "time", "weather");
 			break;
 		case "Scratch":
-			availCats = new Array("actions", "animals", "beach", "clothes", "days", "describing", "food", "free time", "grammar", "months", "occupations", "places and transport", "body", "school", "stationery", "time");
+			availCats = new Array("actions", "animals", "beach", "clothes", "days", "describing", "food", "free_time", "grammar", "months", "occupations", "places_and_transport", "body", "school", "stationery", "time");
 			break;
 	}
 }
@@ -3263,9 +3318,9 @@ function setVocArrays() {
 				vocArray = new Array("barber", "butcher", "cook", "dentist", "doctor", "farmer", "fisherman", "monk", "nurse", "policeman", "student", "teacher");
 				curr_topic_dir = "occupations";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array ("beach", "bike", "boat", "bus", "car", "farm", "home", "market", "on foot", "plane", "school", "shop", "temple", "train", "van", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("bag", "book", "pen", "pencil", "rubber", "ruler");
@@ -3349,7 +3404,7 @@ function setVocArrays() {
 				break;
 			case "asean":
 				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "beach":
 				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
@@ -3395,9 +3450,9 @@ function setVocArrays() {
 				vocArray = new Array("aunt", "baby", "boy", "brother", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "queen", "sister", "son", "uncle", "woman");
 				curr_topic_dir = "people";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "home", "Indonesia", "Laos", "Malaysia", "market", "motorbike", "Myanmar", "on foot", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("Art", "bag", "backpack", "blackboard", "book", "chalk", "classroom", "clock", "computer", "desk", "English", "eraser", "homework", "Math", "map", "Music", "notebook", "paper", "P.E.", "pen", "pencil", "ruler", "school", "Science");
@@ -3426,7 +3481,7 @@ function setVocArrays() {
 				break;
 			case "asean":
 				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "beach":
 				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
@@ -3480,9 +3535,9 @@ function setVocArrays() {
 				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "granddaughter", "grandfather", "grandmother", "grandson", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
 				curr_topic_dir = "people";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "factory", "farm", "Hanoi", "helicopter", "home", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "train", "truck", "tuk-tuk", "van", "Vientiene", "Vietnam", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("Art", "backpack", "bag", "bell", "blackboard", "book", "bookshelf", "calculator", "calendar", "canteen", "chalk", "classroom", "clock", "coloured pencils", "computer", "computer room", "crayons", "desk", "English", "eraser", "homework", "ink", "library", "lunch box", "map", "Math", "Music", "music room", "notebook", "P.E.", "paper", "pen", "pencil", "pencil case", "pencil sharpener", "playground", "ruler", "school", "Science", "scissors", "Social Studies", "toilet", "umbrella", "whiteboard");
@@ -3511,7 +3566,7 @@ function setVocArrays() {
 				break;
 			case "asean":
 				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "beach":
 				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
@@ -3565,9 +3620,9 @@ function setVocArrays() {
 				vocArray = new Array("aunt", "baby", "boy", "brother", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "queen", "sister", "son", "uncle", "woman");
 				curr_topic_dir = "people";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "on foot", "home",  "Indonesia", "Laos", "Malaysia", "market", "Myanmar", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("Art", "bag", "backpack", "blackboard", "book", "chalk", "classroom", "clock", "computer", "desk", "English", "eraser", "homework", "map", "Math", "Music", "notebook", "paper", "P.E.", "pen", "pencil", "ruler", "school", "Science");
@@ -3595,7 +3650,7 @@ function setVocArrays() {
 				break;
 			case "asean":
 				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "beach":
 				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
@@ -3629,9 +3684,9 @@ function setVocArrays() {
 				vocArray = new Array("apple", "banana", "beans", "beef", "bread", "breakfast", "butter", "cabbage", "cake", "candy", "carrots", "cheese", "chicken", "chilli", "chocolate", "coconuts", "coffee", "coke", "cookies", "corn", "cucumber", "curry", "durian", "egg", "eggplant", "fish", "food", "fried chicken", "fried egg", "fried fish", "fried rice", "fruit", "garlic", "grapes", "guava", "hamburger", "hot dog", "ice cream", "iced coffee", "iced tea", "ice", "jam", "juice", "lemons", "limes", "lollipop", "long beans", "lunch", "mangoes", "mangosteens", "milk", "noodles", "oil", "onion", "orange", "papayas", "pineapple", "pizza", "pomelo", "pork", "pumpkin", "rambutans", "rice", "rose apple", "salad", "salt", "sandwich", "shrimp", "soda", "soft drinks", "soup", "strawberries", "sugar", "sushi", "tea", "tomato", "vinegar", "water", "watermelon", "wine", "yoghurt");
 				curr_topic_dir = "food";
 				break;
-			case "free time":
+			case "free_time":
 				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "draw", "go camping", "go fishing", "go horse riding", "go shopping", "listen to music", "paint", "play badminton", "play basketball", "play computer games", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
-				curr_topic_dir = "free time";
+				curr_topic_dir = "free_time";
 				break;
 			case "grammar":
 				vocArray = new Array("?", "be / is / am / are", "but", "can", "cannot", "do / does",  "how", "how many", "how much", "I", "in", "into", "my", "not", "on", "or", "that", "this", "to", "what time", "why", "which", "what", "when", "where", "who", "you");
@@ -3661,9 +3716,9 @@ function setVocArrays() {
 				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
 				curr_topic_dir = "people";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "farm", "home", "Indonesia", "Laos", "Malaysia", "market", "motorbike", "Myanmar", "on foot", "Philippines", "plane", "school", "Singapore", "temple", "Thailand", "train", "van", "Vietnam", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("Art", "bag", "backpack", "blackboard", "book", "chalk", "classroom", "clock", "computer", "desk", "English", "eraser", "homework", "map", "Math", "Music", "notebook", "paper", "P.E.", "pen", "pencil", "rubber", "ruler", "school", "scissors", "Science");
@@ -3696,7 +3751,7 @@ function setVocArrays() {
 				break;
 			case "asean":
 				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "beach":
 				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
@@ -3722,9 +3777,9 @@ function setVocArrays() {
 				vocArray = new Array("apple", "banana", "beans", "beef", "bread", "breakfast", "butter", "cabbage", "cake", "candy", "carrots", "cheese", "chicken", "chilli", "chocolate", "coconuts", "coffee", "coke", "cookies", "corn", "cucumber", "curry", "durian", "egg", "eggplant", "fish", "food", "fried chicken", "fried egg", "fried fish", "fried rice", "fruit", "garlic", "grapes", "guava", "hamburger", "hot dog", "ice cream", "iced coffee", "iced tea", "ice", "jam", "juice", "lemons", "limes", "lollipop", "long beans", "lunch", "mangoes", "mangosteens", "milk", "noodles", "oil", "onion", "orange", "papayas", "pineapple", "pizza", "pomelo", "pork", "pumpkin", "rambutans", "rice", "rose apple", "salad", "salt", "sandwich", "shrimp", "soda", "soft drinks", "soup", "strawberries", "sugar", "sushi", "tea", "tomato", "vinegar", "water", "watermelon", "wine", "yoghurt");
 				curr_topic_dir = "food";
 				break;
-			case "free time":
+			case "free_time":
 				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming","practise judo", "karate", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "read comic books", "read", "ride a bike", "sing", "watch TV");
-				curr_topic_dir = "free time";
+				curr_topic_dir = "free_time";
 				break;
 			case "grammar":
 			 	vocArray = new Array("?", "and", "at", "be / is / am / are", "behind", "between", "but", "can", "cannot", "do / does", "her", "his", "how", "how many", "how much", "I", "in front of", "in", "into", "it", "my", "near", "next to", "no", "not", "on", "on the left of", "on the right of", "or", "that", "the", "this", "to", "under", "what", "what time", "when", "where", "which", "who", "why", "you", "your");
@@ -3750,9 +3805,9 @@ function setVocArrays() {
 				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "grandfather", "grandmother", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
 				curr_topic_dir = "people";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "home", "hospital", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "train", "truck", "tuk-tuk", "van", "Vientiene", "Vietnam", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("Art", "backpack", "bag", "bell", "bin", "blackboard", "book", "bookshelf", "calculator", "calendar", "canteen", "chalk", "classroom", "clock", "coloured pencils", "computer", "computer room", "crayons", "desk", "English", "eraser", "globe", "glue", "homework", "ink", "library", "lunch box", "map", "Math", "Music", "music room", "notebook", "paper", "P.E.", "pencil case", "pencil", "pencil sharpener", "pen", "playground", "ruler", "school", "Science", "scissors", "social studies", "toilet", "umbrella", "violin", "waste paper basket", "whiteboard");
@@ -3787,7 +3842,7 @@ function setVocArrays() {
 				break;
 			case "asean":
 				vocArray = new Array("Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "beach":
 				vocArray = new Array ("bench", "bin", "cement stool", "coconut", "flag", "gazebo", "grass", "inner tube", "island", "ladder", "light bulb", "lighthouse", "log", "motorbike", "palm", "pavilion", "pier", "sand", "shell", "ship", "sign", "socket", "spirit house", "stone circle", "stump", "swing", "table", "toilet", "tree");
@@ -3821,9 +3876,9 @@ function setVocArrays() {
 				vocArray = new Array("apple", "banana", "beans", "beef", "bread", "breakfast", "butter", "cabbage", "cake", "candy", "carrots", "cheese", "chicken", "chilli", "chocolate", "coconuts", "coffee", "coke", "cookies", "corn", "cucumber", "curry", "durian", "egg", "eggplant", "fish", "food", "fried chicken", "fried egg", "fried fish", "fried rice", "fruit", "garlic", "grapes", "guava", "hamburger", "hot dog", "ice cream", "iced coffee", "iced tea", "ice", "jam", "juice", "lemons", "limes", "lollipop", "long beans", "lunch", "mangoes", "mangosteens", "milk", "noodles", "oil", "onion", "orange", "papayas", "pineapple", "pizza", "pomelo", "pork", "pumpkin", "rambutans", "rice", "rose apple", "salad", "salt", "sandwich", "shrimp", "soda", "soft drinks", "soup", "strawberries", "sugar", "sushi", "tea", "tomato", "vinegar", "water", "watermelon", "wine", "yoghurt");
 				curr_topic_dir = "food";
 				break;
-			case "free time":
+			case "free_time":
 				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "draw", "fly a kite", "go camping", "go climbing", "go fishing", "go for a picnic", "go horse riding", "go jogging", "go shopping", "go skating", "go swimming", "listen to music", "listen to the radio", "paint", "play badminton", "play basketball", "play cards", "play chess", "play computer games", "play darts", "play football", "play games", "play ping-pong", "play the guitar", "play volleyball", "practise judo", "practise karate", "read comic books", "read", "ride a bike", "sing", "watch TV");
-				curr_topic_dir = "free time";
+				curr_topic_dir = "free_time";
 				break;
 			case "grammar":
 				vocArray = new Array("?", "a / the", "and", "at", "be / is / am / are", "back", "behind", "between", "but", "can", "cannot", "comma", "do / does", "do you want ...", "exclamation mark", "for", "have / has", "her", "his", "how many", "how much", "how", "I", "in front of", "in", "into", "is / am / are", "is / are", "it", "my", "near", "next to", "no", "not", "on the left of", "on the right of", "on", "or", "question mark", "that", "the", "this", "to", "under", "up", "we", "what time", "what", "when", "where", "which", "who", "why", "you", "your");
@@ -3849,9 +3904,9 @@ function setVocArrays() {
 				vocArray = new Array("aunt", "baby", "boy", "brother", "cousin", "daughter", "family", "father", "friend", "girl", "granddaughter", "grandfather", "grandmother", "grandson", "king", "man", "mother", "nephew", "niece", "queen", "sister", "son", "uncle", "woman");
 				curr_topic_dir = "people";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "bank", "beach", "bike", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "home", "hospital", "Indonesia", "Jakarta", "Kuala Lumpur", "Laos", "Malaysia", "Manila", "market", "motorbike", "motorbike taxi", "Myanmar", "Naypyidaw", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office", "railway station", "restaurant", "rice paddy", "school", "sea", "ship", "shop", "Singapore", "studio", "supermarket", "swimming pool", "taxi", "temple", "Thailand", "train", "truck", "tuk-tuk", "van", "Vientiene", "Vietnam", "zoo");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("Art", "backpack", "bag", "bell", "blackboard", "book", "bookshelf", "calculator", "calendar", "canteen", "chalk", "classroom", "clock", "coloured pencils", "computer", "computer room", "crayons", "desk", "English", "eraser", "globe", "glue", "homework", "ink", "library", "lunch box", "map", "Math", "Music", "music room", "notebook", "paper", "P.E.", "pencil case", "pencil", "pencil sharpener", "pen", "playground", "rubber", "ruler", "school", "Science", "scissors", "Social Studies", "toilet", "umbrella", "violin", "waste paper basket", "whiteboard");
@@ -3906,9 +3961,9 @@ function setVocArrays() {
 				vocArray = new Array("apple", "banana", "cake", "candy", "durian", "egg", "mangoes", "milk", "orange", "papayas", "rice", "tea");
 				curr_topic_dir = "food";
 				break;
-			case "free time":
+			case "free_time":
 				vocArray = new Array("collect stamps", "cook", "dance", "do gardening", "do gymnastics", "watch TV");
-				curr_topic_dir = "free time";
+				curr_topic_dir = "free_time";
 				break;
 			case "grammar":
 				vocArray = new Array("?", "be / is / am / are", "do / does", "why", "you", "your");
@@ -3918,9 +3973,9 @@ function setVocArrays() {
 				vocArray = new Array("มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
 				curr_topic_dir = "time";
 				break;
-			case "places and transport":
+			case "places_and_transport":
 				vocArray = new Array("Bandar Seri Begawan", "Bangkok", "beach", "boat", "Brunei", "bus", "Cambodia", "car", "coffee shop", "factory", "farm", "Hanoi", "helicopter", "hill", "hospital", "Indonesia", "Jakarta", "Naypyidaw", "on foot", "Philippines", "Phnom Penh", "plane", "police station", "post office");
-				curr_topic_dir = "places and transport";
+				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
 				vocArray = new Array("backpack", "bell", "bin", "blackboard", "book", "box", "calculator", "calendar", "chair", "chalk", "classroom", "desk", "door", "eraser", "fan", "notebook", "pen");
@@ -3948,14 +4003,22 @@ function setVocArrays() {
 			break;
 
 			case "onet_q_a":
-				vocArray = new Array ({when:["April", "at night", "at noon", "August", "Christmas", "December", "February", "Friday", "in the afternoon", "in the evening", "in the morning", "January", "July", "June", "March", "May", "Monday", "November", "October", "Saturday", "September", "Sunday", "Thursday", "tomorrow", "today", "Tuesday", "Wednesday", "yesterday"]}, {where:["right here","somewhere else", "go straight", "turn left", "turn right"]},{"what time":["7:15", "midnight", "lunch time", "half past two", "10:15 a.m.", "three o'clock"]},{who:["David", "Miss Jones", "my brother", "the teacher"]},{why:["because I like it", "because it's Friday", "because he's my uncle"]});
+				vocArray = new Array (qa_when,qa_where,qa_what_time,qa_who,qa_why,qa_how);
 			break;
 
 			case "onet_gq":
-        vocArray = new Array (gq001, gq002, gq003, gq004, gq005, gq006, gq007, gq008, gq009, gq010, gq011, gq012, gq013, gq014, gq015, gq016, gq017, gq018, gq019, gq020, gq021, gq022, gq023, gq024, gq025, gq026, gq027, gq028, gq029, gq030, gq031, gq032, gq033, gq034, gq035, gq036, gq037, gq038, gq039, gq040, gq041, gq042);
 
-				/*vocArray = new Array("onet_2551_01-3", "onet_2551_02-2", "onet_2551_03-1", "onet_2551_04-4", "onet_2551_05-2", "onet_2551_06-3", "onet_2551_07-4", "onet_2551_08-3", "onet_2551_09-1", "onet_2551_10-4", "onet_bq011-2", "onet_bq012-2", "onet_bq013-1", "onet_bq014-4", "onet_bq015-3", "onet_bq016-2", "onet_bq017-3", "onet_bq018-2", "onet_bq019-2", "onet_bq020-4", "onet_bq021-3", "onet_bq022-1", "onet_bq023-4", "onet_bq024-4");
-				curr_topic_dir = "onet_gq";*/
+
+				vocArray = new Array(single001, single002, single003, single004, single005, single006, single007, single008, single009, single010, single011,
+                                 	single012, single013, single014, single015, single016, single017, single018, single019, single020, single021, single022,
+                                 	single023, single024, single025, single026, single027, single028, single029, single030, single031, single032, single033,
+                                 	single034, single035, single036, single037, single038, single039, single040, single041, single042, single043, single044,
+                                 	single045, single046, single047, single048, single049, single050, single051, single052, single053, single054, single055,
+                                 	single056, single057, single058, single059, single060, single061, single062, single063, single064, single065, single066,
+                                 	single067, single068, single069, single070, single071, single072, single073, single074, single075, single076, single077,
+                                 	single078, single079, single080, single081, single082, single083, single084, single085, single086, single087, single088,
+                                 	single089, single090);
+
 			break;
 
 			case "onet_soc":
@@ -3978,11 +4041,18 @@ function setVocArrays() {
 			break;
 
       		case "onet_full":
-        		vocArray = new Array(cloze005, pass002, pass007, single001, single002, single003, single004, single005, single006, single007, single008, single009, single010, single011, single012, single013, single014, single015, single016, single017, single018, single019, single020, single021, single022, single023, single024, single025, single026, single027, single028, single029, single030, single031, single032, single033, single034, gq001, gq002, gq003, gq004, gq005, gq006, gq007, gq008, gq009, gq010, gq011, gq012, gq013, gq014, gq015, gq016, gq017, gq018, gq019, gq020, gq021, gq022, gq023, gq024, gq025, gq026, gq027, gq028, gq029, gq030, gq031, gq032, gq033, gq034, gq035, gq036, gq037, gq038, gq039, gq040, gq041, gq042);
+      			vocArray.length=0;
+      			for (var i=0; i<onet_full_array.length; i++) {
+					vocArray[i]=onet_full_array[i];
+      			}
 			break;
 
       		case "onet_full_2":
-        		vocArray = new Array(cloze001,cloze002,cloze003,cloze004,cloze006,cloze007, pass001, pass003, pass004, pass005, pass006);
+      			vocArray.length=0;
+      			for (var i=0; i<onet_full2_array.length; i++) {
+					vocArray[i]=onet_full2_array[i];
+      			}
+        		//vocArray = new Array(cloze001,cloze002,cloze003,cloze004,cloze006,cloze007, pass001, pass003, pass004, pass005, pass006);
 			break;			
 		}
 	}
@@ -4619,68 +4689,93 @@ function setVocArrays() {
 
 function setPhonicsArrays () {
 		switch (currentPhonUnit) {
+
 			case "phon1":
-			iArray= new Array ("m","s","p","t","");
-			vArray= new Array ("a","i","o","");
-			fArray= new Array ("m","s","p","t","");
+				iArray= new Array ("m","s","p","t","");
+				vArray= new Array ("a","i","o","");
+				fArray= new Array ("m","s","p","t","");
 			break;
-		case "phon2":
-			iArray= new Array ("m","s","p","t","n","f","h","");
-			vArray= new Array ("a","i","o","e","u","");
-			fArray= new Array ("m","s","p","t","n","f","");
+
+			case "phon2":
+				iArray= new Array ("m","s","p","t","n","f","h","");
+				vArray= new Array ("a","i","o","e","u","");
+				fArray= new Array ("m","s","p","t","n","f","");
 			break;
-		case "phon3":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","");
-			vArray= new Array ("a","e","i","o","u","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","");
+
+			case "phon3":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","");
+				vArray= new Array ("a","e","i","o","u","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","");
 			break;
-		case "phon4":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","");
-			vArray= new Array ("a","e","i","o","u","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","");
-			vSpecArray = new Array ("e","i","");
+
+			case "phon4":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","");
+				vArray= new Array ("a","e","i","o","u","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","");
+				vSpecArray = new Array ("e","i","");
 			break;
-		case "phon5":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
-			vArray= new Array ("a","e","i","o","u","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","");
-			vSpecArray = new Array ("e","i","");
+
+			case "phon5":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
+				vArray= new Array ("a","e","i","o","u","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","");
+				vSpecArray = new Array ("e","i","");
 			break;
-		case "phon6":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
-			vArray= new Array ("a","e","i","o","u","ee","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","");
-			vSpecArray= new Array ("e","i","ee","");
+
+			case "phon6":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
+				vArray= new Array ("a","e","i","o","u","ee","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","");
+				vSpecArray= new Array ("e","i","ee","");
 			break;
-		case "phon7":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
-			vArray= new Array ("a","e","i","o","u","ee","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk","");
-			vSpecArray= new Array ("e","i","ee","");
+
+			case "phon7":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","");
+				vArray= new Array ("a","e","i","o","u","ee","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk","");
+				vSpecArray= new Array ("e","i","ee","");
 			break;
-		case "phon8":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","");
-			vArray= new Array ("a","e","i","o","u","ee","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk","l","");
-			vSpecArray= new Array ("e","i","ee","");
+
+			case "phon8":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","");
+				vArray= new Array ("a","e","i","o","u","ee","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","nc","nk","l","");
+				vSpecArray= new Array ("e","i","ee","");
 			break;
-		case "phon9":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","");
-			vArray= new Array ("a","e","i","o","u","ee","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
-			vSpecArray= new Array ("e","i","ee","");
+
+			case "phon9":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","");
+				vArray= new Array ("a","e","i","o","u","ee","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
+				vSpecArray= new Array ("e","i","ee","");
 			break;
-		case "phon10":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","sl","sm","sn","tr","");
-			vArray= new Array ("a","e","i","o","u","ee","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
-			vSpecArray= new Array ("e","i","ee","");
+
+			case "phon10":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","sl","sm","sn","tr","");
+				vArray= new Array ("a","e","i","o","u","ee","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
+				vSpecArray= new Array ("e","i","ee","");
 			break;
-		case "phon11":
-			iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","sl","sm","sn","tr","");
-			vArray= new Array ("a","e","i","o","u","ee","ar","ir","or","ow","oy","oo","");
-			fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
-			vSpecArray= new Array ("e","i","ee","");
+
+			case "phon11":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","sl","sm","sn","tr","");
+				vArray= new Array ("a","e","i","o","u","ee","ar","ir","or","ow","oy","oo","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
+				vSpecArray= new Array ("e","i","ee","");
+				break;
+
+			case "phon12":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","sl","sm","sn","tr","sc","sch","sk","sp","st","");
+				vArray= new Array ("a","e","i","o","u","ee","ar","ir","or","ow","oy","oo","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
+				vSpecArray= new Array ("e","i","ee","");
+			break;
+
+			case "phon13":
+				iArray= new Array ("m","s","p","t","n","f","h","b","d","z","c","k","g","j","gu","l","r","bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","sl","sm","sn","tr","sc","sch","sk","sp","st","w","wh","y","");
+				vArray= new Array ("e","i","o","u","ee","ir","ow","oy","oo","a","ar","or","y","");
+				fArray= new Array ("m","s","p","t","n","f","b","d","z","ck","g","j","k","c","gu","ng","l","nc","nk","ft","ld","lk","lp","lt","mp","nd","nt","sp","st","");
+				vSpecArray= new Array ("e","i","ee","");
 			break;
 		}
 }
@@ -5239,7 +5334,13 @@ function choices(imgInd) {
 		document.getElementById("ch4").ontouchstart = function () { chAnswer(3,imgInd); document.getElementById("ch4").onclick = "";};
 	}
 	else if (uMode == "read_choose" || uMode == "listen_choose") {
-		if (curr_topic_title!="multi"){
+		if (curr_topic_title=="onet_voc") {
+			document.getElementById("imCh1").src = choice1Im.src;
+			document.getElementById("imCh2").src = choice2Im.src;
+			document.getElementById("imCh3").src = choice3Im.src;
+			document.getElementById("imCh4").src = choice4Im.src;
+		}
+		else if (curr_topic_title!="multi"){
 			document.getElementById("imCh1").src = "images/vocab/" + curr_topic_dir + "/" + choice1Im + ".jpg";
 			document.getElementById("imCh2").src = "images/vocab/" + curr_topic_dir + "/" + choice2Im + ".jpg";
 			document.getElementById("imCh3").src = "images/vocab/" + curr_topic_dir + "/" + choice3Im + ".jpg";
@@ -5262,18 +5363,34 @@ function choices(imgInd) {
 		document.getElementById("fbTxt3").innerHTML = "";
 		document.getElementById("fbTxt4").innerHTML = "";
 
-		document.getElementById("cellCh1").onclick = function () { chAnswer(0); };
-		document.getElementById("cellCh1").oncontextmenu = function () { chAnswer(0); };
-		document.getElementById("cellCh1").ontouchstart = function () { chAnswer(0); document.getElementById("cellCh1").onclick = "";};
-		document.getElementById("cellCh2").onclick = function () { chAnswer(1); };
-		document.getElementById("cellCh2").oncontextmenu = function () { chAnswer(1); };
-		document.getElementById("cellCh2").ontouchstart = function () { chAnswer(1);  document.getElementById("cellCh2").onclick = "";};
-		document.getElementById("cellCh3").onclick = function () { chAnswer(2); };
-		document.getElementById("cellCh3").oncontextmenu = function () { chAnswer(2); };
-		document.getElementById("cellCh3").ontouchstart = function () { chAnswer(2);  document.getElementById("cellCh3").onclick = "";};
-		document.getElementById("cellCh4").onclick = function () { chAnswer(3); };
-		document.getElementById("cellCh4").oncontextmenu = function () { chAnswer(3); };
-		document.getElementById("cellCh4").ontouchstart = function () { chAnswer(3);  document.getElementById("cellCh4").onclick = "";};
+		if (curr_topic_title=="onet_voc") {
+			document.getElementById("cellCh1").onclick = function () { chAnswer(choice1Im.txt,0); };
+			document.getElementById("cellCh1").oncontextmenu = function () { chAnswer(choice1Im.txt,0); };
+			document.getElementById("cellCh1").ontouchstart = function () { chAnswer(choice1Im.txt,0); document.getElementById("cellCh1").onclick = "";};
+			document.getElementById("cellCh2").onclick = function () { chAnswer(choice2Im.txt,1); };
+			document.getElementById("cellCh2").oncontextmenu = function () { chAnswer(choice2Im.txt,1); };
+			document.getElementById("cellCh2").ontouchstart = function () { chAnswer(choice2Im.txt,1);  document.getElementById("cellCh2").onclick = "";};
+			document.getElementById("cellCh3").onclick = function () { chAnswer(choice3Im.txt,2); };
+			document.getElementById("cellCh3").oncontextmenu = function () { chAnswer(choice3Im.txt,2); };
+			document.getElementById("cellCh3").ontouchstart = function () { chAnswer(choice3Im.txt,2);  document.getElementById("cellCh3").onclick = "";};
+			document.getElementById("cellCh4").onclick = function () { chAnswer(choice4Im.txt,3); };
+			document.getElementById("cellCh4").oncontextmenu = function () { chAnswer(choice4Im.txt,3); };
+			document.getElementById("cellCh4").ontouchstart = function () { chAnswer(choice4Im.txt,3);  document.getElementById("cellCh4").onclick = "";};
+		}
+		else {
+			document.getElementById("cellCh1").onclick = function () { chAnswer(0); };
+			document.getElementById("cellCh1").oncontextmenu = function () { chAnswer(0); };
+			document.getElementById("cellCh1").ontouchstart = function () { chAnswer(0); document.getElementById("cellCh1").onclick = "";};
+			document.getElementById("cellCh2").onclick = function () { chAnswer(1); };
+			document.getElementById("cellCh2").oncontextmenu = function () { chAnswer(1); };
+			document.getElementById("cellCh2").ontouchstart = function () { chAnswer(1);  document.getElementById("cellCh2").onclick = "";};
+			document.getElementById("cellCh3").onclick = function () { chAnswer(2); };
+			document.getElementById("cellCh3").oncontextmenu = function () { chAnswer(2); };
+			document.getElementById("cellCh3").ontouchstart = function () { chAnswer(2);  document.getElementById("cellCh3").onclick = "";};
+			document.getElementById("cellCh4").onclick = function () { chAnswer(3); };
+			document.getElementById("cellCh4").oncontextmenu = function () { chAnswer(3); };
+			document.getElementById("cellCh4").ontouchstart = function () { chAnswer(3);  document.getElementById("cellCh4").onclick = "";};
+		}
 	}
 
 	if (uMode == "read_choose") {
@@ -5427,6 +5544,21 @@ function setTimbreSelect(mode,caller){
 }
 
 
+function playRV(vE,timbre){
+	var rvStarted=false;
+
+	responsiveVoice.speak(vE,timbre, {volume: aud_rv_vol, rate:0.7, onstart:function(){rvStarted=true;}});
+
+	setTimeout(function(){
+		console.log("RV started: "+rvStarted);
+		if (rvStarted==false){
+			responsiveVoice.cancel();
+			audVoc.play();
+		}
+	},1000);
+}
+
+
 function playVocab() {
 
 	if (uMode!="phon_bingo" && uMode!="voc_bingo" && uMode!="num_bingo") {
@@ -5441,16 +5573,16 @@ function playVocab() {
 		}
 		else {
 			if (curr_topic_title!="multi"){
-				responsiveVoice.speak(vocEx,timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+				playRV(vocEx,timbre);
+				
 				//utterance.text=vocEx;
 			}
 			else {
-				responsiveVoice.speak(vocEx.substr(vocEx.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+				playRV(vocEx.substr(vocEx.indexOf("/")+1),timbre);
+				//responsiveVoice.speak(vocEx.substr(vocEx.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onstart:function(){rvStarted=true;}, onerror: function(){audVoc.play();}});
 				//utterance.text=vocEx.substr(vocEx.indexOf("/")+1);
 			}
 
-			
-			
 			/*window.speechSynthesis.speak(utterance);
 			utterance.onerror = function(event) {
 				audVoc.play();
@@ -5513,7 +5645,38 @@ function bingoPlay() {
 	if (bingRepeat <2 && bingExAud !="") {
 		if (uMode=="num_bingo"){
 			if (stopCount==false){
-				responsiveVoice.speak(bingEx.toString(),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+				playRV(bingEx.toString(),timbre);
+				console.log("Number: "+bingEx);
+				var h = Math.floor(bingEx/100);
+				var t = Math.floor((bingEx-(h*100))/10);
+				var u = (bingEx-(h*100))-(t*10);
+				if (t==0 && u==0) {
+					h=(h*100).toString() + "_f.mp3";
+				}
+				else{
+					h=(h*100).toString()+".mp3";
+				}
+				if (t==1){
+					t=0;
+					u=(u+10);
+					u=u.toString()+".mp3";
+				}
+				if (u==0){
+					t=(t*10).toString()+ "_f.mp3";
+				}
+				else{
+					t=(t*10).toString()+".mp3";
+				}
+				if (u<10){
+					u=u.toString()+".mp3";
+				}
+				if (bingEx==0){
+					u="zero.mp3"
+				}
+				console.log("hundreds: "+h);
+				console.log("tens: "+t);
+				console.log("units: "+u);
+				//responsiveVoice.speak(bingEx.toString(),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 				/*utterance.text=bingEx.toString();
 				window.speechSynthesis.speak(utterance);*/
 			}
@@ -5539,12 +5702,14 @@ function bingoPlay() {
 				}
 				else {
 					if (curr_topic_title!="multi"){
-						responsiveVoice.speak(bingExAud,timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+						playRV(bingExAud,timbre);
+						//responsiveVoice.speak(bingExAud,timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 						//utterance.text=bingExAud;
 
 					}
 					else {
-						responsiveVoice.speak(bingExAud.substr(bingExAud.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+						playRV(bingExAud.substr(bingExAud.indexOf("/")+1),timbre);
+						//responsiveVoice.speak(bingExAud.substr(bingExAud.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 						//utterance.text=bingExAud.substr(bingExAud.indexOf("/")+1);
 					}
 					//window.speechSynthesis.speak(utterance);
@@ -5564,7 +5729,8 @@ function bingoPlay() {
 		if (uMode=="num_bingo"){
 			bingExAud=bingEx;
 			if (stopCount==false){
-				responsiveVoice.speak((bingEx.toString()),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+				playRV((bingEx.toString()),timbre);
+				//responsiveVoice.speak((bingEx.toString()),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 				/*utterance.text=(bingEx.toString());
 				window.speechSynthesis.speak(utterance);*/
 			}
@@ -5588,12 +5754,14 @@ function bingoPlay() {
 				}
 				else {
 					if (curr_topic_title!="multi"){
-						responsiveVoice.speak(bingExAud,timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+						playRV(bingExAud,timbre);
+						//responsiveVoice.speak(bingExAud,timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 						/*utterance.text=(bingExAud);
 						window.speechSynthesis.speak(utterance);*/
 					}
 					else {
-						responsiveVoice.speak(bingExAud.substr(bingExAud.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
+						playRV(bingExAud.substr(bingExAud.indexOf("/")+1),timbre);
+						//responsiveVoice.speak(bingExAud.substr(bingExAud.indexOf("/")+1),timbre, {volume: aud_rv_vol, rate:0.7, onerror: function(){audVoc.play();}});
 						/*utterance.text=(bingExAud.substr(bingExAud.indexOf("/")+1));
 						window.speechSynthesis.speak(utterance);*/
 
@@ -5660,8 +5828,10 @@ function bingoCheck(ch) {
 					document.getElementById("bingo_overlay").style.display = "block";
 					points=points+bingoPoints;
 					document.getElementById("score").innerHTML = "Score: " + Math.floor(points)+pointsTxt;
-					responsiveVoice.cancel();
-					window.speechSynthesis.cancel();
+					if (typeof responsiveVoice!="undefined"){
+						responsiveVoice.cancel();
+					}
+					//window.speechSynthesis.cancel();
 					audVoc.src = "audio/bingo_cheer.mp3";
 					audVoc.play();
 					resetBingTestArray();
@@ -5678,56 +5848,56 @@ function bingoCheck(ch) {
 
 function chAnswer(ch,imgInd,caller) {
 
-  if (curr_topic_title=="onet_cloze"){
+	if (curr_topic_title=="onet_cloze"){
 
-      if (finished != true){
+		if (finished != true){
 
-        if (ch==vocEx["a"+multi_part_item]-1){
-          points++;
-          document.getElementById("score").innerHTML = "Score: " + Math.floor(points);
-        }
-        else{
-          feedback(ch,vocEx["a"+multi_part_item]-1);
-        }
-        if (multi_part_item<(vocEx.qs)){
-          document.getElementById(vocEx.name+"_ans_"+(multi_part_item)).style.backgroundColor="";
-          document.getElementById(vocEx.name+"_ans_"+(multi_part_item+1)).style.backgroundColor="#f60";
-          //document.getElementById(vocEx.name+"_ans_"+(multi_part_item+1)).scrollIntoView();
-          if (vocEx.gaps>0){
-            document.getElementById(vocEx.name+"_gap_"+(multi_part_item)).style.backgroundColor="";
-            document.getElementById(vocEx.name+"_gap_"+(multi_part_item+1)).style.backgroundColor="#f60";
-           // document.getElementById(vocEx.name+"_gap_"+(multi_part_item+1)).scrollIntoView();
-          }
-        }
-        multi_part_item++
-        if (multi_part_item>(vocEx.qs)) {
-          multi_part_item=1;
-          newImage();
-        }
-      }
-    return;
-  }
+        	if (ch==vocEx["a"+multi_part_item]-1){
+				points++;
+				document.getElementById("score").innerHTML = "Score: " + Math.floor(points);
+			}
+			else{
+				feedback(ch,vocEx["a"+multi_part_item]-1);
+			}
+			if (multi_part_item<(vocEx.qs)){
+				document.getElementById(vocEx.name+"_ans_"+(multi_part_item)).style.backgroundColor="";
+				document.getElementById(vocEx.name+"_ans_"+(multi_part_item+1)).style.backgroundColor="#f60";
+				//document.getElementById(vocEx.name+"_ans_"+(multi_part_item+1)).scrollIntoView();
+				if (vocEx.gaps>0){
+					document.getElementById(vocEx.name+"_gap_"+(multi_part_item)).style.backgroundColor="";
+					document.getElementById(vocEx.name+"_gap_"+(multi_part_item+1)).style.backgroundColor="#f60";
+					// document.getElementById(vocEx.name+"_gap_"+(multi_part_item+1)).scrollIntoView();
+				}
+			}
+			multi_part_item++
+			if (multi_part_item>(vocEx.qs)) {
+  				multi_part_item=1;
+  				newImage();
+			}
+		}
+		return;
+	}
 
 
-  if (ch=="onet"){
-    if (finished != true){
+	if (ch=="onet"){
+		if (finished != true){
 
-      var i = imgInd.slice(0,-2);
+			var i = imgInd.slice(0,-2);
 
-      if (i==onet_test_item){
-        document.getElementById("onet_ans_"+i+"_1").src="images/labels/onet_1.png";
-        document.getElementById("onet_ans_"+i+"_2").src="images/labels/onet_2.png";
-        document.getElementById("onet_ans_"+i+"_3").src="images/labels/onet_3.png";
-        document.getElementById("onet_ans_"+i+"_4").src="images/labels/onet_4.png";
-        caller.src="images/labels/onet_filled.png";
-      }
-      if (imgInd.slice(-1) == vocEx["a"+multi_part_item]){
-        document.getElementById("onet_grade_"+i).src="images/buttons/yes_button.png";
-      }
-      else{
-        document.getElementById("onet_grade_"+i).src="images/buttons/no_button.png";
-      }
-    }
+			if (i==onet_test_item){
+				document.getElementById("onet_ans_"+i+"_1").src="images/labels/onet_1.png";
+				document.getElementById("onet_ans_"+i+"_2").src="images/labels/onet_2.png";
+				document.getElementById("onet_ans_"+i+"_3").src="images/labels/onet_3.png";
+				document.getElementById("onet_ans_"+i+"_4").src="images/labels/onet_4.png";
+				caller.src="images/labels/onet_filled.png";
+			}
+			if (imgInd.slice(-1) == vocEx["a"+multi_part_item]){
+				document.getElementById("onet_grade_"+i).src="images/buttons/yes_button.png";
+			}
+			else {
+				document.getElementById("onet_grade_"+i).src="images/buttons/no_button.png";
+			}
+		}
 		return;
 	}
 
@@ -5739,11 +5909,14 @@ function chAnswer(ch,imgInd,caller) {
 				response=vocEx;
 			}
 		}
-    else if (curr_topic_title=="onet_gq") {
-      var correct_ans = vocEx.a1;
-      var response=ch+1;
-
-    }
+		else if (curr_topic_title=="onet_gq") {
+			var correct_ans = vocEx.a1;
+			var response=ch+1;
+		}
+		else if (curr_topic_title=="onet_voc") {
+			correct_ans=vocEx;
+			var response=ch;
+		}
 		else if (curr_topic_dir != "onet_gq") {
 			correct_ans=vocEx;
 			var aIndex = inds[ch];
@@ -5751,12 +5924,10 @@ function chAnswer(ch,imgInd,caller) {
 		}
 		else {
 			var correct_ans = ((vocArray[imgInd].substr(vocArray[imgInd].indexOf("-")+1))-1);
-
 			var response=ch;
 		}
 
-
-		if (response == correct_ans && finished == false) {
+		if (((response == correct_ans) || (typeof response=="object" && response.indexOf(vocEx)!= -1)) && finished == false) {
 			if (curr_topic_dir == "onet_gq") {
 				if (vocArray.length>2) {
 					vocArray.splice(imgInd,1);
@@ -5769,6 +5940,13 @@ function chAnswer(ch,imgInd,caller) {
 		}
 		else if (response != correct_ans && finished == false && (uMode == "book_trans" || strikesAllowed==false)){
 			newImage('wrong_trans');
+		}
+		else if (response != correct_ans && finished == false && curr_topic_title=="onet_voc"){
+			strikes++;
+			feedback(imgInd, response);
+			if (strikes>1){
+				newImage('no');
+			}
 		}
 		else if (response != correct_ans && finished == false) {
 			strikes++;
@@ -5886,8 +6064,19 @@ function upcmnErrs(vocItem) {
 	}
 
 	if (vocItem!="") {
-		if (curr_topic_title!="multi"){
+		if (curr_topic_title=="onet_voc"){
+			var obj = vocArray.filter(function ( obj ) {
+				return obj.txt === vocItem;
+			})[0];
+			console.log("obj.src: "+obj.src);
+			vocItem=obj.src;
+			vocItem=vocItem.slice(13);
+			var a = vocItem.indexOf(".jpg")
+			vocItem=vocItem.substring(0,a);
+		}
+		else if (curr_topic_title!="multi"){
 			vocItem = curr_topic_dir + "/" + vocItem;
+			console.log(vocItem);
 		}
 		if (cmnErrs [0][0] == "") {
 			cmnErrs[0] = [vocItem, 1];
@@ -5906,6 +6095,7 @@ function upcmnErrs(vocItem) {
 			sortCmnErrs();
 		}
 	}
+
 
 
 	if (fbMode == "common") {
@@ -6047,7 +6237,7 @@ function activity(button){
     	submitONET();
   	}
 	else if (button=="forward"){
-		if (onet_test_item>38){
+		if (onet_test_item>onet_test.length-2){
         	return;
       	}
     	if (onet_test_item<39){
@@ -6060,16 +6250,6 @@ function activity(button){
       		newImage();
       		multi_part_item=1;
       		if (vocEx.qs>1){
-        		for (var i=0;i<vocEx.qs;i++){
-          			document.getElementById(vocEx.name+"_ans_"+(i+1)).innerHTML=onet_test_item+i+1;
-          			if (vocEx.gaps>0){
-            			document.getElementById(vocEx.name+"_gap_"+(i+1)).innerHTML="("+(onet_test_item+i+1) +")";
-          			}
-        		}
-        		document.getElementById(vocEx.name+"_ans_1").style.backgroundColor="#f60";
-        		if (vocEx.gaps>0){
-          			document.getElementById(vocEx.name+"_gap_1").style.backgroundColor="#f60";
-        		}
       		}
     	}
     	else if (vocEx.qs>1){
@@ -6087,31 +6267,20 @@ function activity(button){
 
 
   else if (button=="back"){
-    if (onet_test_item>0){
-      document.getElementById("onet_num_"+onet_test_item).style.backgroundColor="";
-      onet_test_item-- ;
-      document.getElementById("onet_num_"+onet_test_item).style.backgroundColor="yellow";
-      document.getElementById("onet_num_"+onet_test_item).scrollIntoView();
-      if (onet_test_item<1){
-      }
+  	if (onet_test_item<1){
+  		return;
+    }
+  	if (onet_test_item>0){
+    	document.getElementById("onet_num_"+onet_test_item).style.backgroundColor="";
+      	onet_test_item-- ;
+      	document.getElementById("onet_num_"+onet_test_item).style.backgroundColor="yellow";
+      	document.getElementById("onet_num_"+onet_test_item).scrollIntoView();
     }
     if (vocEx.name!= onet_test[onet_test_item].name){
       newImage();
       multi_part_item=1;
       if (vocEx.qs>1){
         multi_part_item=vocEx.qs;
-        for (var i=vocEx.qs;i>0;i--){
-          document.getElementById(vocEx.name+"_ans_"+((vocEx.qs-i)+1)).innerHTML=((onet_test_item-i)+2);
-          if (vocEx.gaps>0){
-            document.getElementById(vocEx.name+"_gap_"+((vocEx.qs-i)+1)).innerHTML="("+((onet_test_item-i)+2)+")";
-          }
-        }
-        document.getElementById(vocEx.name+"_ans_"+vocEx.qs).style.backgroundColor="#f60";
-        document.getElementById(vocEx.name+"_ans_"+vocEx.qs).scrollIntoView();
-        if (vocEx.gaps>0){
-          document.getElementById(vocEx.name+"_gap_"+vocEx.qs).style.backgroundColor="#f60";
-          document.getElementById(vocEx.name+"_gap_"+vocEx.qs).scrollIntoView();
-        }
       }
     }
 
@@ -6309,6 +6478,12 @@ function newSyllable(button) {
 		break;
 	case "phon11":
 		unit11();
+		break;
+	case "phon12":
+		unit12();
+		break;
+	case "phon13":
+		unit13();
 		break;
 	}
 
@@ -6691,6 +6866,87 @@ function tabooCheck() {
 		syll=igraph.concat (vgraph,fgraph,eCompGraph);
 	}
 
+
+	function unit12() {
+
+		setIndices (37,12,29,5,6,12,3);
+		console.log(initC);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+		var eCompGraph=eCompArray[eCompIndex];
+
+		if (igraph=="k"||igraph=="gu") {
+			vgraph=vSpecArray[vSpecIndex];
+		}
+
+		//Matching middle vowel with final
+		if ((fgraph=="ck")&&(vgraph=="ee"||eCompGraph=="e")) {
+			fgraph="k";
+		}
+		else if (fgraph=="c" && vgraph=="ee") {
+			fgraph="k";
+		}
+		else if (fgraph=="gu" && vgraph=="ee") {
+			fgraph="g";
+		}
+		else if ((fgraph=="nk"||fgraph=="ng"||fgraph=="nc")&&vgraph=="ee"){
+			vgraph="e";
+		}
+
+		//Compound vowel with "e" depending on final or "ee" vowel
+		if (vgraph=="ee"||vgraph=="ar"||vgraph=="ir"||vgraph=="or"||vgraph=="ow"||vgraph=="oy"||vgraph=="oo"||fgraph=="ck"||fgraph=="nk"||fgraph=="ft"||fgraph=="ld"||fgraph=="lk"||fgraph=="lp"||fgraph=="lt"||fgraph=="mp"||fgraph=="nd"||fgraph=="nt"||fgraph=="sp"||fgraph=="st") {
+			eCompGraph="";
+		}
+		else if (fgraph=="c"||fgraph=="k"||fgraph=="gu") {
+			eCompGraph="e";
+		}
+		else {}
+
+		syll=igraph.concat (vgraph,fgraph,eCompGraph);
+	}
+
+	function unit13() {
+
+		setIndices (40,13,29,3,4,12,3);
+
+		var igraph=iArray[iIndex];
+		var vgraph=vArray[vIndex];
+		var fgraph=fArray[fIndex];
+		var eCompGraph=eCompArray[eCompIndex];
+
+		if (igraph=="k"||igraph=="gu") {
+			vgraph=vSpecArray[vSpecIndex];
+		}
+
+		//Matching middle vowel with final
+		if ((fgraph=="ck")&&(vgraph=="ee"||eCompGraph=="e")) {
+			fgraph="k";
+		}
+		else if (fgraph=="c" && vgraph=="ee") {
+			fgraph="k";
+		}
+		else if (fgraph=="gu" && vgraph=="ee") {
+			fgraph="g";
+		}
+		else if ((fgraph=="nk"||fgraph=="ng"||fgraph=="nc")&&vgraph=="ee"){
+			vgraph="e";
+		}
+
+		//Compound vowel with "e" depending on final or "ee" vowel
+		if (vgraph=="ee"||vgraph=="ar"||vgraph=="ir"||vgraph=="or"||vgraph=="ow"||vgraph=="oy"||vgraph=="oo"||fgraph=="ck"||fgraph=="nk"||fgraph=="ft"||fgraph=="ld"||fgraph=="lk"||fgraph=="lp"||fgraph=="lt"||fgraph=="mp"||fgraph=="nd"||fgraph=="nt"||fgraph=="sp"||fgraph=="st") {
+			eCompGraph="";
+		}
+		else if (fgraph=="c"||fgraph=="k"||fgraph=="gu") {
+			eCompGraph="e";
+		}
+		else {}
+
+		syll=igraph.concat (vgraph,fgraph,eCompGraph);
+	}
+
+
 function setAllVocArray(){
 
 	all_voc_array.length=0;
@@ -6738,22 +6994,27 @@ function newImage(trigger) {
 			document.getElementById("ch3").style.display = "table-cell";
 			document.getElementById("ch4").style.display = "table-cell";
 		}
-    if (curr_topic_title=="onet_full"){
-		onet_test_item=0;
-		document.getElementById("back_fwd_div").style.display = "block";
-		document.getElementById("b_submit").style.display = "block";
-		document.getElementById("b_reset").style.display = "none";
-		document.getElementById("controls_central").style.display = "block";
-      	document.getElementById("onet_num_0").style.backgroundColor="yellow";
-      	document.getElementById("mainImage").src = "images/vocab/" + curr_topic_dir + "/" + onet_test[0] + ".jpg";
-      	document.getElementById("onet_num_"+onet_test_item).scrollIntoView();
-    }
-    if (curr_topic_title=="onet_cloze"){
-      document.getElementById("mainImage").style.display="none";
-      document.getElementById("innerDiv").style.display="block";
-      var html_display=true;
-      onet_test_item=0;
-    }
+		if (curr_topic_title=="onet_full"){
+			onet_test_item=0;
+			document.getElementById("back_fwd_div").style.display = "block";
+			document.getElementById("b_submit").style.display = "block";
+			document.getElementById("b_reset").style.display = "none";
+			document.getElementById("controls_central").style.display = "block";
+			document.getElementById("onet_num_0").style.backgroundColor="yellow";
+			document.getElementById("onet_num_"+onet_test_item).scrollIntoView();
+			onet_ready=false;
+		}
+		if (curr_topic_title=="onet_gq"){
+			document.getElementById("mainImage").style.display="none";
+		  	document.getElementById("innerDiv").style.display="block";
+			var html_display=true;
+		}
+		if (curr_topic_title=="onet_cloze"){
+		  document.getElementById("mainImage").style.display="none";
+		  document.getElementById("innerDiv").style.display="block";
+		  var html_display=true;
+		  onet_test_item=0;
+		}
 		if (uMode == "listen_choose") {
 			document.getElementById("b_replay").style.display = "block";
 		}
@@ -6816,8 +7077,10 @@ function newImage(trigger) {
 		if (lives<2){
 			countTime=2;
 		}
-		var answer = vocArray[pImgInd];
-		feedback(0, answer);
+		if (curr_topic_title!="onet_voc"){
+			var answer = vocArray[pImgInd];
+			feedback(0, answer);
+		}
 		if (strikes>1){
 			strikes=0;
 			document.getElementById("life"+livesPos+lives).src = "images/labels/lives_lost.png";
@@ -6832,7 +7095,7 @@ function newImage(trigger) {
 		if (points<1 && pointsTxt=="&frac12;"){
 			document.getElementById("score").innerHTML = "Score: &frac12;";
 		}
-		else{
+		else if (curr_topic_title!="onet_full"){
 			document.getElementById("score").innerHTML = "Score: " + Math.floor(points)+pointsTxt;
 		}
 
@@ -6859,25 +7122,36 @@ function newImage(trigger) {
 			newImage();
 			return;
 		}
-    if (curr_topic_title=="onet_full") {
-      vocEx=onet_test[onet_test_item];
-      if (vocEx.dispType=="img" && vocEx.qs==1){
-        var single_img_display=true;
-      }
-      else {
-        document.getElementById("mainImage").style.display="none";
-        document.getElementById("innerDiv").style.display="block";
-        var html_display=true;
-      }
-    }
-    else if (curr_topic_title=="onet_gq"){
-      vocEx = vocArray[imgInd];
-    }
-    else if (curr_topic_dir=="onet_gq"){
+		if (curr_topic_title=="onet_full") {
+			vocEx=onet_test[onet_test_item];
+			if (vocEx.dispType=="img" && vocEx.qs==1){
+				var single_img_display=true;
+		 	}
+			else {
+				document.getElementById("mainImage").style.display="none";
+				document.getElementById("innerDiv").style.display="block";
+				var html_display=true;
+			}
+		}
+		else if (curr_topic_title=="onet_gq"){
+		  vocEx = vocArray[imgInd];
+		  var html_display=true;
+		}
+		else if (curr_topic_dir=="onet_gq"){
 			vocEx = (vocArray[imgInd].substr(0,vocArray[imgInd].indexOf("-")));
 		}
 		else if (curr_topic_title=="onet_q_a") {
 			vocEx =Object.getOwnPropertyNames(vocArray[imgInd]);
+		}
+		else if (curr_topic_title=="onet_voc"){
+			if (typeof vocArray[imgInd].txt=="object"){
+				//alert("object");
+				var txt_ind=Math.floor(Math.random() * vocArray[imgInd].txt.length);
+				vocEx = vocArray[imgInd].txt[txt_ind];
+			}
+			else {
+				vocEx = vocArray[imgInd].txt;
+			}
 		}
 		else {
 			vocEx = vocArray[imgInd];
@@ -6950,17 +7224,28 @@ function newImage(trigger) {
 			document.getElementById("mainImage").src = "images/vocab/dot_and_Ben/sentences/d_B_"+currentBook.substr(4)+"_"+DBPageNum+".jpg";
 			document.getElementById("book_overlay").src = "images/vocab/" + curr_topic_dir + "/" + vocExIm + ".png";
 		}
-    else if (single_img_display){
-      document.getElementById("mainImage").style.display="inline";
-      document.getElementById("innerDiv").style.display="none";
-      document.getElementById("mainImage").src = vocEx.src;
-    }
-    else if (curr_topic_title=="onet_gq"){
-      document.getElementById("mainImage").src = vocEx.src;
-    }
-    else if (html_display){
-      document.getElementById("innerDiv").innerHTML=vocEx.html;
-    }
+		else if (single_img_display){
+		  document.getElementById("mainImage").style.display="inline";
+		  document.getElementById("innerDiv").style.display="none";
+		  document.getElementById("mainImage").src = vocEx.src;
+		}
+		else if (html_display){
+			document.getElementById("innerDiv").innerHTML=vocEx.html;
+			if (vocEx.qs>1){
+				for (var i=0;i<vocEx.qs;i++){
+					document.getElementById(vocEx.name+"_ans_"+(i+1)).innerHTML=onet_test.indexOf(vocEx)+i+1+".";
+					if (vocEx.gaps>0){
+						document.getElementById(vocEx.name+"_gap_"+(i+1)).innerHTML="("+(onet_test.indexOf(vocEx)+i+1) +")";
+					}
+				}
+				document.getElementById(vocEx.name+"_ans_"+(onet_test_item-onet_test.indexOf(vocEx)+1)).style.backgroundColor="#f60";
+				document.getElementById(vocEx.name+"_ans_"+(onet_test_item-onet_test.indexOf(vocEx)+1)).scrollIntoView();
+				if (vocEx.gaps>0){
+          			document.getElementById(vocEx.name+"_gap_"+(onet_test_item-onet_test.indexOf(vocEx)+1)).style.backgroundColor="#f60";
+          			document.getElementById(vocEx.name+"_gap_"+(onet_test_item-onet_test.indexOf(vocEx)+1)).scrollIntoView();
+        		}
+			}
+		}
 		else if (curr_topic_title!="multi"){
 			document.getElementById("mainImage").src = "images/vocab/" + curr_topic_dir + "/" + vocExIm + ".jpg";
 		}

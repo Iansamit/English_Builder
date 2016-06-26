@@ -21,9 +21,10 @@
 
 		<!--Scripts all the neat stuff! --><script type="text/javascript" src="tpf_scripts.js"></script>
 
-        <!--Cloze tests as js variables --><script type="text/javascript" src="cloze_tests.js"></script>
+        <!--Cloze tests as js variables --><script type="text/javascript" src="onet_items.js"></script>
 
-		<script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+		<!--toast for script loading --><script type="text/javascript" src="inject.js"></script>
+
 
 		<style>
 			* {
@@ -50,28 +51,28 @@
 				</div>
 				<div id="msg_box_clone" style="padding: 0em 1em 0em 1em; font-size: 30%; text-align: center" >
 					<div style= "width: 4em; float:left; margin-left: 0.5em; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_K2.png" onclick="setVocChoiceTable('clone_topic_cont','K2')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_K2.png" onclick="setVocChoiceTable('clone_topic_cont','K2')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style= "width: 4em; float:left; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_P1.png" onclick="setVocChoiceTable('clone_topic_cont','P1')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_P1.png" onclick="setVocChoiceTable('clone_topic_cont','P1')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style= "width: 4em; float:left; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_P2.png" onclick="setVocChoiceTable('clone_topic_cont','P2')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_P2.png" onclick="setVocChoiceTable('clone_topic_cont','P2')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style= "width: 4em; float:left; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_P3.png" onclick="setVocChoiceTable('clone_topic_cont','P3')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_P3.png" onclick="setVocChoiceTable('clone_topic_cont','P3')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style= "width: 4em; clear:left; float: left; margin-left: 2em; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_P4.png" onclick="setVocChoiceTable('clone_topic_cont','P4')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_P4.png" onclick="setVocChoiceTable('clone_topic_cont','P4')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style= "width: 4em; float:left; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_P5.png" onclick="setVocChoiceTable('clone_topic_cont','P5')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_P5.png" onclick="setVocChoiceTable('clone_topic_cont','P5')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style= "width: 4em; float:left; margin-right:0.3em">
-						<img style= "width: 100%" src="images/buttons/b_P6.png" onclick="setVocChoiceTable('clone_topic_cont','P6')" onmousedown="b_press(this)">
+						<img style= "width: 100%" src="images/buttons/b_P6.png" onclick="setVocChoiceTable('clone_topic_cont','P6')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()">
 					</div>
 					<div style="clear:left; width: 100%; height: 2.5em; padding-top: 0.5em">
-						<img style="width: 6em;" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" />
+						<img style="width: 6em;" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 				</div>
 				<div id="msg_box_save" style="padding: 1em 1em 0em 1em; font-size: 30%; text-align: justify; display: none" >
@@ -82,29 +83,29 @@
 					<p style="margin-bottom: 0.5em">Press <img style="width: 3.8em; vertical-align: middle" src="images/buttons/cancel_leaving.png" /> if you want to continue working.</p>
 				</div>
 				<div id="msg_close" style="width: 100%; font-size: 30%; height: 2.5em; margin-top: 0.2em">
-					<img id="msg_close_button" style="width: 5em;" src="images/buttons/close_button.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" />
+					<img id="msg_close_button" style="width: 5em;" src="images/buttons/close_button.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 				</div>
 				<div id="msg_OK_cancel" style="width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.2em">
-					<img style="width: 6em; float: left; margin-left: 2em" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" />
-					<img id="msg_OK" style="width: 6em; float: right; margin-right: 2em" src="images/buttons/continue.png" onmousedown="b_press(this)" />
+					<img style="width: 6em; float: left; margin-left: 2em" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					<img id="msg_OK" style="width: 6em; float: right; margin-right: 2em" src="images/buttons/continue.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 				</div>
 				<div id="msg_edit_delete" style="position:relative; width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.5em">
 					<div style="position: absolute; bottom: 0.25em; left:1em; width: 4.7em; font: inherit; text-align: center">
-						<img id="msg_edit_topic" style="width: 100%" src="images/buttons/edit_topic.png" onmousedown="b_press(this)" />
+						<img id="msg_edit_topic" style="width: 100%" src="images/buttons/edit_topic.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 					<div style="position: absolute; bottom: 0.25em; right:1em; width: 4.7em; font: inherit; text-align: center">
-						<img id="msg_delete_topic" style="width: 100%" src="images/buttons/delete_topic.png" onmousedown="b_press(this)" />
+						<img id="msg_delete_topic" style="width: 100%" src="images/buttons/delete_topic.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 				</div>
 				<div id="msg_save_leave_cancel" style="position:relative; width: 100%; text-align:center; font-size: 30%; height: 2.5em; margin-top: 0.2em">
 					<div style="position: absolute; bottom: 0.25em; right:0; left: 0; margin-left: auto; margin-right: auto; width: 4.7em; font: inherit; text-align: center">
-						<img id="msg_leave" style="width: 100%" src="images/buttons/leave.png" onclick="leave()" onmousedown="b_press(this)" />
+						<img id="msg_leave" style="width: 100%" src="images/buttons/leave.png" onclick="leave()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 					<div style="position: absolute; bottom: 0.25em; left:1em; width: 4.7em; font: inherit; text-align: center">
-						<img id="msg_save" style="width: 100%" src="images/buttons/save.png" onclick="saveSetup();setDisplays({modal_back:'none',msg_box:'block',msg_box_save:'none'})" onmousedown="b_press(this)" />
+						<img id="msg_save" style="width: 100%" src="images/buttons/save.png" onclick="saveSetup();setDisplays({modal_back:'none',msg_box:'block',msg_box_save:'none'})" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 					<div style="position: absolute; bottom: 0.25em; right:1em; width: 4.7em; font: inherit; text-align: center">
-						<img style="width: 4.7em; " src="images/buttons/cancel_leaving.png" onclick="setDisplays({modal_back:'none',msg_box:'block',msg_box_save:'none'})" onmousedown="b_press(this)" />
+						<img style="width: 4.7em; " src="images/buttons/cancel_leaving.png" onclick="setDisplays({modal_back:'none',msg_box:'block',msg_box_save:'none'})" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 				</div>
 			</div>
@@ -117,7 +118,7 @@
 
 			</div>
 			<div style="width: 100%; font-size: 30%; height: 2.5em; margin-top: 0.2em">
-				<img id="infClose" style="width: 5em;" src="images/buttons/close_button.png" onclick="document.getElementById('helpWin').style.display='none'" onmousedown="b_press(this)" />
+				<img id="infClose" style="width: 5em;" src="images/buttons/close_button.png" onclick="document.getElementById('helpWin').style.display='none'" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 			</div>
 		</div>
 
@@ -236,7 +237,7 @@
 			<!-- ONET Choice  -->
 			<!--_____________ -->
 			<div id="choice_onet" style="position: absolute; top:0; left: 0; z-index: 5; width: 100%; height: 100%; background-color:#E5E6DC; font: inherit; font-size: 25%; text-align: center; display:none"  >
-				<div style="margin-bottom:1em; padding: 0.5em; text-align: justify"  onclick="setupONET()">Select the correct number for each question. You can select a different number, if you change your mind.</div>
+				<div style="margin-bottom:1em; padding: 0.5em; text-align: justify"  onclick="setupONET(40)">Select the correct number for each question. You can select a different number, if you change your mind.</div>
 
 				<div id="onet_answer_sheet" style="height: 28em; overflow-y: auto; text-align: left">
 
@@ -351,6 +352,9 @@
 						<div id="reader_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold; display: none">
 							Graded Reader Activities
 						</div>
+						<div id="onet_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold; display: none">
+							ONET Activities
+						</div>
 						<div id="book_trans_icon" style="float:left; margin-left: 0.5em; display: none">
 							<div class="activityButtonDiv">
 								<img id="b_book_trans"  src='images/buttons/ba_book_trans_off.png' class="activityButton" onclick="selectActivity('book_trans')"/>
@@ -361,7 +365,7 @@
 								</div>
 							</div>
 						</div>
-						<div style="float:left; margin-left: 0.5em;">
+						<div id="read_choose_icon" style="float:left; margin-left: 0.5em;">
 							<div class="activityButtonDiv">
 								<img id="b_read_choose"  src='images/buttons/ba_read_choose_off.png' class="activityButton" style="display:none" onclick="selectActivity('read_choose')"/>
 								<img id='b_read_choose_gl1' class="buttonGlow" style="display: block" src="images/buttons/ba_read_choose_glo1.png" />
@@ -371,7 +375,7 @@
 								</div>
 							</div>
 						</div>
-						<div style="float:left; margin-left: 0.5em;">
+						<div id="look_choose_icon" style="float:left; margin-left: 0.5em;">
 							<div class="activityButtonDiv">
 								<img id="b_look_choose"  src='images/buttons/ba_look_choose_off.png' class="activityButton" onclick="selectActivity('look_choose')"/>
 								<img id='b_look_choose_gl1' class="buttonGlow" src="images/buttons/ba_look_choose_glo1.png" />
@@ -391,7 +395,7 @@
 								</div>
 							</div>
 						</div>
-						<div style="float:left; margin-left: 0.5em;">
+						<div id="play_learn_icon" style="float:left; margin-left: 0.5em;">
 							<div class="activityButtonDiv">
 								<img id="b_play_learn"  src='images/buttons/ba_play_learn_off.png' class="activityButton" onclick="selectActivity('play_learn')"/>
 								<img id='b_play_learn_gl1' class="buttonGlow" src="images/buttons/ba_play_learn_glo1.png" />
@@ -411,7 +415,7 @@
 								</div>
 							</div>
 						</div>
-						<div style="float:left; margin-left: 0.5em;">
+						<div id="voc_bingo_icon" style="float:left; margin-left: 0.5em;">
 							<div class="activityButtonDiv">
 								<img id="b_voc_bingo"  src='images/buttons/ba_voc_bingo_off.png' class="activityButton" onclick="selectActivity('voc_bingo')"/>
 								<img id='b_voc_bingo_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_glo1.png" />
@@ -419,6 +423,12 @@
 								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
 									Vocabulary Bingo
 								</div>
+							</div>
+						</div>
+						<div id="onet_act_icon" style="float:left; margin-left: 0.5em; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8; display: none">
+							<div style="position: relative; margin-top: 0.5em; width: 22em; height: 6.3em; margin-left: 0.2em; margin-right: 0.2em; font-size: 85%; font-weight: bold; color: black; text-align: center">
+								The activity is selected automatically for:
+								<img id="l_onet_topic" style="display:block; width:6.5em; margin-top:0.5em; margin-left:auto; margin-right:auto" /> 
 							</div>
 						</div>
 					</div>
@@ -473,26 +483,16 @@
 							</div>
 						</div>
 					</div>
-					<div id="onet_activities" style="float: left; display: none">
-						<div style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
-							ONET Activities
-						</div>
-						<div style="float:left; margin-left: 0.5em; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8">
-							<div style="position: relative; margin-top: 0.5em; width: 22em; height: 6.3em; margin-left: 0.2em; margin-right: 0.2em; font-size: 85%; font-weight: bold; color: black; text-align: justify">
-								Select a topic from the list below. The activity is selected automatically for each topic.
-							</div>
-						</div>
-					</div>
 
 					<div style="float:right; width: 7.5em; ">
 						<div style="position:relative; height:4em; margin-top: 2em">
 							<div style="position: absolute; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto">
-								<img id="b_info" src='images/buttons/help button.png' style="width:4em" onmousedown="b_press(this)" onclick="setInfo(uMode,'open','#393','11em',3.5)" />
+								<img id="b_info" src='images/buttons/help button.png' style="width:4em" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setInfo(uMode,'open','#393','11em',3.5)" />
 							</div>
 						</div>
 						<div style="position:relative; height:2em">
 							<div style="position: absolute; bottom: 0">
-								<img id="b_options" src='images/buttons/options_button.png' style="width:80%; display:block; margin-top: 0.5em" onmousedown="b_press(this)" onclick="optionsDiv('block')"/>
+								<img id="b_options" src='images/buttons/options_button.png' style="width:80%; display:block; margin-top: 0.5em" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="optionsDiv('block')"/>
 							</div>
 						</div>
 					</div>
@@ -550,8 +550,8 @@
 									</tr>
 								</tbody>
 							</table>
-							<div style="position: relative; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto; width: 4.5em; z-index: 200">
-								<img style="width: 100%;" src="images/buttons/close_button.png" onclick="optionsDiv('none')" onmousedown="b_press(this)" />
+							<div style="position: relative; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto; width: 8.5em; z-index: 200">
+								<img style="width: 100%;" src="images/buttons/save_close_button.png" onclick="optionsDiv('none')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 							</div>
 						</div>
 						<div>
@@ -567,7 +567,7 @@
 										Customise user vocabulary topics
 										<div style="position:relative; width: 100%; height: 2.5em; margin-bottom: 1em; font: inherit; text-align: center">
 											<div style="position: absolute; bottom: 0; font: inherit">
-												<img style="width: 40%" src="images/buttons/setup_button.png" onclick="setVocMode('user');setVocChoiceTable('topics')" onmousedown="b_press(this)" />
+												<img style="width: 40%" src="images/buttons/setup_button.png" onclick="setVocMode('user');setVocChoiceTable('topics')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 											</div>
 										</div>
 
@@ -591,24 +591,24 @@
 										Choose voices for listening activities
 										<table border="0" style="table-layout:fixed; border:none; width:100%; margin-bottom: 0.3em; text-align:center; border-spacing:1%; font:inherit;">
 											<tbody style="padding:inherit; font:inherit;">
-												<tr id="vox_none" style="font:inherit; display: none ;">
+												<tr id="vox_none" style="font:inherit">
 													<td colspan="2" class="optSelect"  style="width=33%; font:85% 'Nunito', sans-serif;">
 														Sorry! Computer voices are not available.
 													</td>
 												</tr>
 												<tr style="font:inherit; ;">
-													<td id="vox_Ian_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif;" onclick="selectVox('Ian',this)">
+													<td id="vox_Ian_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif; display:none" onclick="selectVox('Ian',this)">
 														Ian
 													</td>
-													<td id="vox_UK English Female_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif;" onclick="selectVox('UK English Female',this)">
+													<td id="vox_UK English Female_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif; display:none" onclick="selectVox('UK English Female',this)">
 														<p>UK</p>Female
 													</td>
 												</tr>
 												<tr style="font:inherit; ;">
-													<td id="vox_UK English Male_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif;" onclick="selectVox('UK English Male',this)">
+													<td id="vox_UK English Male_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif; display:none" onclick="selectVox('UK English Male',this)">
 														<p>UK</p>Male
 													</td>
-													<td id="vox_US English Female_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif;" onclick="selectVox('US English Female',this)">
+													<td id="vox_US English Female_toggle" class="optSelected"  style="width=33%; font:80% 'Nunito', sans-serif; display:none" onclick="selectVox('US English Female',this)">
 														<p>US</p>Female
 													</td>
 
@@ -748,7 +748,7 @@
 												</td>
 												<td>&nbsp;</td>
 												<td style="padding:inherit; font:inherit; vertical-align: bottom">
-													Warning klaxon when nearly finished
+													Warning bells when nearly finished
 												</td>
 											</tr>
 											<tr style="font:inherit; padding:1%;">
@@ -946,7 +946,7 @@
 											Syllable Structure
 										</td>
 										<td style="text-align: center; ">
-											<img id="b_ex" onclick="newSyllable('ex')"  onmousedown="b_press(this)" style="width:65%" src="images/buttons/b_example.png" />
+											<img id="b_ex" onclick="newSyllable('ex')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:65%" src="images/buttons/b_example.png" />
 										</td>
 									</tr>
 									<tr>
@@ -965,13 +965,13 @@
 									</tr>
 									<tr>
 										<td align="center">
-											<img id="b_initC" onclick="iSet()"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/b_all.png" />
+											<img id="b_initC" onclick="iSet()"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/b_all.png" />
 										</td>
 										<td align="center">
-											<img id="b_vowel" onclick="vSet()" onmousedown="b_press(this)" style="width:80%" src="images/buttons/b_all.png" />
+											<img id="b_vowel" onclick="vSet()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%" src="images/buttons/b_all.png" />
 										</td>
 										<td align="center">
-											<img id="b_finalC" onclick="fSet()" onmousedown="b_press(this)" style="width:80%" src="images/buttons/b_all.png" />
+											<img id="b_finalC" onclick="fSet()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%" src="images/buttons/b_all.png" />
 										</td>
 									</tr>
 								</table>
@@ -1032,8 +1032,16 @@
 							</div>
 						</td>
 						<td style="padding:inherit;">
+							<div style="position: relative; width:90%; margin-left: auto; margin-right: auto">
+								<img id="on_phon12" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_phon12"  src='images/buttons/b_phon12.png' style="width:100%;" onclick="selectPhonUnit('phon12')"/>
+							</div>
 						</td>
 						<td style="padding:inherit;">
+							<div style="position: relative; width:90%; margin-left: auto; margin-right: auto">
+								<img id="on_phon13" src="images/formatting/button_on.png" class="buttonOn"/>
+								<img id="b_phon13"  src='images/buttons/b_phon13.png' style="width:100%;" onclick="selectPhonUnit('phon13')"/>
+							</div>
 						</td>
 
 					</tr>
@@ -1055,6 +1063,12 @@
 						</td>
 						<td style="font: inherit; text-align: center">
 							Phonics Unit <img src="images/labels/l_phon11.png" style="width: 20%" />
+						</td>
+						<td style="font: inherit; text-align: center">
+							Phonics Unit <img src="images/labels/l_phon12.png" style="width: 20%" />
+						</td>
+						<td style="font: inherit; text-align: center">
+							Phonics Unit <img src="images/labels/l_phon13.png" style="width: 20%" />
 						</td>
 					</tr>
 				</table>
@@ -1107,13 +1121,13 @@
 							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon1.png" style="width: 10%" /> Options</div>
 							<div>
 								<div style="float: left; width: 15%; height: 2.5em">
-									<img id="b_numOpZero" onclick="numOpSet('numOpZero')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+									<img id="b_numOpZero" onclick="numOpSet('numOpZero')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/yes_button.png" />
 								</div>
 								<div style="text-align: left">Include Zero</div>
 							</div>
 							<div style="clear: left">
 								<div style="float: left; width: 15%; height: 2.5em">
-								<img id="b_numOp12" onclick="numOpSet('numOp12')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								<img id="b_numOp12" onclick="numOpSet('numOp12')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/no_button.png" />
 								</div>
 								<div style="text-align: left">Include 11 &amp; 12</div>
 							</div>
@@ -1123,19 +1137,19 @@
 							<div style="font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon2.png" style="width: 10%" /> Options</div>
 							<div>
 								<div style="float: left; width: 15%; height: 2.5em">
-									<img id="b_numOpAll" onclick="numOpSet('numOpAll')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+									<img id="b_numOpAll" onclick="numOpSet('numOpAll')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/yes_button.png" />
 								</div>
 								<div style="text-align: left">All Tens</div>
 							</div>
 							<div style="clear: left">
 								<div style="float: left; width: 15%; height: 2.5em">
-								<img id="b_numOpReg" onclick="numOpSet('numOpReg')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								<img id="b_numOpReg" onclick="numOpSet('numOpReg')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/no_button.png" />
 								</div>
 								<div style="text-align: left">Regular Tens Only</div>
 							</div>
 							<div style="clear: left">
 								<div style="float: left; width: 15%; height: 2.5em">
-								<img id="b_numOpIrreg" onclick="numOpSet('numOpIrreg')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								<img id="b_numOpIrreg" onclick="numOpSet('numOpIrreg')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/no_button.png" />
 								</div>
 								<div style="text-align: left">Irregular Tens Only</div>
 							</div>
@@ -1148,19 +1162,19 @@
 							<div style="font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon4.png" style="width: 10%" /> Options</div>
 							<div>
 								<div style="float: left; width: 15%; height: 2.5em">
-									<img id="b_numOpAll2" onclick="numOpSet('numOpAll2')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+									<img id="b_numOpAll2" onclick="numOpSet('numOpAll2')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/yes_button.png" />
 								</div>
 								<div style="text-align: left">All Teens</div>
 							</div>
 							<div style="clear: left">
 								<div style="float: left; width: 15%; height: 2.5em">
-								<img id="b_numOpReg2" onclick="numOpSet('numOpReg2')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								<img id="b_numOpReg2" onclick="numOpSet('numOpReg2')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/no_button.png" />
 								</div>
 								<div style="text-align: left">Regular Teens Only</div>
 							</div>
 							<div style="clear: left">
 								<div style="float: left; width: 15%; height: 2.5em">
-								<img id="b_numOpIrreg2" onclick="numOpSet('numOpIrreg2')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/no_button.png" />
+								<img id="b_numOpIrreg2" onclick="numOpSet('numOpIrreg2')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/no_button.png" />
 								</div>
 								<div style="text-align: left">Irregular Teens Only</div>
 							</div>
@@ -1173,7 +1187,7 @@
 							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon6.png" style="width: 10%" /> Options</div>
 							<div>
 								<div style="float: left; width: 15%; height: 2.5em">
-									<img id="b_numOp0_9" onclick="numOpSet('numOp0_9')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+									<img id="b_numOp0_9" onclick="numOpSet('numOp0_9')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/yes_button.png" />
 								</div>
 								<div style="text-align: left">Include 0-9</div>
 							</div>
@@ -1182,7 +1196,7 @@
 							<div style=" font-size: 1.5em; padding-top: 0.5em; padding-bottom: 0.5em">Unit <img src="images/labels/l_phon7.png" style="width: 10%" /> Options</div>
 							<div>
 								<div style="float: left; width: 15%; height: 2.5em">
-									<img id="b_numOp0_99" onclick="numOpSet('numOp0_99')"  onmousedown="b_press(this)" style="width:80%;" src="images/buttons/yes_button.png" />
+									<img id="b_numOp0_99" onclick="numOpSet('numOp0_99')"  onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" style="width:80%;" src="images/buttons/yes_button.png" />
 								</div>
 								<div style="text-align: left">Include 0-99</div>
 							</div>
@@ -1279,7 +1293,7 @@
 										<img id="on_multi" src="images/formatting/button_on.png" style="position: absolute; width:94%; border:outset #5bc8e8;"/>
 										<img id="b_multi"  style="width:94%; border:outset " onclick="selectTopic('multi','button')"  src="images/buttons/multi.jpg" />
 									</div>
-									<img id="b_comCats_select" src='images/buttons/select_button.png' style="width:60%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="comCatsSelect()"/>
+									<img id="b_comCats_select" src='images/buttons/select_button.png' style="width:60%; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="comCatsSelect()"/>
 								</td>
 								<td colspan="8" style="font:inherit; font-size: 120%; font-weight: bold; text-align: center; padding-bottom: 0px;">
 									General Vocabulary Topics
@@ -1329,10 +1343,10 @@
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="ch_free time" onclick="modComCats('free time')" class="topicCheckbox" src="images/buttons/yes_button.png">
-										<img id="in_free time" src="images/formatting/button_inactive.png" class="topicMask" />
-										<img id="on_free time" src="images/formatting/button_on.png" class="buttonOn"/>
-										<img id="b_free time"  style="width:100%; " onclick="selectTopic('free time','button')"  src="images/buttons/free time.jpg" />
+										<img id="ch_free_time" onclick="modComCats('free_time')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_free_time" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_free_time" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_free_time"  style="width:100%; " onclick="selectTopic('free_time','button')"  src="images/buttons/free_time.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
@@ -1387,10 +1401,10 @@
 								</td>
 								<td style="padding:inherit; text-align: center;">
 									<div style="position: relative;">
-										<img id="ch_places and transport" onclick="modComCats('places and transport')" class="topicCheckbox" src="images/buttons/yes_button.png">
-										<img id="in_places and transport" src="images/formatting/button_inactive.png" class="topicMask" />
-										<img id="on_places and transport" src="images/formatting/button_on.png" class="buttonOn"/>
-										<img id="b_places and transport"  style="width:100%; " onclick="selectTopic('places and transport','button')"  src="images/buttons/places and transport.jpg" />
+										<img id="ch_places_and_transport" onclick="modComCats('places_and_transport')" class="topicCheckbox" src="images/buttons/yes_button.png">
+										<img id="in_places_and_transport" src="images/formatting/button_inactive.png" class="topicMask" />
+										<img id="on_places_and_transport" src="images/formatting/button_on.png" class="buttonOn"/>
+										<img id="b_places_and_transport"  style="width:100%; " onclick="selectTopic('places_and_transport','button')"  src="images/buttons/places_and_transport.jpg" />
 									</div>
 								</td>
 								<td style="padding:inherit; text-align: center;">
@@ -1562,7 +1576,14 @@
 								ONET Topics
 							</td>
 						</tr>
+
 						<tr style="padding:0.2%; padding-top: 0px">
+							<td style="padding:inherit; text-align: center;">
+								<div style="position: relative;">
+									<img id="on_onet_voc" src="images/formatting/button_on.png" class="buttonOn"/>
+									<img id="b_onet_voc"  style="width:100%;" onclick="selectTopic('onet_voc','button');selectActivity('read_choose')"  src="images/buttons/onet_voc.jpg" />
+								</div>
+							</td>
 							<td style="padding:inherit; text-align: center;">
 								<div style="position: relative;">
 									<img id="on_onet_inst" src="images/formatting/button_on.png" class="buttonOn"/>
@@ -1589,12 +1610,6 @@
 							</td>
 							<td style="padding:inherit; text-align: center;">
 								<div style="position: relative;">
-									<img id="on_onet_shop" src="images/formatting/button_on.png" class="buttonOn"/>
-									<img id="b_onet_shop"  style="width:100%;" onclick="selectTopic('onet_shop','button');selectActivity('look_choose')"  src="images/buttons/onet_shop.jpg" />
-								</div>
-							</td>
-							<td style="padding:inherit; text-align: center;">
-								<div style="position: relative;">
 									<img id="on_onet_phon" src="images/formatting/button_on.png" class="buttonOn"/>
 									<img id="b_onet_phon"  style="width:100%;" onclick="selectTopic('onet_phon','button');selectActivity('look_choose')"  src="images/buttons/onet_phon.jpg" />
 								</div>
@@ -1614,16 +1629,90 @@
 							<td style="padding:inherit; text-align: center;">
 								<div style="position: relative;">
 									<img id="on_onet_full" src="images/formatting/button_on.png" class="buttonOn"/>
-									<img id="b_onet_full"  style="width:100%;" onclick="selectTopic('onet_full','button');selectActivity('look_choose')"  src="images/buttons/onet_full.jpg" />
+									<img id="b_onet_full"  style="width:100%;" onclick="selectTopic('onet_full','button');selectActivity('look_choose');SetOnetFullRand()"  src="images/buttons/onet_full.jpg" />
 								</div>
 							</td>
 						</tr>
 					</table>
+					 
+					<div id="onet_full_select" style= "width: 22em; height: 8.5em; margin-top:1em; margin-bottom:1em; background-color: #b8e4ec;border: 0.3em ridge #7bd8e8; display:none">
+						<p style="font-size: 120%; font-weight: bold">
+							Test Selection
+						</p>
+						<div style= "float:left; width: 11em; border-right: 0.3em ridge #7bd8e8">
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em">
+									Random Items
+								</div>
+								<div style="float: right; position:relative; margin-right: 1em; width:1.5em; height:1.5em">
+									<img id="b_onet_rand" style = "position:absolute; display:block; bottom:0;left:0;right:0; margin-left:auto; margin-right:auto; width:100%" src="images/buttons/yes_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="SetOnetFullRand()">
+								</div>
+							</div>
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em">
+									2558 / 2015
+								</div>
+								<div style="float: right; position:relative; margin-right: 1em; width:1.5em; height:1.5em">
+									<img id="b_onet_58" style = "position:absolute; display:block; bottom:0;left:0;right:0; margin-left:auto; margin-right:auto; width:100%" src="images/buttons/no_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="SetOnetFull58()">
+								</div>
+							</div>
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em; color:grey">
+									2557 / 2014
+								</div>
+								<div style="float: right; height:1.5em; margin-right: 1em">
+									
+								</div>
+							</div>
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em">
+									2555 / 2012
+								</div>
+								<div style="float: right; position:relative; margin-right: 1em; width:1.5em; height:1.5em">
+									<img id="b_onet_55" style = "position:absolute; display:block; bottom:0;left:0;right:0; margin-left:auto; margin-right:auto; width:100%" src="images/buttons/no_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="SetOnetFull55()">
+								</div>
+							</div>
+						</div>
+						<div style= "float:right; width:45%">
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em; color:grey">
+									2554 / 2011
+								</div>
+								<div style="float: right; margin-right: 1em">
+									
+								</div>
+							</div>
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em">
+									2553 / 2010
+								</div>
+								<div style="float: right; position:relative; margin-right: 1em; width:1.5em; height:1.5em">
+									<img id="b_onet_53" style = "position:absolute; display:block; bottom:0;left:0;right:0; margin-left:auto; margin-right:auto; width:100%" src="images/buttons/no_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="SetOnetFull53()">
+								</div>
+							</div>
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em">
+									2551 / 2008
+								</div>
+								<div style="float: right; position:relative; margin-right: 1em; width:1.5em; height:1.5em">
+									<img id="b_onet_51" style = "position:absolute; display:block; bottom:0;left:0;right:0; margin-left:auto; margin-right:auto; width:100%" src="images/buttons/no_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="SetOnetFull51()">
+								</div>
+							</div>
+							<div style="clear:both">
+								<div style="float:left; height:1.5em; margin-left: 0.5em">
+									2549 / 2007
+								</div>
+								<div style="float: right; position:relative; margin-right: 1em; width:1.5em; height:1.5em">
+									<img id="b_onet_49" style = "position:absolute; display:block; bottom:0;left:0;right:0; margin-left:auto; margin-right:auto; width:100%" src="images/buttons/no_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="SetOnetFull49()">
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 
 
 				<div style="position: absolute; z-index: 20; width: 100%; bottom: 0.1em; font:inherit;">
-					<img id="b_contentOK" onclick="categoryDiv('none')" onmousedown="b_press(this)" src="images/buttons/OK.png" style="width:5%; " />
+					<img id="b_contentOK" onclick="categoryDiv('none')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" src="images/buttons/OK.png" style="width:5%; " />
 				</div>
 			</div>
 
@@ -1712,10 +1801,14 @@
 			<!-- Main Displays	 -->
 			<!-- =============== -->
 			<div  id="welcomeDiv" style="position:relative; z-index: 8; width: 100%; height: 85%; background-color:#E3D5C9; text-align: center; display: block;">
+				<div style="position:absolute; right:1.5em; top:10em; font:inherit; font-size: 30%">
+					Version: 0.9001
+				</div>
 				<div style="height:0.7em">
 					&nbsp;
 				</div>
-				<div style="width: 90%; margin-left: auto; margin-right: auto; padding: 1%; text-align: left; font-size: 60%; color: #000;  display: block;" >
+				<div style="position:relative; width: 90%; margin-left: auto; margin-right: auto; padding: 1%; text-align: left; font-size: 60%; color: #000;  display: block;" >
+					
 					<p style="text-align: center; font-size: 130%;margin-top:0.9em; margin-bottom: 1.2em">Welcome to the <img style="width: 34%; vertical-align: -0.2em;" src="images/labels/host_text.png"/> English Builder.</p>
 					<p style="margin-bottom: 2.5%">Press <img style="width: 6%; vertical-align: -0.2em;" src="images/buttons/start_button.png" onclick="activity('start')" /> to begin an activity.</p>
 					<p style="margin-bottom: 2.5%">Press <img src="images/buttons/reset_button.png" style="width: 4.07%; vertical-align: -0.2em;" /> to stop an activity at any time, and to reset when an activity is finished.</p>
@@ -1843,7 +1936,7 @@
 
 
 
-                <div id="innerDiv" style="position:absolute; z-index:200; width: 60%; margin-top:7%; margin-left: 18.3%; height: 30em; font-family:'FreeSerif'; font-size:30%; display:none">
+                <div id="innerDiv" style="position:absolute; z-index:200; width: 78%; margin-top:7%; margin-left: 2%; height: 24em; font-family:'FreeSerif'; font-size:38%; display:none">
 				</div>
 
 				<div style="position:absolute; width: 60%; margin-left: 18.3%; margin-top: 5%">
@@ -2129,10 +2222,6 @@
 				</table>
 			</div>
 
-
-
-
-
 			<!-- =========== -->
 			<!-- Controls	-->
 			<!-- ========== -->
@@ -2141,11 +2230,11 @@
 					<div style="position:relative; float:left; left:0.5em; height:1.5em; width:1.6em">
 						<div style="position: absolute; bottom: 0; left: 0; right: 0">
 							<img  id="b_help" src="images/buttons/help button.png" style="display:block; width:100%;margin-left:auto; margin-right:auto"
-								onmousedown="b_press(this)" onclick="showWelcome()" />
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="showWelcome()" />
 							<img  id="b_reset" src="images/buttons/reset_button.png" style="width:100%; margin-left:auto; margin-right:auto; display: none"
-								onmousedown="b_press(this)" onclick="resetScore(this)" />
-							<img id="b_submit" src="images/buttons/b_submit.png" style="width: 100%; display:none" onmousedown="b_press(this)"
-								onclick="activity('submit')" />
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="resetScore(this)" />
+							<img id="b_submit" src="images/buttons/b_submit.png" style="width: 100%; display:none" 
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('submit')" />
 						</div>
 					</div>
 					<div style="position:relative; float:left; top:0.2em; left:1.4em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black;">
@@ -2162,40 +2251,40 @@
 					<div id="controls_central" style="position:relative; float:left; left:1.5em; height:1.5em; width:10.5em">
 						<div style="position: absolute; bottom: 0; left: 0; right: 0">
 							<img id="b_start" style="display:block; width: 2.75em; margin-left:auto; margin-right:auto" src="images/buttons/start_button.png"
-								onmousedown="b_press(this)" onclick="activity('start')" />
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" ontouchend="activity('start')" onclick="activity('start')" />
 							<img id="finishedButton" src='images/buttons/finished_button.png' alt="Finished!" style="width:4.55em; margin-left:auto; margin-right:auto; display: none" />
 							<img id="b_replay" style="display:none; width:1.9em; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png'
-								onmousedown="b_press(this)" onclick="playVocab()" />
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="playVocab()" />
 						</div>
 						<div id="yes_no_div" style="display:none; position:relative; height:1.5em">
 							<div style="position: absolute; width:1.65em; bottom: 0; left: 1em">
 								<img id="noButton"	style="display:block; width:1.65em; margin-left:auto; margin-right:auto" src='images/buttons/no_button.png' 
-									onmousedown="b_press(this)" onclick="activity('no')"/>
+									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('no')"/>
 							</div>
 							<div style="position: absolute;width:2.2em; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto">
 								<img id="clearButton" style="display:block; width: 2.2em; margin-left:auto; margin-right:auto" src="images/buttons/clear.png" 
-									onmousedown="b_press(this)" onclick="activity('clear')" />
+									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('clear')" />
 							</div>
 							<div style="position: absolute; width:1.65em; bottom: 0; right: 1em">
 								<img id="yesButton" style="display:block; width:1.65em; margin-left:auto; margin-right:auto" src='images/buttons/yes_button.png' 
-									onmousedown="b_press(this)" onclick="activity('yes')"/>
+									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('yes')"/>
 							</div>
 						</div>
 						<div id="back_fwd_div" style="display:none; position:relative; height:1.5em">
 							<div style="position: absolute; width:1.65em; bottom: 0; left: 3em">
 								<img id="back_button"	style="display:block; width:1.65em; margin-left:auto; margin-right:auto" src='images/buttons/b_back.png' 
-									onmousedown="b_press(this)" onclick="activity('back')"/>
+									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('back')"/>
 							</div>
 							<div style="position: absolute; width:1.65em; bottom: 0; right: 3em">
 								<img id="fwd_button" style="display:block; width:1.65em; margin-left:auto; margin-right:auto" src='images/buttons/b_forward.png' 
-									onmousedown="b_press(this)" onclick="activity('forward')"/>
+									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('forward')"/>
 							</div>
 						</div>
 					</div>
 					<div id="order_div" style="position:relative; float:left; left:1.5em; height:1.5em; width:7.5em; display:none">
 						<div style="position: absolute; bottom: 0.4em; left: 0; right: 0">
 							<img id="orderButton"	style="display:block; width:40%; margin-left:auto; margin-right:auto" src='images/buttons/random_button.png' 
-								onmousedown="b_press(this)" onclick="activity('random')"/>
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('random')"/>
 						</div>
 					</div>
 					<div id="hide_div" style="position:relative; top:0.06em; float:left; left:1.5em; height:1.5em; width:3em; display:none">
@@ -2204,7 +2293,7 @@
 								<div style="height: 2.4em; font: inherit;">
 									<div style="width: 4em; float: left">
 										<img id="showAllButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/yes_button.png' 
-											onmousedown="b_press(this)" onclick="activity('showBoth')"/>
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('showBoth')"/>
 									</div>
 									<div style="float: left; font: inherit;font-size: 1.7em">
 										Show All
@@ -2213,7 +2302,7 @@
 								<div  style="height: 2.4em; ">
 									<div style="width: 4em; float: left">
 										<img id="hideImgButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/no_button.png' 
-											onmousedown="b_press(this)" onclick="activity('hideImg')"/>
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('hideImg')"/>
 									</div>
 									<div style="float: left; font: inherit; font-size: 1.7em">
 										Hide Images
@@ -2222,7 +2311,7 @@
 								<div style="height: 2.4em;">
 									<div style="width: 4em; float: left">
 										<img id="hideTxtButton"	style="width:2.7em; vertical-align: middle" src='images/buttons/no_button.png' 
-											onmousedown="b_press(this)" onclick="activity('hideTxt')"/>
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('hideTxt')"/>
 									</div>
 									<div style="float: left; font: inherit; font-size: 1.7em">
 										Hide Text
@@ -2236,7 +2325,8 @@
 							<div class="userSetupGroup" style="width: 10%; background: none; border: none">
 								<div style="position:relative; height: 100%; font:inherit">
 									<div class=userSetupButtonDiv style="bottom: -0.1em">
-										<img id="b_vc_info"	style="width:90%;" src='images/buttons/help button.png' onmousedown="b_press(this)" onclick="setMsg('u_c','User Settings Information')"/>
+										<img id="b_vc_info"	style="width:90%;" src='images/buttons/help button.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setMsg('u_c','User Settings Information')"/>
 									</div>
 								</div>
 							</div>
@@ -2246,12 +2336,14 @@
 								</div>
 								<div style="position:relative; float:left; height: 50%; width: 50%;">
 									<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
-										<img id="b_show_all"	style="width:90%" src='images/buttons/show_all.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('show_all')"/>
+										<img id="b_show_all"	style="width:90%" src='images/buttons/show_all.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setVocChoiceTable('show_all')"/>
 									</div>
 								</div>
 								<div style="position:relative; float:left; height: 50%; width: 50%;">
 									<div style="position: absolute; bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0">
-										<img id="b_show_selected"	style="width:90%" src='images/buttons/show_selected.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('show_selected')"/>
+										<img id="b_show_selected"	style="width:90%" src='images/buttons/show_selected.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setVocChoiceTable('show_selected')"/>
 									</div>
 								</div>
 							</div>
@@ -2265,12 +2357,14 @@
 							<div class="userSetupGroup">
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
-										<img id="b_select_all"	style="width:79.4%;" src='images/buttons/select_all.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('select_all')"/>
+										<img id="b_select_all"	style="width:79.4%;" src='images/buttons/select_all.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setVocChoiceTable('select_all')"/>
 									</div>
 								</div>
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
-										<img id="b_clear_all"	style="width:79.4%" src='images/buttons/clear_all.png' onmousedown="b_press(this)" onclick="adjustUserTopics('','clear')"/>
+										<img id="b_clear_all"	style="width:79.4%" src='images/buttons/clear_all.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="adjustUserTopics('','clear')"/>
 									</div>
 								</div>
 							</div>
@@ -2278,38 +2372,44 @@
 							<div class="userSetupGroup">
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
-										<img id="b_reset_to_default" style="width:79.4%" src='images/buttons/reset_to_default.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('init')"/>
+										<img id="b_reset_to_default" style="width:79.4%" src='images/buttons/reset_to_default.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setVocChoiceTable('init')"/>
 									</div>
 								</div>
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
 										<input type="file" id="reset_topic" onchange="loadSetup(this)" style="display: none">
-										<img id="b_reset_to_saved" style="width:79.4%" src='images/buttons/reset_to_saved.png' onmousedown="b_press(this)" onclick="loadSetup(this)"/>
+										<img id="b_reset_to_saved" style="width:79.4%" src='images/buttons/reset_to_saved.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="loadSetup(this)"/>
 									</div>
 								</div>
 							</div>
 							<div id="save_load_grp" class="userSetupGroup">
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
-										<img id="b_save"	style="width:79.4%" src='images/buttons/save_all.png' onmousedown="b_press(this)" onclick="saveSetup()"/>
+										<img id="b_save"	style="width:79.4%" src='images/buttons/save_all.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="saveSetup()"/>
 									</div>
 								</div>
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
 										<input type="file" id="reset_all" onchange="loadSetup(this)" style="display: none">
-										<img id="b_reset_all" style="width:79.4%" src='images/buttons/load_all.png' onmousedown="b_press(this)" onclick="loadSetup(this)"/>
+										<img id="b_reset_all" style="width:79.4%" src='images/buttons/load_all.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="loadSetup(this)"/>
 									</div>
 								</div>
 							</div>
 							<div id="topic_clone_grp" class="userSetupGroup" style="display: none">
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
-										<img id="b_select_topic"	style="width:79.4%" src='images/buttons/select_topic.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('topics')"/>
+										<img id="b_select_topic"	style="width:79.4%" src='images/buttons/select_topic.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setVocChoiceTable('topics')"/>
 									</div>
 								</div>
 								<div style="position:relative; height: 50%; font:inherit">
 									<div class=userSetupButtonDiv>
-										<img id="b_clone_topic"	style="width:79.4%" src='images/buttons/clone_topic.png' onmousedown="b_press(this)" onclick="setVocChoiceTable('clone_topic')"/>
+										<img id="b_clone_topic"	style="width:79.4%" src='images/buttons/clone_topic.png' 
+											onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setVocChoiceTable('clone_topic')"/>
 									</div>
 								</div>
 							</div>
@@ -2317,7 +2417,8 @@
 					</div>
 					<div style="position:relative; float:right; right:0.5em; height:1.5em; width:3.4em">
 						<div style="position: absolute; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto">
-							<img id="b_content" src="images/buttons/content_button.png" style="display:block; width:100%;margin-left:auto; margin-right:auto" onmousedown="b_press(this)" onclick="categoryDiv('block')"/>
+							<img id="b_content" src="images/buttons/content_button.png" style="display:block; width:100%;margin-left:auto; margin-right:auto" 
+								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="categoryDiv('block')"/>
 						</div>
 					</div>
 				</div>

@@ -21,18 +21,17 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
-  // Create the browser window.
+  // Create the browser window(s).
   splashWindow = new BrowserWindow({width: 600, height: 450, frame: false});
   mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname + '/images/formatting/e_b_icon.png'});
   mainWindow.minimize()
 
-  // and load the index.html of the app.
+  // and load the html of the apps.
 
   splashWindow.loadUrl('file://' + __dirname + '/splash.html');
-
   mainWindow.loadUrl('file://' + __dirname + '/index.html');
   mainWindow.webContents.executeJavaScript("electron=true");
-  
+    
   ipc.on('nearly', function(event){mainWindow.webContents.executeJavaScript("audCtrls(startup, 'play');");});
   ipc.on('finished', function(event) {startMain ();});
 
