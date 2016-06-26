@@ -118,7 +118,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9200";
+var version_num="0.9210";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -166,8 +166,8 @@ if (!localStorage.version) {
 function init() {
 	if (!localStorage.version) {
 		localStorage.clear();
-		localStorage.version=0.91;
 	}
+	localStorage.version=version_num;
 	document.onkeydown = function(event) {processKey(event);};
 	window.ondragstart=function(){return false;};
 
@@ -223,12 +223,39 @@ function init() {
 			ipc.send('tickVol', 0.6);
 		}
 		if (electron==true) {
+			setHost();
+			document.getElementById("optGrp_hosts").style.display="block";
 			document.getElementById("bing_dl_notes_norm").style.display="none";
 			document.getElementById("bing_dl_notes_electron").style.display="block";
 			document.getElementById("bing_dl_normal").style.display="none";
 			document.getElementById("bing_dl_electron").style.display="block";
 		}
-	},400);	
+	},400);
+	//localStorage.host="bko";
+	//setHost();
+}
+
+
+function selectHost(host) {
+	if (host!=localStorage.host) {
+		audCtrls(aswitch, "play");
+		document.getElementById("b_" + localStorage.host).style.width = "100%";
+		document.getElementById("b_" + localStorage.host).style.border = "none";
+		localStorage.host=host;
+		setHost();
+	}
+}
+
+
+function setHost() {
+	if (localStorage.host) {
+		document.getElementById("host_text").src="images/labels/hosts/"+localStorage.host+"/host_text.png";
+		document.getElementById("host_logo1").src="images/labels/hosts/"+localStorage.host+"/host_logo.png";
+		document.getElementById("host_logo2").src="images/labels/hosts/"+localStorage.host+"/host_logo.png";
+		document.getElementById("bingo_logo").style.backgroundImage= "url('images/labels/hosts/"+localStorage.host+"/host_logo_wide.png')";
+		document.getElementById("b_" + localStorage.host).style.width = "91%";
+		document.getElementById("b_" + localStorage.host).style.border = "0.2em outset #7bd8e8";			
+	}
 }
 
 
@@ -1387,7 +1414,7 @@ function selectActivityGroup(group){
 
 		switch (group){
 			case "vocab":
-				setDisplays ({phonUSelect:"none",vocSelect:"block",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"block",reader_act_title:"none",onet_act_title:"none",read_choose_icon:"block",book_trans_icon:"none",look_choose_icon:"block",list_choose_icon:"block",play_learn_icon:"block",say_word_icon:"block",voc_bingo_icon:"block",onet_act_icon:"none",onet_voc_set:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"block",numUSelect:"none",readerSelect:"none",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"block",reader_act_title:"none",onet_act_title:"none",read_choose_icon:"block",book_trans_icon:"none",look_choose_icon:"block",list_choose_icon:"block",play_learn_icon:"block",say_word_icon:"block",voc_bingo_icon:"block",onet_act_icon:"none",onet_voc_set:"none",voc_bingo_class_icon:"block"});
 				selectActivity("read_choose");
 				document.getElementById("panelLev").src="images/buttons/b_"+currentLev+".png";
 				document.getElementById("panelLev2").src="images/buttons/b_"+currentLev+".png";
@@ -1409,11 +1436,11 @@ function selectActivityGroup(group){
 				document.getElementById("panelLev2").src="images/labels/l_"+currentNumUnit+"_p.png";
 			break;
 			case "readers":
-				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"block",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"block",onet_act_title:"none",book_trans_icon:"block",read_choose_icon:"block",look_choose_icon:"block",list_choose_icon:"none",play_learn_icon:"block",say_word_icon:"none",voc_bingo_icon:"block",onet_act_icon:"none",onet_voc_set:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"block",ONETSelect:"none",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"block",onet_act_title:"none",book_trans_icon:"block",read_choose_icon:"block",look_choose_icon:"block",list_choose_icon:"none",play_learn_icon:"block",say_word_icon:"none",voc_bingo_icon:"block",onet_act_icon:"none",onet_voc_set:"none",voc_bingo_class_icon:"none"});
 				selectActivity("book_trans");
 			break;
 			case "onet":
-				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"none",ONETSelect:"block",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"none",onet_act_title:"block",book_trans_icon:"none",look_choose_icon:"none",list_choose_icon:"none",say_word_icon:"none",voc_bingo_icon:"none"});
+				setDisplays ({phonUSelect:"none",vocSelect:"none",numUSelect:"none",readerSelect:"none",ONETSelect:"block",optDiv:"none",vocab_activities:"block",phonics_activities:"none",numbers_activities:"none",voc_act_title:"none",reader_act_title:"none",onet_act_title:"block",book_trans_icon:"none",look_choose_icon:"none",list_choose_icon:"none",say_word_icon:"none",voc_bingo_icon:"none",voc_bingo_class_icon:"none"});
 				selectTopic("onet_voc");
 				selectActivity("read_choose");
 				document.getElementById("panelLev").src="images/buttons/b_P6.png";
@@ -1926,6 +1953,7 @@ function selectTopic(topic,caller) {
 	}
 }
 
+
 function shuffle(array) {
     var tmp, current, top = array.length;
 
@@ -2115,23 +2143,27 @@ function setMsg(content,response_type,string_1,string_2) {
 
 	switch (response_type) {
 		case "OK_Cancel":
-			setDisplays({msg_close:"none",msg_OK_cancel:"block",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+			setDisplays({msg_close:"none",msg_OK_cancel:"block",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none",msg_delete_cancel:"none"});
+		break;
+
+		case "delete_cancel":
+			setDisplays({msg_close:"none",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none",msg_delete_cancel:"block"});
 		break;
 
 		case "msg_clone":
-			setDisplays({msg_box_clone:"block",msg_close:"none",msg_OK_cancel:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+			setDisplays({msg_box_clone:"block",msg_close:"none",msg_OK_cancel:"none",msg_edit_delete:"none",msg_new_continue:"none",msg_delete_cancel:"none"});
 		break;
 
 		case "edit_delete":
-			setDisplays({msg_box_clone:"none",msg_close:"none",msg_OK_cancel:"none",msg_edit_delete:"block",msg_new_continue:"none"});
+			setDisplays({msg_box_clone:"none",msg_close:"none",msg_OK_cancel:"none",msg_edit_delete:"block",msg_new_continue:"none",msg_delete_cancel:"none"});
 		break;
 
 		case "new_continue":
-			setDisplays({msg_close:"none",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"block"});
+			setDisplays({msg_close:"none",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"block",msg_delete_cancel:"none"});
 		break;
 
 		case "success":
-			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none",msg_delete_cancel:"none"});
 			document.getElementById("msg_win").style.borderColor = "#393";
 			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:#0DDB0D; \
 															color:black; border:0.15em grey ridge; \font-weight:bold; font-size:150%">Success</span></p>';
@@ -2148,9 +2180,9 @@ function setMsg(content,response_type,string_1,string_2) {
 		case "bing_back":
 			msg_box.innerHTML='<p>Would you like to:</p><p style="text-indent:2em">Start a <span style="color:#64FFFF; font-weight:bold">new</span> game?</p><p style="text-indent:2em">\
 								<span style="color:#64FFFF; font-weight:bold">Continue</span> the previous game?</p><p style="text-indent:2em"><span style="color:#64FFFF; font-weight:bold">Load</span> a game from a saved file?</p>';
-			document.getElementById("msg_new").onclick= function() {activity("phon_bingo_class_cont");setDisplays({modal_back:'none'})};
+			document.getElementById("msg_new").onclick= function() {activity("bingo_class_cont");setDisplays({modal_back:'none'})};
 			document.getElementById("msg_continue").onclick= function() {bingClassProc("backup");};
-			document.getElementById("msg_load").onclick= function() {document.getElementById('input_phon_bingo').click();};
+			document.getElementById("msg_load").onclick= function() {document.getElementById('input_load_bingo').click();};
 		break;
 
 		case "err_pron_points":
@@ -2209,6 +2241,13 @@ function setMsg(content,response_type,string_1,string_2) {
 								for <span style='color:#64FFFF; font-weight:bold'>"+currentLev+".</span></p><p style='margin-bottom: 0.5em'> Choose <img style='width:4.7em; vertical-align:middle' \
 								src= 'images/buttons/continue.png' /> to add it and select vocabulary items.</p>";
 			document.getElementById("msg_OK").onclick = function () {document.getElementById('modal_back').style.display='none';modUserAvailTopics(string_1,"add_continue");};
+		break;
+
+		case "choice_delete_game":
+			msg_box.innerHTML="<p style='text-align:center; margin-bottom:1em;'><span style='padding:0 0.3em 0 0.3em; \
+								background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%'>Warning</span></p><p style='margin-bottom:\
+								0.5em'>Are you sure you want to delete the game: <span style='color:#64FFFF; word-break:break-all; font-weight:bold'>"+localStorage.curr_vb_game+"</span>?</p>";
+			document.getElementById("msg_delete").onclick = function () {deleteVocBingGame();};
 		break;
 
 		case "choice_delete_topic":
@@ -2279,13 +2318,16 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 	switch (content) {
 		case "read_choose":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Read and Choose:</span> develops learners' ability to identify the meaning of vocabulary quickly and accurately. They read the words or phrases at the top of the screen and must select matching images or translations below.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct choice on first attempt; 1/2 point on second attempt. Each incorrect choice results in a 5 second penalty.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_A.png' /> top left choice</div><div style='float:right'>top right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_dub_quote.png' /></div><div style='clear:left; float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Z.png' /> bottom left choice</div><div style='float:right'>bottom right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_qm.png' /></div><div style='clear:both'><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</div><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+
 		case "look_choose":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Look and Choose:</span> is similar to Read and Choose but relates meaning to words, rather than words to meaning. Learners are presented with images or Thai text, and must select corresponding words or phrases from the box on the right.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct choice on first attempt; 1/2 point on second attempt. Each incorrect choice results in a 5 second penalty.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><p style='padding-top:0.5em'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_1.png' /> 1st choice</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_2.png' /> 2nd choice</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_3.png' /> 3rd choice</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_4.png' /> 4th choice</p><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "play_learn":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Play and Learn:</span> is a non-competitive activity which lets learners practise vocabulary in fun ways before trying a scored activity.</p><p style='padding-top:0.5em'>All of the vocabulary items for a topic and level are displayed in a table, which can be either randomised or ordered. There are also options to hide the images or text, depending on whether students need to practice reading or speaking.</p><p style='padding-top:0.5em'>There are many ways to use Play and Learn including:</p> <ul  style='padding-top:0.5em'><li>Look at each image, try saying the corresponding word or phrase before clicking on the image to hear an example.</li><li style='padding-top:0.5em'>Hide the images, read the text and try to remember the meaning before uncovering its image.</li><li style='padding-top:0.5em'>Hide the text, look at each image and try saying or spelling the word before uncovering its text.</li></ul> ";
-			break;
+		break;
+		
 		case "book_trans":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Read a Book:</span> \
 			develops student's ability to read and understand longer texts. The books follow the Phonics course (see Read and Say), focussing on the letters  and sounds \
@@ -2298,61 +2340,115 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 			src='images/buttons/key_3.png' /> 3rd choice</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_4.png' /> 4th choice</p><p>\
 			<img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' \
 			src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "listen_choose":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Listen and Choose:</span> is similar to Read and Choose but develops listening skills rather than reading. Learners listen to words or phrases and must select matching images or translations.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct choice on first attempt; 1/2 point on second attempt. Each incorrect choice results in a 5 second penalty.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_A.png' /> top left choice</div><div style='float:right'>top right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_dub_quote.png' /></div><div style='clear:left; float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Z.png' /> bottom left choice</div><div style='float:right'>bottom right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_qm.png' /></div><div style='clear:both'><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start / Repeat Item</div><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "say_word":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Say the Word:</span> develops speaking and pronunciation skills. Learners are presented with an image or Thai text, and must say the corresponding word or phrase as clearly as possible.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> This is a human-assessed activity, meaning that a teacher, parent or more advanced student is needed to award points. Generally, 1 point is given if a word or phrase is vaguely recognisable, and 2 points if it is clear. You can split the points for words and clarity in the <img style='width: 4em; vertical-align:middle' src='images/buttons/options_button.png' /> section. </p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='margin:0.2em 7em 0.5em 7em'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p style='color:red'>incorrect</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p style='color:#f60'>correct</p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p style='color:green'>correct and clear</p><p>(2 points)</p></div></div><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "voc_bingo":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Vocabulary Bingo:</span> is a listening activity, similar to Listen and Choose but in the form of a bingo game. Learners listen to a word or phrase and must select a matching image or translation from the grid. Each item is repeated 3 times before proceeding to the next.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct selection while the word is current; 1/2 point if the word was played previously. Selecting a cell that has not been played yet results in a 5 second penalty. </p><p style='padding-top:0.5em'>The Bingo bonus starts at 50 points with 1 point deducted every few seconds. To score Bingo, players must get a complete row, column or diagonal before the time or words run out.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start / Repeat Item</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "read_say":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Read and Say:</span> develops reading and pronunciation skills by focussing on the <b>relationship</b> between spelling and pronunciation (Phonics). Learners must say the sound that each letter or group of letters represents, and blend these sounds into syllables.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> This is a human-assessed activity, meaning that a teacher, parent or more advanced student is needed to award points. Generally, 2 points are given if the student can read the text by themselves, and 1 point if they can read it with some assistance.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='margin:0.2em 5em 0.5em 5em'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p><span style='color:red'>cannot</span> read</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p>read <span style='color:#f60'>with help</span></p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p>read <span style='color:green'>without help</span></p><p>(2 points)</p></div></div><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "phon_bingo":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Phonics Bingo:</span> is a listening activity, similar to Vocabulary Bingo, but focussing on the relationship between spelling and pronunciation (Phonics). Learners listen to syllables and words and must select matching text from the grid. Each item is repeated 3 times before proceeding to the next.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct selection while the item is current; 1/2 point if the item was played previously. Selecting a cell that has not been played yet results in a 5 second penalty. </p><p style='padding-top:0.5em'>The Bingo bonus starts at 50 points with 1 point deducted every few seconds. To score Bingo, players must get a complete row, column or diagonal before the time or words run out.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start / Repeat Item</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "phon_bingo_class":
 			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Bingo: Classroom Version</span> is still under construction.';
-			break;
+		break;
+		
+		case "voc_bingo_class":
+			document.getElementById("helpBox").innerHTML='<p><span style="font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em">Vocabulary Bingo: Classroom Version</span> \
+				This activity helps students to learn vocabulary, as well as practise reading and listening skills.</p><p style="padding-top:0.5em">Before the class, you will need to prepare one\
+				Bingo Sheet for each student. Click <img style="width: 5em;vertical-align: -0.3em" src=images/buttons/bing_setup.png /> to create a new game, or choose a game from the list\
+				if you have previously created some.</p>\
+				<p style="padding-top:0.5em">If you have already printed bingo sheets, please check to make sure that the the Game ID on the sheets matches the Game ID of the selected game.\
+				<span style="font-weight:bold; color:red">Otherwise, the vocabulary items will probably not match!!!</span>\
+				<p style="padding-top:0.5em; margin-top:0.5em"><span style="font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em">Scoring:</span> \
+				20 points for the first correct bingo; then 19, 18, 17 etc. until students get single points for a bingo. Optionally deduct 1 point for an incorrect bingo call.</p>\
+				<p style="padding-top:0.5em; padding-bottom:0.5em; margin-top:0.5em"><span style="font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em">Actions:</span> \
+				Click on a button for more information.</p>\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_start.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_start.png\';bing_info.innerHTML=\'  Shuffles the vocabulary and starts the game from the first word.\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_continue.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_continue.png\';bing_info.innerHTML=\' If you do not have time to finish a game, this starts from the vocabulary item where you left off.\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_pdf.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_pdf.png\';bing_info.innerHTML=\' This creates bingo sheets for the selected game, which you can print out or save.\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_delete.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_delete.png\';bing_info.innerHTML=\' This deletes the selected game from the list. It is a good idea to save this game to disk first in case you change your mind!\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_display.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_display.png\';bing_info.innerHTML=\' This displays all the vocabulary of the selected game.\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_setup.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_setup.png\';bing_info.innerHTML=\' This takes you to the Vocabulary Bingo Setup page where you can create a new game. Further instructions are on that page.\'" />\
+				<img style="width: 3.4em; vertical-align:middle" src="images/buttons/next_button.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'4em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/next_button.png\';bing_info.innerHTML=\' This proceeds to the next vocabulary item, which will then appear in the Ordered List on the right of the screen.\'" />\
+				<img style="width: 2.4em; vertical-align:middle" src="images/buttons/replay_button.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'2.8em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/replay_button.png\';bing_info.innerHTML=\' This plays an audio recording of the item.\'" />\
+				<img style="width: 3.6em; vertical-align:middle" src="images/buttons/review.jpg" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'4em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/review.jpg\';bing_info.innerHTML=\' These buttons are for review purposes. They step through the vocabulary items in the order that they have been called.\'" />\
+				<img style="width: 6.2em; vertical-align:middle" src="images/buttons/load_game.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5.7em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/load_game.png\';bing_info.innerHTML=\' This loads a game that you have previously saved to disk. It should then appear in the list.\'" />\
+				<img style="width: 6.2em; vertical-align:middle" src="images/buttons/save_game.png" \
+				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5.7em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/save_game.png\';bing_info.innerHTML=\' This saves the current game to disk, for archiving, or for moving to another computer.\'" />\
+				<div style="height:3em; width:95%; margin:1em 0; border: ridge gray 0.2em; padding:0.5em; background:#ccc; color:black"><img id="bing_inf_img" style="vertical-align:middle" /><span id="bing_info">&nbsp</span></div>';
+		break;
+		
 		case "numbers":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Say the Number:</span> is similar to Say the Word and Read and Say, but focusses on numbers. Learners are presented with a number, and must pronounce it as clearly as possible.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> This is a human-assessed activity, meaning that a teacher, parent or more advanced student is needed to award points.</p><p style='padding-top:0.5em'>There are two ways to score. When starting a new unit, focus on independence, giving 2 points if students can read the numbers without help (see Read and Say). Once students can generally read without help, move the focus to give 2 points for clarity (see Say the Word).</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span> Click on <span id='b_method' style='border:#7bd8e8 ridge ; background-color:blue; padding:0em 0.2em; cursor: pointer' onclick='swapScoring()'>Scoring Method 1</span> to see alternative.</p><div id='scoringM1' style='margin:0.5em 5em 0.5em 5em'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p><span style='color:red'>cannot</span> read</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p>read <span style='color:#f60'>with help</span></p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p>read <span style='color:green'>without help</span></p><p>(2 points)</p></div></div><div id='scoringM2' style='margin:0.5em 5em 0.5em 5em; display:none'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p style='color:red'>incorrect</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p style='color:#f60'>correct</p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p style='color:green'>correct and clear</p><p>(2 points)</p></div></div><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
-			break;
+		break;
+		
 		case "actions":
 			document.getElementById("helpBox").innerHTML="Actions";
-			break;
+		break;
+		
 		case "animals":
 			document.getElementById("helpBox").innerHTML="Animals";
-			break;
+		break;
+		
 		case "body":
 			document.getElementById("helpBox").innerHTML="Parts of the Body";
-			break;
+		break;
+		
 		case "clothes":
 			document.getElementById("helpBox").innerHTML="Clothes";
-			break;
+		break;
+		
 		case "describing":
 			document.getElementById("helpBox").innerHTML="Describing";
-			break;
+		break;
+		
 		case "food":
 			document.getElementById("helpBox").innerHTML="Food and Drinks";
-			break;
+		break;
+		
 		case "free_time":
 			document.getElementById("helpBox").innerHTML="Free Time";
-			break;
+		break;
+		
 		case "occupations":
 			document.getElementById("helpBox").innerHTML="Occupations";
-			break;
+		break;
+		
 		case "places_and_transport":
 			document.getElementById("helpBox").innerHTML="places_and_transport";
-			break;
+		break;
+		
 		case "school":
 			document.getElementById("helpBox").innerHTML="School";
-			break;
+		break;
+		
 		case "time":
 			document.getElementById("helpBox").innerHTML="Time";
-			break;
+		break;
 
 	}
 	if (bCol!="") {
@@ -2361,7 +2457,12 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 	if (w!="") {
 		document.getElementById("helpWin").style.width=w;
 	}
-	document.getElementById("helpWin").style.top =yPos+"em";
+	if (yPos) {
+		document.getElementById("helpWin").style.top =yPos+"em";
+	}
+	if (xPos) {
+		document.getElementById("helpWin").style.left =xPos+"em";
+	}
 	if (action=="open") {
 		document.getElementById("helpWin").style.display="block";
 	}
@@ -2456,6 +2557,10 @@ function topicTitle(title) {
 		
 		case "school":
 			return("School");
+		break;
+		
+		case "socialising":
+			return("Socialising");
 		break;
 		
 		case "time":
@@ -3242,13 +3347,14 @@ function setVocChoiceTable(button, data_1) {
 	setUserData(button,num_topics);
 }
 
+
 function makeVocBingoSheets (caller) {
 
 	if (caller=="new") {
 		var title="Vocabulary Bingo: "+currentLev+" "+topicTitle(curr_topic_title);
-		var doc_title="Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+game_code+".pdf";
 		var game_code=Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+"_"+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString();
 		var game_id="VB_"+currentLev+"_"+curr_topic_title+"_"+game_code;
+		var doc_title="Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+game_id+".pdf";
 
 		setVocBingSheet();
 
@@ -3263,19 +3369,17 @@ function makeVocBingoSheets (caller) {
 		}
 		localStorage[game_id]="English Builder Vocabulary Bingo Version: 1.0\ngame_id: ("+game_id+")\nbingArray: ("+bingArray+")";
 	}
+	
 	else {
 		var t_string=localStorage[localStorage.curr_vb_game];
 		var t_start=t_string.indexOf("bingArray")+12;
 		var t_end=t_string.lastIndexOf(")");
 		t_string=t_string.slice(t_start,t_end);
 		bingArray=t_string.split(",");
-
 		t_string=localStorage.curr_vb_game;
 		var title="Vocabulary Bingo: "+t_string.slice(3,5)+" "+topicTitle(t_string.slice(6,-10));
 		var game_id=t_string;
-		//alert(title);
-
-		//return;
+		var doc_title="Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+game_id+".pdf";
 	}
 
 	var font_sizes={};
@@ -3353,7 +3457,27 @@ function makeVocBingoSheets (caller) {
 	shuffle(t_array31);
 	var t_array32 = bingArray.toString().split(",");
 	shuffle(t_array32);
-
+	var t_array33 = bingArray.toString().split(",");
+	shuffle(t_array33);
+	var t_array34 = bingArray.toString().split(",");
+	shuffle(t_array34);
+	var t_array35 = bingArray.toString().split(",");
+	shuffle(t_array35);
+	var t_array36 = bingArray.toString().split(",");
+	shuffle(t_array36);
+	var t_array37 = bingArray.toString().split(",");
+	shuffle(t_array37);
+	var t_array38 = bingArray.toString().split(",");
+	shuffle(t_array38);
+	var t_array39 = bingArray.toString().split(",");
+	shuffle(t_array39);
+	var t_array40 = bingArray.toString().split(",");
+	shuffle(t_array40);
+	var t_array41 = bingArray.toString().split(",");
+	shuffle(t_array41);
+	var t_array42 = bingArray.toString().split(",");
+	shuffle(t_array42);
+	
 	pdfMake.fonts = {
 		Nunito: {
 			normal: "Nunito-Regular.ttf",
@@ -3364,26 +3488,47 @@ function makeVocBingoSheets (caller) {
 	  		bold: "ComicNeue-Bold.ttf"
 	  	}
 	}
+	var host="srn";
+	if (localStorage.host) {
+		host=localStorage.host;
+	}
 
 	var bing_pdf = { 
 		pageSize: 'A4',
-		background: {image: 'bing_back.jpg', width:594},
+		background: {image: 'bing_back_'+host+'.jpg', width:594},
 		info: {
 			title: title,
 			author: 'Ian Smith',
 		},
 		content: [
 			{	table: {
-					headerRows: 7,
+					headerRows: 9,
 					widths:[15,"*",15],
 					body: [
 						[{ text: title, fontSize: 14, margin: [0, 0, 0, 2],fillColor: 'white',colSpan: 3}],
 						[{ text: "Game ID: "+game_id, fontSize: 12, margin: [0, 0, 0, 8],fillColor: 'white',colSpan: 3}],
-						[{text: "Information here about how to load this game normally.",fontSize: 11, margin: [0, 0, 0, 8],fillColor: 'white',colSpan: 3}],
-						[{text: "If this game gets deleted, or if you want to play this game on another computer, copy the following into a new text file:",fillColor: 'white',colSpan: 3}],
+						[{text: "To play this game:",fontSize: 11, margin: [0, 0, 0, 0],fillColor: 'white',colSpan: 3}],
+						[{ol: [
+								'Open English Builder',
+								{text: ['Click: ', {text: 'Activities and Content', fontSize: 14, bold: true}]},
+								{text: ['Click: ', {text: 'Bingo in Class', fontSize: 14, bold: true}]},
+								{text: ['Select this game (', {text: game_id, fontSize: 14, bold: true},') from the list']},
+								{text: ['Click: ', {text: 'Start', fontSize: 14, bold: true}]},
+							],colSpan: 3, fillColor: 'white', margin: [15, 0, 0, 8]
+						},],
+						[{text: "If this game gets deleted from English Builder, or if you want to play this game on another computer, copy the following into a new text file and save it:",fillColor: 'white',colSpan: 3, margin: [0,0,0,20]}],
 						[{fillColor:"#fff"},{text: "English Builder Vocabulary Bingo Version: 1.0\n"+"game_id: ("+game_id+")\nbingArray: ("+bingArray+")",fillColor: "#eee"},{fillColor:"#fff"}],
-						[{text: "Then you can load that file into the game.",fillColor: 'white',colSpan: 3}],
-						[{text: "",fillColor: '#fff',margin:[0,0,0,500],colSpan: 3}]
+						[{text: "Then:", fillColor: 'white',colSpan: 3, margin: [0,20,0,0]}],
+						[{ol: [
+								'Open English Builder',
+								{text: ['Click: ', {text: 'Activities and Content', fontSize: 14, bold: true}]},
+								{text: ['Click: ', {text: 'Bingo in Class', fontSize: 14, bold: true}]},
+								{text: ['Click: ', {text: 'Load Game', fontSize: 14, bold: true}]},
+								{text: ['Locate the text file you saved and click: ', {text: 'OK', fontSize: 14, bold: true}]},
+								{text: ['This game (', {text: game_id, fontSize: 14, bold: true},') should appear in the list of games']},
+							],colSpan: 3, fillColor: 'white', margin: [15, 0, 0, 20]
+						},],
+						[{text: "",fillColor: '#fff',margin:[-10,0,0,200],colSpan: 3}]
 					]	
 				},
 				layout: 'noBorders',
@@ -3686,7 +3831,7 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: "t_array17[0]",style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[0]]}, {text: t_array17[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[1]]}, {text: t_array17[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[2]]}, {text: t_array17[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[3]]}, {text: t_array17[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[4]]}],
+						[ {text: t_array17[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[0]]}, {text: t_array17[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[1]]}, {text: t_array17[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[2]]}, {text: t_array17[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[3]]}, {text: t_array17[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[4]]}],
 						[ {text: t_array17[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[5]]}, {text: t_array17[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[6]]}, {text: t_array17[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[7]]}, {text: t_array17[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[8]]}, {text: t_array17[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[9]]}],
 						[ {text: t_array17[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[10]]}, {text: t_array17[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[11]]}, {text: 'Set 17',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array17[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[12]]}, {text: t_array17[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[13]]}],
 						[ {text: t_array17[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[14]]}, {text: t_array17[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[15]]}, {text: t_array17[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[16]]}, {text: t_array17[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[17]]}, {text: t_array17[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[18]]}],
@@ -3964,6 +4109,186 @@ function makeVocBingoSheets (caller) {
 					]
 				},
 			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array33[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[0]]}, {text: t_array33[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[1]]}, {text: t_array33[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[2]]}, {text: t_array33[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[3]]}, {text: t_array33[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[4]]}],
+						[ {text: t_array33[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[5]]}, {text: t_array33[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[6]]}, {text: t_array33[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[7]]}, {text: t_array33[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[8]]}, {text: t_array33[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[9]]}],
+						[ {text: t_array33[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[10]]}, {text: t_array33[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[11]]}, {text: 'Set 33',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array33[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[12]]}, {text: t_array33[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[13]]}],
+						[ {text: t_array33[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[14]]}, {text: t_array33[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[15]]}, {text: t_array33[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[16]]}, {text: t_array33[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[17]]}, {text: t_array33[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[18]]}],
+						[ {text: t_array33[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[19]]}, {text: t_array33[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[20]]}, {text: t_array33[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[21]]}, {text: t_array33[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[22]]}, {text: t_array33[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array34[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[0]]}, {text: t_array34[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[1]]}, {text: t_array34[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[2]]}, {text: t_array34[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[3]]}, {text: t_array34[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[4]]}],
+						[ {text: t_array34[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[5]]}, {text: t_array34[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[6]]}, {text: t_array34[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[7]]}, {text: t_array34[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[8]]}, {text: t_array34[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[9]]}],
+						[ {text: t_array34[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[10]]}, {text: t_array34[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[11]]}, {text: 'Set 34',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array34[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[12]]}, {text: t_array34[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[13]]}],
+						[ {text: t_array34[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[14]]}, {text: t_array34[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[15]]}, {text: t_array34[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[16]]}, {text: t_array34[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[17]]}, {text: t_array34[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[18]]}],
+						[ {text: t_array34[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[19]]}, {text: t_array34[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[20]]}, {text: t_array34[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[21]]}, {text: t_array34[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[22]]}, {text: t_array34[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array35[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[0]]}, {text: t_array35[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[1]]}, {text: t_array35[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[2]]}, {text: t_array35[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[3]]}, {text: t_array35[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[4]]}],
+						[ {text: t_array35[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[5]]}, {text: t_array35[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[6]]}, {text: t_array35[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[7]]}, {text: t_array35[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[8]]}, {text: t_array35[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[9]]}],
+						[ {text: t_array35[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[10]]}, {text: t_array35[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[11]]}, {text: 'Set 35',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array35[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[12]]}, {text: t_array35[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[13]]}],
+						[ {text: t_array35[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[14]]}, {text: t_array35[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[15]]}, {text: t_array35[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[16]]}, {text: t_array35[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[17]]}, {text: t_array35[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[18]]}],
+						[ {text: t_array35[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[19]]}, {text: t_array35[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[20]]}, {text: t_array35[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[21]]}, {text: t_array35[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[22]]}, {text: t_array35[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array36[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[0]]}, {text: t_array36[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[1]]}, {text: t_array36[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[2]]}, {text: t_array36[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[3]]}, {text: t_array36[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[4]]}],
+						[ {text: t_array36[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[5]]}, {text: t_array36[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[6]]}, {text: t_array36[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[7]]}, {text: t_array36[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[8]]}, {text: t_array36[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[9]]}],
+						[ {text: t_array36[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[10]]}, {text: t_array36[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[11]]}, {text: 'Set 36',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array36[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[12]]}, {text: t_array36[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[13]]}],
+						[ {text: t_array36[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[14]]}, {text: t_array36[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[15]]}, {text: t_array36[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[16]]}, {text: t_array36[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[17]]}, {text: t_array36[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[18]]}],
+						[ {text: t_array36[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[19]]}, {text: t_array36[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[20]]}, {text: t_array36[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[21]]}, {text: t_array36[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[22]]}, {text: t_array36[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array37[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[0]]}, {text: t_array37[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[1]]}, {text: t_array37[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[2]]}, {text: t_array37[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[3]]}, {text: t_array37[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[4]]}],
+						[ {text: t_array37[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[5]]}, {text: t_array37[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[6]]}, {text: t_array37[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[7]]}, {text: t_array37[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[8]]}, {text: t_array37[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[9]]}],
+						[ {text: t_array37[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[10]]}, {text: t_array37[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[11]]}, {text: 'Set 37',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array37[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[12]]}, {text: t_array37[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[13]]}],
+						[ {text: t_array37[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[14]]}, {text: t_array37[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[15]]}, {text: t_array37[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[16]]}, {text: t_array37[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[17]]}, {text: t_array37[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[18]]}],
+						[ {text: t_array37[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[19]]}, {text: t_array37[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[20]]}, {text: t_array37[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[21]]}, {text: t_array37[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[22]]}, {text: t_array37[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array38[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[0]]}, {text: t_array38[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[1]]}, {text: t_array38[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[2]]}, {text: t_array38[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[3]]}, {text: t_array38[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[4]]}],
+						[ {text: t_array38[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[5]]}, {text: t_array38[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[6]]}, {text: t_array38[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[7]]}, {text: t_array38[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[8]]}, {text: t_array38[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[9]]}],
+						[ {text: t_array38[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[10]]}, {text: t_array38[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[11]]}, {text: 'Set 38',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array38[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[12]]}, {text: t_array38[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[13]]}],
+						[ {text: t_array38[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[14]]}, {text: t_array38[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[15]]}, {text: t_array38[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[16]]}, {text: t_array38[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[17]]}, {text: t_array38[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[18]]}],
+						[ {text: t_array38[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[19]]}, {text: t_array38[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[20]]}, {text: t_array38[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[21]]}, {text: t_array38[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[22]]}, {text: t_array38[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array39[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[0]]}, {text: t_array39[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[1]]}, {text: t_array39[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[2]]}, {text: t_array39[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[3]]}, {text: t_array39[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[4]]}],
+						[ {text: t_array39[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[5]]}, {text: t_array39[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[6]]}, {text: t_array39[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[7]]}, {text: t_array39[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[8]]}, {text: t_array39[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[9]]}],
+						[ {text: t_array39[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[10]]}, {text: t_array39[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[11]]}, {text: 'Set 39',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array39[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[12]]}, {text: t_array39[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[13]]}],
+						[ {text: t_array39[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[14]]}, {text: t_array39[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[15]]}, {text: t_array39[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[16]]}, {text: t_array39[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[17]]}, {text: t_array39[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[18]]}],
+						[ {text: t_array39[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[19]]}, {text: t_array39[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[20]]}, {text: t_array39[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[21]]}, {text: t_array39[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[22]]}, {text: t_array39[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array40[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[0]]}, {text: t_array40[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[1]]}, {text: t_array40[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[2]]}, {text: t_array40[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[3]]}, {text: t_array40[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[4]]}],
+						[ {text: t_array40[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[5]]}, {text: t_array40[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[6]]}, {text: t_array40[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[7]]}, {text: t_array40[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[8]]}, {text: t_array40[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[9]]}],
+						[ {text: t_array40[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[10]]}, {text: t_array40[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[11]]}, {text: 'Set 40',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array40[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[12]]}, {text: t_array40[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[13]]}],
+						[ {text: t_array40[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[14]]}, {text: t_array40[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[15]]}, {text: t_array40[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[16]]}, {text: t_array40[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[17]]}, {text: t_array40[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[18]]}],
+						[ {text: t_array40[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[19]]}, {text: t_array40[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[20]]}, {text: t_array40[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[21]]}, {text: t_array40[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[22]]}, {text: t_array40[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array41[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[0]]}, {text: t_array41[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[1]]}, {text: t_array41[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[2]]}, {text: t_array41[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[3]]}, {text: t_array41[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[4]]}],
+						[ {text: t_array41[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[5]]}, {text: t_array41[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[6]]}, {text: t_array41[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[7]]}, {text: t_array41[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[8]]}, {text: t_array41[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[9]]}],
+						[ {text: t_array41[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[10]]}, {text: t_array41[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[11]]}, {text: 'Set 41',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array41[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[12]]}, {text: t_array41[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[13]]}],
+						[ {text: t_array41[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[14]]}, {text: t_array41[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[15]]}, {text: t_array41[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[16]]}, {text: t_array41[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[17]]}, {text: t_array41[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[18]]}],
+						[ {text: t_array41[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[19]]}, {text: t_array41[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[20]]}, {text: t_array41[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[21]]}, {text: t_array41[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[22]]}, {text: t_array41[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[23]]}]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ {text: t_array42[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[0]]}, {text: t_array42[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[1]]}, {text: t_array42[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[2]]}, {text: t_array42[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[3]]}, {text: t_array42[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[4]]}],
+						[ {text: t_array42[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[5]]}, {text: t_array42[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[6]]}, {text: t_array42[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[7]]}, {text: t_array42[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[8]]}, {text: t_array42[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[9]]}],
+						[ {text: t_array42[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[10]]}, {text: t_array42[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[11]]}, {text: 'Set 42',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array42[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[12]]}, {text: t_array42[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[13]]}],
+						[ {text: t_array42[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[14]]}, {text: t_array42[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[15]]}, {text: t_array42[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[16]]}, {text: t_array42[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[17]]}, {text: t_array42[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[18]]}],
+						[ {text: t_array42[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[19]]}, {text: t_array42[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[20]]}, {text: t_array42[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[21]]}, {text: t_array42[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[22]]}, {text: t_array42[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[23]]}]
+					]
+				},
+			},
 		],
 		pageMargins: [ 28, 46, 28, 28 ],
 		styles: {
@@ -4145,7 +4470,6 @@ function masterVoc (title) {
 
 
 function saveTopic() {
-	//fixed!!!???
 	if (curr_topic_title=="multi") {
 		return;
 	}
@@ -4168,15 +4492,22 @@ function saveTopic() {
 
 
 function saveSetup(save_type) {
-	if (save_type == "phon_bingo") {
-		var file_name = "EB Phonics Bingo";
-		var file_elem = document.createElement("a");
-		var save_str ="English Builder Phonics Bingo Version: 1.0\n";
-		var temp_string ="";
-		var tArray = [];
-		save_str += "bingArray: ("+bingArray+")\n";
-		save_str += "bing_back_ind: (" +localStorage.bing_back_ind+")\n";
-		save_str += "bing_back_unit: (" +localStorage.bing_back_unit+")\n";
+	if (save_type == "bingo") {
+		if (uMode == "phon_bingo_class") {
+			var file_name = "EB Phonics Bingo";
+			var file_elem = document.createElement("a");
+			var save_str ="English Builder Phonics Bingo Version: 1.0\n";
+			var temp_string ="";
+			var tArray = [];
+			save_str += "bingArray: ("+bingArray+")\n";
+			save_str += "bing_back_ind: (" +localStorage.phon_bing_back_ind+")\n";
+			save_str += "bing_back_unit: (" +localStorage.phon_bing_back_unit+")\n";
+		}
+		else if (uMode == "voc_bingo_class") {
+			var file_name = "EB Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+localStorage.curr_vb_game;
+			var file_elem = document.createElement("a");
+			var save_str =localStorage[localStorage.curr_vb_game];
+		}
 	}
 	else {
 		var file_name = "EB Vocabulary";
@@ -4267,31 +4598,68 @@ function loadSetup(caller) {
 		var close_brace=0;
 		var topic_len=0;
 		
-		if (caller.id=="input_phon_bingo") {
-			if  (loaded_text.indexOf("English Builder Phonics Bingo")== -1) {
-				setMsg("err_file","",file_name.name,"Bingo");
-				return;
+		if (caller.id=="input_load_bingo") {
+			if (uMode=="phon_bingo_class") {
+				if  (loaded_text.indexOf("English Builder Phonics Bingo")== -1) {
+					setMsg("err_file","",file_name.name,"Phonics Bingo");
+					return;
+				}
+				if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
+					setMsg("err_version","",file_name.name);
+					return;
+				}
+				topic=loaded_text.substr(loaded_text.indexOf("bingArray"));
+				open_brace=topic.indexOf("(");
+				close_brace=topic.indexOf(")");
+				topic=topic.substring(open_brace+1,close_brace);
+				localStorage.phon_bing_back=topic;
+				topic=loaded_text.substr(loaded_text.indexOf("bing_back_ind"));
+				open_brace=topic.indexOf("(");
+				close_brace=topic.indexOf(")");
+				topic=topic.substring(open_brace+1,close_brace);
+				localStorage.phon_bing_back_ind=topic;
+				topic=loaded_text.substr(loaded_text.indexOf("bing_back_unit"));
+				open_brace=topic.indexOf("(");
+				close_brace=topic.indexOf(")");
+				topic=topic.substring(open_brace+1,close_brace);
+				localStorage.phon_bing_back_unit=topic;
+				bingClassProc("backup");
 			}
-			if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
-				setMsg("err_version","",file_name.name);
-				return;
+			else if (uMode=="voc_bingo_class") {
+				if  (loaded_text.indexOf("English Builder Vocabulary Bingo")== -1) {
+					setMsg("err_file","",file_name.name,"Vocabulary Bingo");
+					return;
+				}
+				if (parseFloat(loaded_text.substring(loaded_text.indexOf("Version:")+9, loaded_text.indexOf("\n"))) >1) {
+					setMsg("err_version","",file_name.name);
+					return;
+				}
+				open_brace=loaded_text.indexOf("(");
+				close_brace=loaded_text.indexOf(")");
+				var game_id= loaded_text.substring(open_brace+1,close_brace);
+				if (localStorage[game_id]) {
+					alert(game_id + " is already in your list. If you want to reload this game, delete it from your list first.");
+				}
+				else {
+					open_brace=loaded_text.indexOf("bingArray");
+					var t_bingarray =loaded_text.slice(open_brace);
+					t_bingarray=t_bingarray.replace('\n','');
+					loaded_text=loaded_text.slice(0,open_brace)+t_bingarray;
+					localStorage[game_id]=loaded_text;
+					if (!localStorage.voc_bing_games) {
+						localStorage.voc_bing_games=game_id;
+					}
+					else {
+						var t_array_games=localStorage.voc_bing_games.split(",");
+						t_array_games.push(game_id);
+						t_array_games.sort();
+						localStorage.voc_bing_games=t_array_games;
+					}
+					localStorage.curr_vb_game=game_id;
+					procVocBingGame('',"open")
+					listVBGames();
+				}
 			}
-			topic=loaded_text.substr(loaded_text.indexOf("bingArray"));
-			open_brace=topic.indexOf("(");
-			close_brace=topic.indexOf(")");
-			topic=topic.substring(open_brace+1,close_brace);
-			localStorage.bing_back=topic;
-			topic=loaded_text.substr(loaded_text.indexOf("bing_back_ind"));
-			open_brace=topic.indexOf("(");
-			close_brace=topic.indexOf(")");
-			topic=topic.substring(open_brace+1,close_brace);
-			localStorage.bing_back_ind=topic;
-			topic=loaded_text.substr(loaded_text.indexOf("bing_back_unit"));
-			open_brace=topic.indexOf("(");
-			close_brace=topic.indexOf(")");
-			topic=topic.substring(open_brace+1,close_brace);
-			localStorage.bing_back_unit=topic;
-			bingClassProc("backup");
 			return;
 		}
 		else {
@@ -4747,7 +5115,7 @@ function setVocArrays() {
 
 	setAvailCats();
 
-	if (voc_mode=="user" && curr_topic_title!="dot_and_Ben") {
+	if (voc_mode=="user" && curr_topic_title!="dot_and_Ben"  && curr_topic_title.substr(0,5) != "onet_") {
 		setUserVocArray();
 		return;
 	}
@@ -5364,7 +5732,6 @@ function setVocArrays() {
       			for (var i=0; i<onet_full2_array.length; i++) {
 					vocArray[i]=onet_full2_array[i];
       			}
-        		//vocArray = new Array(cloze001,cloze002,cloze003,cloze004,cloze006,cloze007, pass001, pass003, pass004, pass005, pass006);
 			break;			
 		}
 	}
@@ -7686,9 +8053,12 @@ function activity(button){
     }
   }
 
-	else if (button=="phon_bingo_class_cont") {
+	else if (button=="bingo_class_cont") {
 		shuffle(bingArray);
-		localStorage.bing_back=bingArray;
+		localStorage.phon_bing_back=bingArray;
+		localStorage.phon_bing_back_ind=0;
+		localStorage.phon_bing_back_unit=currentPhonUnit;
+		audArray.length=0;
 		tempArray.length=0;
 		tempArray[0]=bingArray[0];
 		document.getElementById("bing_items_1").innerHTML="";
@@ -7696,11 +8066,9 @@ function activity(button){
 		document.getElementById("bing_items_3").innerHTML="";
 		document.getElementById("bing_items_4").innerHTML="";
 		document.getElementById("bing_index").innerHTML= "1. ";
+		document.getElementById("bing_current").innerHTML="";
 		document.getElementById("bing_current").innerHTML=bingArray[0];
 		document.getElementById("bing_items_1").innerHTML="<span style='background:yellow; color:black'>"+bingArray[0]+"</span><br>";
-		audArray.length=0;
-		localStorage.bing_back_ind=0;
-		localStorage.bing_back_unit=currentPhonUnit;
 	}
 
   	else if (uMode=="voc_bingo_class") {
@@ -7721,15 +8089,9 @@ function activity(button){
 		document.getElementById("bing_items_4").innerHTML="";
 		document.getElementById("voc_bing_list").innerHTML="";
 		document.getElementById("bing_index").innerHTML="";
-		document.getElementById("bing_current").innerHTML="&nbsp;";
-		document.getElementById("bing_game_topics").innerHTML=topicTitle(curr_topic_title);
-
-		if (localStorage.show_vb_games) {
-			show_vb_games(localStorage.show_vb_games);
-		}
-		else {
-			show_vb_games("all");
-		}
+		document.getElementById("bing_current").innerHTML="";
+		listVBGames();
+		procVocBingGame("","open");
   	}
 	else if (uMode=="phon_bingo_class") {
 		document.getElementById("bing_class_controls").style.display = "block";
@@ -7743,17 +8105,19 @@ function activity(button){
 		document.getElementById("bing_class_voc").style.display="none";
 		document.getElementById("bing_class_display").style.display="block";
 		document.getElementById("bing_class_phon").style.display="block";
+		document.getElementById('bing_index').style.fontSize="130%";
+		document.getElementById('bing_current').style.fontSize="130%"
 		document.getElementById("bing_items_1").innerHTML="";
 		document.getElementById("bing_items_2").innerHTML="";
 		document.getElementById("bing_items_3").innerHTML="";
 		document.getElementById("bing_items_4").innerHTML="";
 		document.getElementById("bing_index").innerHTML="";
-		document.getElementById("bing_current").innerHTML="&nbsp;";
-		if (localStorage.bing_back) {
+		document.getElementById('bing_current').innerHTML="";
+		if (localStorage.phon_bing_back) {
 			setMsg("bing_back","new_continue");
 		}
 		else {
-			activity("phon_bingo_class_cont");
+			activity("bingo_class_cont");
 		}
 	}
 
@@ -7763,42 +8127,119 @@ function activity(button){
 }
 
 function procVocBingGame(game_id,action) {
+	if (voc_bing_list.childElementCount==0) {
+		return;
+	}
 
 	if (game_id!="") {
 		localStorage.curr_vb_game=game_id.innerHTML;
 		hiVocBingGame();
 	}
-	if (action=='open') {
-		document.getElementById("vb_game_actions").style.display="block";
-		document.getElementById("vb_game_instr").style.display="none";
+
+	if (game_id=='' && localStorage.curr_vb_game) {
+		var t_string=localStorage[localStorage.curr_vb_game];
+	}
+	else if (localStorage[game_id.innerHTML].length>0) {
 		var t_string=localStorage[game_id.innerHTML];
-		var t_start=t_string.indexOf("bingArray")+12;
-		var t_end=t_string.lastIndexOf(")");
-		t_string=t_string.slice(t_start,t_end);
-		bingArray=t_string.split(",");
 	}
-	else if (action=='start') {
-		activity("phon_bingo_class_cont");
+	else {
+		return;
 	}
-	else if (action=='actions') {
-		document.getElementById("show_vb_info").className="optSelect";
-		document.getElementById("show_vb_actions").className="optSelected";
-		document.getElementById("vb_game_actions").style.display="block";
-		document.getElementById("vb_game_instr").style.display="none";
+	document.getElementById("panelCont").src="images/buttons/"+localStorage.curr_vb_game.slice(6,-10)+".jpg";
+	document.getElementById("panelCont2").src="images/buttons/"+localStorage.curr_vb_game.slice(6,-10)+".jpg";
+	document.getElementById("panelLev").src="images/buttons/b_"+localStorage.curr_vb_game.slice(3,5)+".png";
+	document.getElementById("panelLev2").src="images/buttons/b_"+localStorage.curr_vb_game.slice(3,5)+".png";
+	var t_start=t_string.indexOf("bingArray")+12;
+	var t_end=t_string.lastIndexOf(")");
+	t_string=t_string.slice(t_start,t_end);
+	bingArray=t_string.split(",");
+
+	var item_width=1;
+	for (var i=0;i<bingArray.length;i++) {
+		document.getElementById("voc_width_tester_2").innerHTML=bingArray[i];
+		if (bingArray[i].indexOf(" ")== -1 && document.getElementById("voc_width_tester_2").offsetWidth>item_width) {
+			item_width=document.getElementById("voc_width_tester_2").offsetWidth;
+		}
 	}
-	else if (action=='info') {
-		document.getElementById("show_vb_actions").className="optSelect";
-		document.getElementById("show_vb_info").className="optSelected";
-		document.getElementById("vb_game_actions").style.display="none";
-		document.getElementById("vb_game_instr").style.display="block";
+	var fs =(((document.getElementById('bing_items_2').offsetWidth*1.2)/item_width)*80);
+	if (fs>100) {
+		fs=100;
 	}
+	if (bingArray.indexOf("Bandar Seri Begawan")!= -1) {
+		fs=70;
+	}
+	document.getElementById('bing_items_1').style.fontSize=fs+"%";
+	document.getElementById('bing_items_2').style.fontSize=fs+"%";
+	document.getElementById('bing_items_3').style.fontSize=fs+"%";
+	document.getElementById('bing_items_4').style.fontSize=fs+"%";
+	document.getElementById("bing_items_1").innerHTML="";
+	document.getElementById("bing_items_2").innerHTML="";
+	document.getElementById("bing_items_3").innerHTML="";
+	document.getElementById("bing_items_4").innerHTML="";
+	document.getElementById("bing_index").innerHTML="";
+	document.getElementById("bing_current").innerHTML="";
+	document.getElementById('bing_index').style.fontSize=fs*1.3+"%";
+	document.getElementById('bing_current').style.fontSize=fs*1.3+"%";
 }
 
 
+function  startVocBingGame () {
+	if (localStorage[localStorage.curr_vb_game].indexOf("game_ind")== -1) {
+		localStorage[localStorage.curr_vb_game]=localStorage[localStorage.curr_vb_game].replace("bingArray","game_ind: (0)\nbingArray");
+	}
+	else {
+		var ind = localStorage[localStorage.curr_vb_game].slice(localStorage[localStorage.curr_vb_game].indexOf("game_ind: (")+11);
+		ind=ind.slice(0,ind.indexOf(")"));
+		localStorage[localStorage.curr_vb_game]=localStorage[localStorage.curr_vb_game].replace("game_ind: ("+ind,"game_ind: (0");
+		var rep_start = localStorage[localStorage.curr_vb_game].indexOf("bingArray");
+		localStorage[localStorage.curr_vb_game]=localStorage[localStorage.curr_vb_game].slice(0,rep_start);
+		localStorage[localStorage.curr_vb_game]+="bingArray: ("+bingArray+")";
+	}
+	tempArray.length=0;
+	tempArray[0]=bingArray[0];
+	document.getElementById("bing_items_1").innerHTML="";
+	document.getElementById("bing_items_2").innerHTML="";
+	document.getElementById("bing_items_3").innerHTML="";
+	document.getElementById("bing_items_4").innerHTML="";
+	document.getElementById("bing_index").innerHTML= "1. ";
+	document.getElementById("bing_current").innerHTML="";
+	document.getElementById("bing_current").innerHTML=bingArray[0];
+	document.getElementById("bing_items_1").innerHTML="<div style='background:yellow; color:black'>"+bingArray[0]+"</div>";
+}
+
+
+function deleteVocBingGame (caller) {
+	if (localStorage.voc_bing_games) {
+		if (caller=="check") {
+			setMsg('choice_delete_game','delete_cancel');
+			return;
+		}
+		var t_array=localStorage.voc_bing_games.split(",");
+		t_array.splice(t_array.indexOf(localStorage.curr_vb_game),1);
+		if (t_array.length>0) {
+			localStorage.voc_bing_games=t_array;
+		}
+		else {
+			localStorage.removeItem ("voc_bing_games");
+		}
+		localStorage.removeItem (localStorage.curr_vb_game);
+		if (t_array.length>0) {
+			localStorage.curr_vb_game=t_array[0];
+			procVocBingGame("","open");
+		}
+		else {
+			localStorage.curr_vb_game="";
+		}
+	}
+	listVBGames();
+	document.getElementById('modal_back').style.display='none';
+}
+
 function hiVocBingGame() {
 	for (var i=0; i<document.getElementById('voc_bing_list').childNodes.length;i++) {
-		if (document.getElementById('voc_bing_list').childNodes[i].innerHTML == localStorage.curr_vb_game) {
+		if (document.getElementById('voc_bing_list').childNodes[i].childNodes[1].innerHTML == localStorage.curr_vb_game) {
 			document.getElementById('voc_bing_list').childNodes[i].style.background="#2f5";
+			document.getElementById('vb_id').innerHTML=localStorage.curr_vb_game;
 		}
 		else {
 			document.getElementById('voc_bing_list').childNodes[i].style.background="";
@@ -7807,29 +8248,167 @@ function hiVocBingGame() {
 }
 
 
-function show_vb_games(opt){
-
-	var bing_games=localStorage.voc_bing_games.split(",");
-
-	if (opt=="all") {
-		document.getElementById("show_vb_games_topic").className="optSelect";
-		document.getElementById("show_vb_games_all").className="optSelected";
+function listVBGames(){
+	document.getElementById("voc_bing_list").innerHTML="";
+	if (localStorage.voc_bing_games) {
+		var bing_games=localStorage.voc_bing_games.split(",");
+		var t_string="";
+		for (var i=0; i<bing_games.length;i++) {
+			t_string=bing_games[i].slice(3,5) + ' ' +topicTitle(bing_games[i].slice(6,-10));
+			document.getElementById("voc_bing_list").innerHTML+='<div class="voc_bing_li" onclick="procVocBingGame(this.childNodes[1],\'open\')">'+t_string+'<div style="display:none" >'+bing_games[i]+'</div></div>';
+		}
+		hiVocBingGame();
 	}
-	else {
-		for (var k=bing_games.length-1; k > -1;k--) {
-			if (bing_games[k].indexOf(curr_topic_title)==-1) {
-				bing_games.splice(bing_games.indexOf(bing_games[k]),1);
+}
+
+
+function bingClassProc(caller) {
+
+	switch (caller) {
+		case "next":
+			if (tempArray.length==bingArray.length) {
+				return;
+			}
+
+			var n = tempArray.length;
+
+			tempArray[n]=bingArray[n];
+			tempArray.sort();
+			document.getElementById("bing_index").innerHTML= (n+1) + ". ";
+			document.getElementById("bing_current").innerHTML= bingArray[n];
+			if (uMode=="phon_bingo_class") {
+				localStorage.phon_bing_back_ind=n;
+			}
+			else {
+				localStorage[localStorage.curr_vb_game]=localStorage[localStorage.curr_vb_game].replace("game_ind: ("+(n-1),"game_ind: ("+(n));
+			}
+		break;
+
+		case "back":
+			var n= parseInt(document.getElementById("bing_index").innerHTML)-1;
+			if (n>0) {
+				document.getElementById("bing_index").innerHTML= (n) + ". ";
+				document.getElementById("bing_current").innerHTML=bingArray[n-1];
+			}
+		break;
+
+		case "fwd":
+			var n= parseInt(document.getElementById("bing_index").innerHTML)-1;
+			if (n<tempArray.length-1) {
+				document.getElementById("bing_index").innerHTML= (n+2) + ". ";
+				document.getElementById("bing_current").innerHTML=bingArray[n+1];
+			}
+		break;
+
+		case "backup":
+			audArray=[];
+			tempArray=[];
+			if (uMode=="phon_bingo_class") {
+				bingArray=localStorage.phon_bing_back.split(",");
+				for (var i=0;i<localStorage.phon_bing_back_ind;i++) {
+					tempArray[i]=bingArray[i];
+				}
+				setDisplays({modal_back:'none'});
+				document.getElementById("panelCont").src="images/buttons/b_"+localStorage.phon_bing_back_unit+".png";
+				document.getElementById("panelCont2").src="images/buttons/b_"+localStorage.phon_bing_back_unit+".png";
+				document.getElementById("panelLev").src="images/labels/l_"+localStorage.phon_bing_back_unit+"_p.png";
+				document.getElementById("panelLev2").src="images/labels/l_"+localStorage.phon_bing_back_unit+"_p.png";
+			}
+			else {
+				var ind = localStorage[localStorage.curr_vb_game].slice(localStorage[localStorage.curr_vb_game].indexOf("game_ind: (")+11);
+				ind=ind.slice(0,ind.indexOf(")"));
+				var t_string=localStorage[localStorage.curr_vb_game];
+				var t_start=t_string.indexOf("bingArray")+12;
+				var t_end=t_string.lastIndexOf(")");
+				t_string=t_string.slice(t_start,t_end);
+				bingArray=t_string.split(",");
+				for (var i=0;i<ind;i++) {
+					tempArray[i]=bingArray[i];
+				}
+			}
+			tempArray.sort();
+			bingClassProc("next");
+		break;
+
+		case "display":
+			tempArray=bingArray.toString().split(",");
+			tempArray.sort();
+		break;
+	}
+			
+	document.getElementById("bing_items_1").innerHTML="";
+	document.getElementById("bing_items_2").innerHTML="";
+	document.getElementById("bing_items_3").innerHTML="";
+	document.getElementById("bing_items_4").innerHTML="";
+
+	var fl = false;
+	var bc = "";
+	for (var i=0; i<tempArray.length;i++) {
+		if (bc=="#9bd") {
+			bc="#bda";
+		}
+		else {
+			bc="#9bd";
+		}
+
+		if (i<8) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
+				document.getElementById("bing_items_1").innerHTML+= "<div style='background:yellow; color:black'>"+tempArray[i]+"</div>";
+				fl=true;
+			}
+			else {
+				document.getElementById("bing_items_1").innerHTML+= "<div style='background:"+bc+"; color:black'>"+tempArray[i]+"</div>";
 			}
 		}
-		document.getElementById("show_vb_games_all").className="optSelect";
-		document.getElementById("show_vb_games_topic").className="optSelected";
+		else if (i<16) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
+				document.getElementById("bing_items_2").innerHTML+= "<div style='background:yellow; color:black'>"+tempArray[i]+"</div>";
+				fl=true;
+			}
+			else {
+				document.getElementById("bing_items_2").innerHTML+= "<div style='background:"+bc+"'>"+tempArray[i]+"</div>";
+			}
+		}
+		else if (i<24) {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
+				document.getElementById("bing_items_3").innerHTML+= "<div style='background:yellow; color:black'>"+tempArray[i]+"</div>";
+				fl=true;
+			}
+			else {
+				document.getElementById("bing_items_3").innerHTML+= "<div style='background:"+bc+"'>"+tempArray[i]+"</div>";
+			}
+		}
+		else {
+			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
+				document.getElementById("bing_items_4").innerHTML+= "<div style='background:yellow; color:black'>"+tempArray[i]+"</div>";
+				fl=true;
+			}
+			else {
+				document.getElementById("bing_items_4").innerHTML+= "<div style='background:"+bc+"'>"+tempArray[i]+"</div>";
+			}
+		}
 	}
-	document.getElementById("voc_bing_list").innerHTML="";
-	for (var i=0; i<bing_games.length;i++) {
-		document.getElementById("voc_bing_list").innerHTML+='<div class="voc_bing_li" onclick="procVocBingGame(this,\'open\')">'+bing_games[i]+'</div>';
+}
+
+
+function BingClassPlay() {
+	if (uMode=="phon_bingo_class") {
+		if (audArray.length==0) {
+			audArray=new Array (1,2,3);
+			shuffle (audArray);
+		}
+		var bingTone = audArray.pop();
+		if (currentPhonUnit.slice(4)>12 && document.getElementById("bing_current").innerHTML.length==2 && ["a","e","i","o","u"].indexOf(document.getElementById("bing_current").innerHTML.slice(-1))!= -1) {
+			bingTone=bingTone+3;
+		}
+		audVoc.pause();
+		audVoc.src ="audio/phonics/bingo/" + document.getElementById("bing_current").innerHTML + bingTone +".mp3";
+	} 
+	else {
+		var dir=localStorage.curr_vb_game.slice(6,-10);
+		audVoc.src ="audio/vocab/" +dir+"/"+document.getElementById("bing_current").innerHTML +".mp3";
 	}
-	localStorage.show_vb_games=opt;
-	hiVocBingGame()
+	audVoc.play();
 }
 
 
@@ -7946,148 +8525,6 @@ function newNumber(button) {
 		var totPoints=points+pronPoints;
 		document.getElementById("total").innerHTML = "Total: " + totPoints;
 	}
-}
-
-function bingClassProc(caller) {
-	
-	if (caller=="next") {
-		if (tempArray.length==bingArray.length) {
-			return;
-		}
-
-		var n = tempArray.length;
-
-		tempArray[n]=bingArray[n];
-		tempArray.sort();
-		document.getElementById("bing_index").innerHTML= (n+1) + ". ";
-		document.getElementById("bing_current").innerHTML= bingArray[n];
-		localStorage.bing_back_ind=n;
-	}
-	else if (caller=="back") {
-		var n= parseInt(document.getElementById("bing_index").innerHTML)-1;
-		if (n>0) {
-			document.getElementById("bing_index").innerHTML= (n) + ". ";
-			document.getElementById("bing_current").innerHTML=bingArray[n-1];
-		}
-	}
-	else if (caller=="fwd") {
-		var n= parseInt(document.getElementById("bing_index").innerHTML)-1;
-		if (n<tempArray.length-1) {
-			document.getElementById("bing_index").innerHTML= (n+2) + ". ";
-			document.getElementById("bing_current").innerHTML=bingArray[n+1];
-		}
-	}
-	else if (caller=="backup") {
-		audArray=[];
-		tempArray=[];
-		bingArray=localStorage.bing_back.split(",");
-		for (var i=0;i<localStorage.bing_back_ind;i++) {
-			tempArray[i]=bingArray[i];
-		}
-		tempArray.sort();
-		setDisplays({modal_back:'none'});
-		document.getElementById("panelCont").src="images/buttons/b_"+localStorage.bing_back_unit+".png";
-		document.getElementById("panelCont2").src="images/buttons/b_"+localStorage.bing_back_unit+".png";
-		document.getElementById("panelLev").src="images/labels/l_"+localStorage.bing_back_unit+"_p.png";
-		document.getElementById("panelLev2").src="images/labels/l_"+localStorage.bing_back_unit+"_p.png";
-		bingClassProc("next");
-	}
-	else if (caller=="font_inc") {
-		if (parseInt(document.getElementById('bing_font_size').innerHTML)<100) {
-			var fs = parseInt(document.getElementById('bing_font_size').innerHTML)+5;
-			document.getElementById('bing_font_size').innerHTML= fs;
-			document.getElementById('bing_items_1').style.fontSize=fs+"%";
-			document.getElementById('bing_items_2').style.fontSize=fs+"%";
-			document.getElementById('bing_items_3').style.fontSize=fs+"%";
-			document.getElementById('bing_items_4').style.fontSize=fs+"%";
-			document.getElementById('bing_index').style.fontSize=fs*1.5+"%";
-			document.getElementById('bing_current').style.fontSize=fs*1.5+"%";
-		}
-	}
-	else if (caller=="font_dec") {
-		if (parseInt(document.getElementById('bing_font_size').innerHTML)>40) {
-			var fs =parseInt(document.getElementById('bing_font_size').innerHTML)-5;
-			document.getElementById('bing_font_size').innerHTML= fs;
-			document.getElementById('bing_items_1').style.fontSize=fs+"%";
-			document.getElementById('bing_items_2').style.fontSize=fs+"%";
-			document.getElementById('bing_items_3').style.fontSize=fs+"%";
-			document.getElementById('bing_items_4').style.fontSize=fs+"%";
-			document.getElementById('bing_index').style.fontSize=fs*1.5+"%";
-			document.getElementById('bing_current').style.fontSize=fs*1.5+"%"
-		}
-	}
-	else if (caller=="display") {
-		tempArray=bingArray.toString().split(",");
-		tempArray.sort();
-	}
-			
-	document.getElementById("bing_items_1").innerHTML="";
-	document.getElementById("bing_items_2").innerHTML="";
-	document.getElementById("bing_items_3").innerHTML="";
-	document.getElementById("bing_items_4").innerHTML="";
-
-	var fl = false;
-	for (var i=0; i<tempArray.length;i++) {
-		
-
-		if (i<8) {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
-				document.getElementById("bing_items_1").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
-				fl=true;
-			}
-			else {
-				document.getElementById("bing_items_1").innerHTML+= tempArray[i]+"<br>";
-			}
-		}
-		else if (i<16) {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
-				document.getElementById("bing_items_2").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
-				fl=true;
-			}
-			else {
-				document.getElementById("bing_items_2").innerHTML+= tempArray[i]+"<br>";
-			}
-		}
-		else if (i<24) {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
-				document.getElementById("bing_items_3").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
-				fl=true;
-			}
-			else {
-				document.getElementById("bing_items_3").innerHTML+= tempArray[i]+"<br>";
-			}
-		}
-		else {
-			if (tempArray[i]==document.getElementById("bing_current").innerHTML && fl==false) {
-				document.getElementById("bing_items_4").innerHTML+= "<span style='background:yellow; color:black'>"+tempArray[i]+"</span><br>";
-				fl=true;
-			}
-			else {
-				document.getElementById("bing_items_4").innerHTML+= tempArray[i]+"<br>";
-			}
-		}
-	}
-}
-
-
-function BingClassPlay() {
-	if (uMode=="phon_bingo_class") {
-		if (audArray.length==0) {
-			audArray=new Array (1,2,3);
-			shuffle (audArray);
-		}
-		var bingTone = audArray.pop();
-		if (currentPhonUnit.slice(4)>12 && document.getElementById("bing_current").innerHTML.length==2 && ["a","e","i","o","u"].indexOf(document.getElementById("bing_current").innerHTML.slice(-1))!= -1) {
-			bingTone=bingTone+3;
-		}
-		audVoc.pause();
-		audVoc.src ="audio/phonics/bingo/" + document.getElementById("bing_current").innerHTML + bingTone +".mp3";
-	} 
-	else {
-		var dir=localStorage.curr_vb_game.slice(6,-10);
-		audVoc.src ="audio/vocab/" +dir+"/"+document.getElementById("bing_current").innerHTML +".mp3";
-	}
-	audVoc.play();
 }
 
 

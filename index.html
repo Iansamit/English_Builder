@@ -46,6 +46,9 @@
 	</head>
 
 	<body style="background: #000; font:60px 'Nunito', sans-serif; margin: 0px" onload="init()" onresize="resize()" oncontextmenu="return false">
+		<div id="voc_width_tester" style="position:absolute; z-index:-100; font-family:Comic; font-size:21px; font-weight:bold">
+			&nbsp
+		</div>
 		<div id="modal_back" style="position: absolute; z-index: 600; left:0; top:3; width:100%; height: 12.9em; display:none">
 			<div id="msg_win" style="position: absolute; z-index: 500; left:0.1em; top:0.1em; width:6em; text-align: center; border:0.1em ridge #f60; background-color:#000; color:#fff" >
 				<div id="msg_dragbar" style="background-image: url('images/formatting/dragbar.jpg'); background-size:100% 100%;  height: 0.5em; cursor: move" onmousedown="moveHelpBox(event,this.parentNode)">
@@ -90,6 +93,14 @@
 					</div>
 					<div style="position:absolute; right:0; width:50%; bottom:0.4em">
 						<img id="msg_OK" style="display:block; margin-left:auto; margin-right:auto; width: 6em" src="images/buttons/continue.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+				</div>
+				<div id="msg_delete_cancel" style="position:relative; width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.2em">
+					<div style="position:absolute; left:0; width:50%; bottom:0.4em">
+						<img style="display:block; margin-left:auto; margin-right:auto; width: 6em" src="images/buttons/cancel.png" onclick="setDisplays({modal_back:'none'})" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div style="position:absolute; right:0; width:50%; bottom:0.4em">
+						<img id="msg_delete" style="display:block; margin-left:auto; margin-right:auto; width: 4.8em" src="images/buttons/delete_topic.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 					</div>
 				</div>
 				<div id="msg_new_continue" style="position:relative; width: 100%; text-align:left; font-size: 30%; height: 2.5em; margin-top: 0.2em">
@@ -452,7 +463,7 @@
 								</div>
 							</div>
 						</div>
-						<div style="float:left; margin-left: 0.5em;">
+						<div id="voc_bingo_class_icon" style="float:left; margin-left: 0.5em;">
 							<div class="activityButtonDiv">
 								<img id="b_voc_bingo_class"  src='images/buttons/ba_voc_bingo_class_off.png' class="activityButton" onclick="selectActivity('voc_bingo_class')"/>
 								<img id='b_voc_bingo_class_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_class_glo1.png" />
@@ -468,7 +479,7 @@
 								<img id="l_onet_topic" style="display:block; width:6.5em; margin-top:0.5em; margin-left:auto; margin-right:auto" /> 
 							</div>
 						</div>
-						<div id="onet_voc_set" style="position:relative; float:left; margin-left: 0.5em; width:8em; height:3.5em; padding-top:0.5em; text-align:center; font:inherit; font-weight:bold; display: none">
+						<div id="onet_voc_set" style="position:relative; float:left; margin-left: 0.5em; width:8.5em; height:3.5em; padding-top:0.5em; text-align:center; font:inherit; font-weight:bold; display: none">
 							Onet Vocabulary
 							<div style="position:absolute; width:8em; bottom:0">
 								<img style="display:block; width:4.5em; margin-left:auto; margin-right:auto" src="images/buttons/setup_button.png" onclick="curr_topic_title='onet_voc';setVocChoiceTable('show_topic')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
@@ -540,7 +551,7 @@
 					<div style="float:right; width: 7.5em; ">
 						<div style="position:relative; height:4em; margin-top: 2em">
 							<div style="position: absolute; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto">
-								<img id="b_info" src='images/buttons/help button.png' style="width:4em" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setInfo(uMode,'open','#393','11em',3.5)" />
+								<img id="b_info" src='images/buttons/help button.png' style="width:4em" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setInfo(uMode,'open','#393','11em',3.5,0.5)" />
 							</div>
 						</div>
 						<div style="position:relative; height:2em">
@@ -964,6 +975,20 @@
 										<div class="volLabel">
 											Other Voices
 										</div>
+									</div>
+								</div>
+								<div id="optGrp_hosts" class="optGrp" style="width: 10em; font: inherit; display:none">
+									<div class="optGrpTitle">
+										Select Host
+									</div>
+									<div style="float:left; width:49%">
+										<img id="b_srn" src="images/labels/hosts/srn/host_logo.png" style=" width:100%;"  onclick="selectHost('srn')" />
+									</div>
+									<div style="float:right; width:49%">
+										<img id="b_peer" src="images/labels/hosts/peer/host_logo.png" style=" width:100%;" onclick="selectHost('peer')" />
+									</div>
+									<div style="width:49%">
+										<img id="b_bko" src="images/labels/hosts/bko/host_logo.png" style=" width:100%;"  onclick="selectHost('bko')" />
 									</div>
 								</div>
 							</div>
@@ -1873,7 +1898,7 @@
 				</div>
 				<div style="position:relative; width: 90%; margin-left: auto; margin-right: auto; padding: 1%; text-align: left; font-size: 60%; color: #000;  display: block;" >
 					
-					<p style="text-align: center; font-size: 130%;margin-top:0.9em; margin-bottom: 1.2em">Welcome to the <img style="width: 34%; vertical-align: -0.2em;" src="images/labels/host_text.png"/> English Builder.</p>
+					<p style="text-align: center; font-size: 130%;margin-top:0.9em; margin-bottom: 1.2em">Welcome to the <img id="host_text" style="width: 34%; vertical-align: -0.2em;" src="images/labels/hosts/srn/host_text.png"/> English Builder.</p>
 					<p style="margin-bottom: 2.5%">Press <img style="width: 6%; vertical-align: -0.2em;" src="images/buttons/start_button.png" onclick="activity('start')" /> to begin an activity.</p>
 					<p style="margin-bottom: 2.5%">Press <img src="images/buttons/reset_button.png" style="width: 4.07%; vertical-align: -0.2em;" /> to stop an activity at any time, and to reset when an activity is finished.</p>
 					<p style="margin-bottom: 2%">Press <img style="width: 4.07%; vertical-align: -0.2em;" src="images/buttons/help button.png"> to show this info screen, or get information about each activity.</p>
@@ -1901,10 +1926,9 @@
 					 <p>Please click here for the attribution and license of individual images and audio files.
 
 				</div>
-				<img src="images/labels/host_logo.png" style="position: absolute; width:10%; left: 1%; top:7%;" />
-				<img src="images/labels/host_logo.png" style="position: absolute; width:10%; right: 1%; top:7%;" />
+				<img id="host_logo1" src="images/labels/hosts/srn/host_logo.png" style="position: absolute; width:10%; left: 1%; top:7%;" />
+				<img id="host_logo2" src="images/labels/hosts/srn/host_logo.png" style="position: absolute; width:10%; right: 1%; top:7%;" />
 			</div>
-
 
 			 <div id="attributionDiv" style="position:relative; z-index: 8; width: 100%; height: 85%; background-color:#E3D5C9; font: inherit; display: none;">
 
@@ -2178,7 +2202,7 @@
 								&nbsp;
 								</div>
 							</td>
-							<td style="text-align: center; background-image: url('images/labels/host_logo_wide.png');background-size:100% 100%;">
+							<td id="bingo_logo" style="text-align: center; background-image: url('images/labels/hosts/srn/host_logo_wide.png');background-size:100% 100%;">
 
 							</td>
 							<td id="bing12Cell" style="background-image:url('images/formatting/graphemes_back.jpg');background-size:100% 100%; width: 20%; font: inherit; ; text-align: center; border:0.13em ridge #393;" onclick="bingoCheck('bing12')">
@@ -2287,75 +2311,76 @@
 			</div>
 
 			<div id="bing_class_display" style="height:85% ; background-color:white; font: inherit; display: none" >
-				<div id="bing_class_voc"  style= "position:relative; z-index:5; float:left; width: 14.5em; margin-left:0.5em; margin-top:0.7em;text-align:center; font:inherit; font-size:80%">
+				<div id="bing_class_voc"  style= "position:relative; z-index:5; float:left; width: 14.7em; margin-left:0.5em; margin-top:0.7em;text-align:center; font:inherit; font-size:80%">
+					<div id="voc_width_tester_2" style="position:absolute; z-index: -1000; font:inherit; font-size:inherit">
+						hellow
+					</div>
 					<div style="background: #000; border: 0.12em ridge  #393; color:white; font:inherit; font-size:80%">
 						Vocabulary Bingo: Classroom Version
 					</div>
 					<div style="text-align:justify; margin-bottom:0.5em; font:inherit; font-size:45%">
 						<p>To prepare for this activity, you will need to print out one Bingo Sheet for each student.</p>
 					</div>
-					<div style="float: left; width:21em; background: #000; border: 0.25em ridge  #393; color:white; font:inherit; font-size:40%">
-						<div style="color:black; height:2.5em; font:inherit; font-size: 80%; font-weight:bold; background:#B8E4EC">
-							<div id="show_vb_games_all" class="optSelected" style="float:left; width:45%; margin:0.35em" onclick="show_vb_games('all')">
-								All Games
-							</div>
-							<div id="show_vb_games_topic" class="optSelect" style="float:right; width:45%; margin:0.35em" onclick="show_vb_games('topic')">
-								<span id="bing_game_topics"></span>
+					<div style="float: left; width:21.6em; background: #000; border: 0.25em ridge  #393; color:white; font:inherit; font-size:40%">
+						<div style="color:black; height:2.7em; font:inherit; font-size: 80%; font-weight:bold; background:#B8E4EC">
+							<div style="float:left; margin-left:0.2em; margin-top:0.6em">Game ID:</div>
+							<div class="optSelected" style="float:left; margin:0.2em; padding:0.2em; text-align:left" >
+								<span id="vb_id">&nbsp</span>
 							</div>
 						</div>
 						<div id="voc_bing_list" style="clear:both; height: 14.5em; overflow:auto">
 						</div>
 					</div>
 					<div class="optGrp" style="float:left; width:11em; height:14em; margin-left:0.6em; font:inherit; font-size:45%; font-weight:bold;">
-						<div id="show_vb_actions" class="optSelected" style="float:left; width:44%; margin:0.1em; font:inherit; font-size:70%" onclick="procVocBingGame('','actions')">
-							Actions
-						</div>
-						<div id="show_vb_info" class="optSelect" style="float:right; width:44%; margin:0.1em; font:inherit; font-size:70%" onclick="procVocBingGame('','info')">
-							<span id="bing_game_topics">Instructions</span>
-						</div>
-						
 						<div id="vb_game_instr" style="margin-top:2.3em; font:inherit; font-size:74%; font-weight:normal; text-align:justify; display:none">
 							<p>Choose a game from the list on the left, or click <img style='width: 3em;vertical-align: -0.3em' src=images/buttons/setup_button.png /> 
 							to create a new game.</p>
 							<p style="margin-top:0.5em">Please check to make sure that the last four numbers of the Game ID on the bingo sheets match the last four numbers of the game selected.</p>
 							<p style="margin-top:0.5em">Otherwise, the vocabulary items will probably not match!!!</p>
 						</div>
+						Actions
 						<div id="vb_game_actions">
-							<div style="position:relative; float:left; margin-top:1em; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position:relative; float:left; margin-top:0.5em; width:49%; height:2.5em; font:inherit; font-size:70%" >
 								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
-									<img style="display:block; width: 4.5em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/start_button.png" onclick="procVocBingGame('','start')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_start.png" onclick="startVocBingGame()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Start Game</div>
 							</div>
-							<div style="position:relative; float:right; margin-top:1em; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position:relative; float:right; margin-top:0.5em; width:49%; height:2.5em; font:inherit; font-size:70%" >
 								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
-									<img style="display:block; width: 4.5em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/next_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_continue.png" onclick="bingClassProc('backup')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Continue Game</div>
 							</div>
-							<div style="position:relative; float:left; margin-top:3em; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position:relative; float:left; margin-top:2em; width:49%; height:2.5em; font:inherit; font-size:70%" >
 								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
-									<img style="display:block; width: 2.7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/b_pdf.png" onclick="makeVocBingoSheets(this)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_pdf.png" onclick="makeVocBingoSheets(this)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Bingo Sheets</div>
 							</div>
-							<div style="position:relative; float:right; margin-top:3em; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position:relative; float:right; margin-top:2em; width:49%; height:2.5em; font:inherit; font-size:70%" >
 								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
-									<img style="display:block; width: 2.7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/no_button.png" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_delete.png" onclick="deleteVocBingGame ('check')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Delete Game</div>
 							</div>
-							<div style="position:relative; float:left; margin-top:3em; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position:relative; float:left; margin-top:2em; width:49%; height:2.5em; font:inherit; font-size:70%" >
 								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
-									<img style="display:block; width: 4.5em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/display.png" onclick="bingClassProc('display')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_display.png" onclick="bingClassProc('display')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Display Game</div>
 							</div>
-							<div style="position:relative; float:right; margin-top:3em; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position:relative; float:right; margin-top:2em; width:49%; height:2.5em; font:inherit; font-size:70%" >
 								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
-									<img style="display:block; width: 5em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/setup_button.png" onclick="setVocChoiceTable('topics','voc_bingo')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_setup.png" onclick="setVocChoiceTable('topics','voc_bingo')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Make Game</div>
+							</div>
+							<div style="position:relative; float:left; margin-top:2em; width:100%; height:2.5em; font:inherit; font-size:70%" >
+								<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
+									<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/info_wide.png" onclick="setInfo(uMode,'open','#393','11em',1.5,13)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+								</div>
+								<div style="position:relative; margin-top:2.5em; height:1em">Instructions</div>
 							</div>
 						</div>
 					</div>
@@ -2491,32 +2516,35 @@
 							</div>
 						</div>
 						<p style="clear:left;">Each page contains 2 Bingo Sheets, so you only need to print out 1 page per 2 students. Make sure each student gets a <b>different</b> bingo sheet!</p>
-						<p style="">For more information and instructions, click <img style="width:2em;vertical-align: -0.2em" src='images/buttons/help button.png' onclick="setInfo(uMode,'open','#393','11em',3.5)" />.</p>
+						<p style="">For more information and instructions, click <img style="width:2em;vertical-align: -0.2em" src='images/buttons/help button.png' onclick="setInfo(uMode,'open','#393','11em',1.5,13)" />.</p>
 					</div>
 				</div>
-				<div style="position:absolute; bottom:3em; width:45%; text font:inherit; font-size:70%">
+				<div style="position:absolute; bottom:3em; width:45%; font:inherit; font-size:70%">
 					<div style="text-align: center">
 						Current Item
 					</div>
-					<div style="width:10em; margin-left:auto; margin-right:auto; background: #000; border: 0.12em ridge  #393; color:white">
-						<span id="bing_index" style="margin-top: 1em; font-size:150%"></span> <span id="bing_current" style="margin-top: 1em; font-size:150%"></span>
+					<div style="position:relative; width:15em; height:2em; margin-left:auto; margin-right:auto; background: #000; border: 0.12em ridge  #393; color:white">
+						<div style="position: absolute; bottom:0.2em; left:0.5em; ">
+							<span id="bing_index" ></span> <span id="bing_current" ></span>
+						</div>
 					</div>
 				</div>
-				<div style="position:relative; float:right; height: 12em; width: 16.6em; right: 0.5em; top:0.7em; background: #000; border: 0.12em ridge  #393; color:white; font:inherit; font-size:80%">
-					<div style="height:1.5em; margin-top:0.3em; font:inherit; font-size:60%; text-align:center">
+				<div style="position:relative; float:right; height: 12em; width: 16.6em; right: 0.5em; top:0.7em; background: #000; border: 0.12em ridge  #393; color:white; font:inherit; font-size:80%; text-align:center">
+					<div style="height:1.5em; margin-top:0.3em; font:inherit; font-size:60%">
 						Ordered List for Checking Bingo Sheets
 					</div>
-					<div id="bing_items_1" style="float:left; height: 12em; width: 24%; padding-left:0.1em; font:inherit">
-					</div>
-					<div id="bing_items_4" style="float:right; height: 12em; width: 24%; font:inherit">
-					</div>
-					<div id="bing_items_2" style="float:left; height: 12em; width: 24%; margin-left:0.2em; font:inherit">
-					</div>
-					<div id="bing_items_3" style="float:left; height: 12em; width: 24%; margin-left:0.2em; font:inherit">
+					<div style="height: 10.8em; overflow:auto; color:black">
+						<div id="bing_items_1" style="float:left; width: 24%; margin-left:0.7%; font:inherit">
+						</div>
+						<div id="bing_items_2" style="float:left; width: 24%; margin-left:0.7%; font:inherit">
+						</div>
+						<div id="bing_items_3" style="float:left; width: 24%; margin-left:0.7%; font:inherit">
+						</div>
+						<div id="bing_items_4" style="float:left; width: 24%; margin-left:0.7%; font:inherit">
+						</div>
 					</div>
 				</div>
 			</div>
-
 
 			<!-- =========== -->
 			<!-- Controls	-->
@@ -2576,17 +2604,17 @@
 									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="activity('forward')"/>
 							</div>
 						</div>
-						<div id="bing_class_controls" style="display:none; position:relative; height:1.5em; width:14em">
-							<div style="position: absolute; width:2.7em; bottom: 0; left: 0.3em">
+						<div id="bing_class_controls" style="display:none; position:relative; height:1.5em; width:12em">
+							<div style="position: absolute; width:2.7em; bottom: 0; left: 0.4em">
 								<img id="bing_next_button" style="display:block; width:2.7em; margin-left:auto; margin-right:auto" src='images/buttons/next_button.png' 
 									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="bingClassProc('next')"/>
 							</div>
-							<div style="position: absolute; width:1.9em; bottom: 0; left: 3.2em">
+							<div style="position: absolute; width:1.9em; bottom: 0; left: 3.4em">
 								<img id="bing_play_button" style="display:block; width:1.9em; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png' 
 									onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="BingClassPlay()"/>
 							</div>
 							
-							<div style="position:absolute; top:0.1em; left:5.4em; width: 2.6em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
+							<div style="position:absolute; top:0.1em; left:5.7em; width: 2.6em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
 								<div style="margin-top:-0.2em; font-size:30%; text-align:center">
 									Review
 								</div>
@@ -2599,28 +2627,15 @@
 										onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="bingClassProc('fwd')"/>
 								</div>
 							</div>
-							<div style="position:absolute; top:0.1em; left:8.5em; width: 2.2em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
-								<div style="margin-top:-0.2em; font-size:30%; text-align:center">
-									<p>Font Size:</p><p style="margin-top:-0.2em"><span id="bing_font_size">100</span>%</p>
-								</div>
-								<div style="position: absolute; width:1.2em; bottom: 0; left: 0.1em">
-									<img id="bing_font_inc"	style="display:block; width:0.7em; margin-left:auto; margin-right:auto" src='images/buttons/b_back.png' 
-										onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="bingClassProc('font_dec')"/>
-								</div>
-								<div style="position: absolute; width:1.2em; bottom: 0; right: 0.1em">
-									<img id="bing_font_dec" style="display:block; width:0.7em; margin-left:auto; margin-right:auto" src='images/buttons/b_forward.png' 
-										onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="bingClassProc('font_inc')"/>
-								</div>
-							</div>
 							<div  style="position:absolute; top:0.1em; right:0.1em; width: 2.6em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
 								<div style="position:absolute; left:0; width:100%; bottom:0.65em">
-									<input type="file" id="input_phon_bingo" onchange="loadSetup(this)" style="display: none">
+									<input type="file" id="input_load_bingo" onchange="loadSetup(this)" style="display: none">
 									<img style="display:block; margin-left:auto; margin-right:auto; width: 2.2em" src='images/buttons/load_game.png' onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" 
-												onclick="document.getElementById('input_phon_bingo').click()" />
+												onclick="document.getElementById('input_load_bingo').click()" />
 								</div>
 								<div style="position:absolute; left:0; width:100%; bottom:0.05em	">
 									<img style="display:block; margin-left:auto; margin-right:auto; width: 2.2em" src='images/buttons/save_game.png' onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" 
-												onclick="saveSetup('phon_bingo')" />
+												onclick="saveSetup('bingo')" />
 								</div>
 							</div>
 						</div>
@@ -2665,9 +2680,7 @@
 						</div>
 					</div>
 					<div id="voc_choice_controls" style="position:relative; top:0.06em; float:left; left:1.4em; height:1.5em; width:14em; display:none; text-align:center">
-						<div id="voc_width_tester" style="position:absolute; z-index:-10; font-family:Comic; font-size:21px; font-weight:bold">
-							&nbsp
-						</div>
+						<img id='imgToExport' src = "images/vocab/animals/cat.jpg" style='width:1em; display:none' onclick="makeVocBingoSheets('pix')"/> 
 						<div style=" background-color:#7bd8e8;  border: 0.2em ridge #5bc8e8; height:4.5em; margin-left:1em; margin-right: 1em; margin-bottom: 0.1em; font:inherit; font-size: 30%">
 							<div class="userSetupGroup" style="width: 10%; background: none; border: none">
 								<div style="position:relative; height: 100%; font:inherit">
