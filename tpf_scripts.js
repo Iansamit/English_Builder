@@ -1,7 +1,7 @@
 var	activity_group ="vocab";
 var	all_voc_array = new Array ("");
 var anim_glow_on=false;
-var	audArray = new Array("");
+var	audArray = [];
 var	audDLRemaining;
 var aud_rv_vol = 0.5;
 var	audReady = new Array(false);
@@ -118,7 +118,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9211";
+var version_num="0.9310";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -128,39 +128,6 @@ var	vowel="all";
 var	vSpecArray=new Array("e","i","");
 var	vSpecIndex;
 
-
-if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function (searchElement, fromIndex) {
-      if ( this === undefined || this === null ) {
-        throw new TypeError( '"this" is null or not defined' );
-  }
-if (!localStorage.version) {
-		localStorage.clear();
-		localStorage.version=0.91;
-	}
-  var length = this.length >>> 0; // Hack to convert object.length to a UInt32
-
-      fromIndex = +fromIndex || 0;
-      if (Math.abs(fromIndex) === Infinity) {
-        fromIndex = 0;
-      }
-
-      if (fromIndex < 0) {
-        fromIndex += length;
-        if (fromIndex < 0) {
-          fromIndex = 0;
-        }
-      }
-
-      for (;fromIndex < length; fromIndex++) {
-        if (this[fromIndex] === searchElement) {
-          return fromIndex;
-        }
-      }
-
-      return -1;
-    };
-  }
 
 
 function init() {
@@ -223,15 +190,15 @@ function init() {
 			ipc.send('tickVol', 0.6);
 		}
 		if (electron==true) {
-			setHost();
 			document.getElementById("optGrp_hosts").style.display="block";
 			document.getElementById("bing_dl_notes_norm").style.display="none";
 			document.getElementById("bing_dl_notes_electron").style.display="block";
 			document.getElementById("bing_dl_normal").style.display="none";
 			document.getElementById("bing_dl_electron").style.display="block";
+			setHost();
 		}
 	},400);
-	//localStorage.host="bko";
+	//localStorage.host="peer";
 	//setHost();
 }
 
@@ -255,6 +222,9 @@ function setHost() {
 		document.getElementById("bingo_logo").style.backgroundImage= "url('images/labels/hosts/"+localStorage.host+"/host_logo_wide.png')";
 		document.getElementById("b_" + localStorage.host).style.width = "91%";
 		document.getElementById("b_" + localStorage.host).style.border = "0.2em outset #7bd8e8";			
+	}
+	else {
+		localStorage.host="srn";
 	}
 }
 
@@ -463,7 +433,8 @@ function processKey(ev) {
 							break;							
 					}
 				}
-				break;
+			break
+
 			case "read_choose":
 			case "listen_choose":
 				switch  (ev.keyCode) {
@@ -498,7 +469,8 @@ function processKey(ev) {
 							playVocab();
 						}
 				}
-				break;
+			break;
+
 			case "look_choose":
 			case "book_trans":
 				switch  (ev.keyCode) {
@@ -522,7 +494,8 @@ function processKey(ev) {
 						audCtrls(aclick, "play");
 						resetScore();
 				}
-				break;
+			break;
+
 			case "voc_bingo":
 			case "phon_bingo":
 				switch  (ev.keyCode) {
@@ -533,6 +506,17 @@ function processKey(ev) {
 					case 32:
 						playVocab();
 				}
+			break;
+
+			case "phon_listen_type":
+			case "voc_listen_type":
+				if (ev.keyCode==13) {
+					listenTypeCheck();
+				}
+				if (ev.keyCode==18) {
+					listenTypePlay();
+				}
+			break;
 		}
 	}
 }
@@ -847,7 +831,7 @@ function showAttribution(caller){
 function categoryDiv(disp) {
 	resetScore();
 	setDisplays ({contentSelect:disp,welcomeDiv:"none",attributionDiv:"none"});
-	if (uMode!="read_say" && uMode!="phon_bingo" && uMode!="numbers" && uMode!="num_bingo" && uMode!="phon_bingo_class") {
+	if (uMode!="read_say" && uMode!="phon_bingo" && uMode!="numbers" && uMode!="num_bingo" && uMode!="phon_bingo_class" && uMode!="phon_listen_type") {
 		setDisplays ({imageDiv:"block"});
 	}
 	if (disp=="block"){
@@ -962,7 +946,7 @@ function newCount() {
 				finished = "nearly";
 				setTimeout(function() {
 					if (document.getElementById("b_reset").style.display != "none"){
-						setDisplays ({yes_no_div:"none",controls_central:"block",finishedButton:"block",b_replay:"none"});
+						setDisplays ({yes_no_div:"none",controls_central:"block",finishedButton:"block",b_replay:"none",listen_type_controls:"none"});
 					}
 					audCtrls(tickFast, "pause");
 					finished = true;
@@ -1070,6 +1054,16 @@ function resetScore(caller) {
 	for (i = 1; i < 11; i++) {
 		document.getElementById("life"+livesPos+i).src="images/labels/lives_rem.png";
 	}
+	if (uMode=="phon_listen_type") {
+		setBingoArrays();
+		shuffle(bingArray);
+		bingRepeat = 0;
+	}
+	if (uMode=="voc_listen_type") {
+		setVocArrays();
+		shuffle(vocArray);
+		bingRepeat=0;
+	}
 	if (uMode=="phon_bingo" || uMode=="voc_bingo" || uMode=="num_bingo" || uMode=="phon_bingo_class") {
 		for (i = 0; i < 24; i++) {
 			document.getElementById("bing"+i+"X").src="images/formatting/30clear_spacer.png";
@@ -1134,6 +1128,18 @@ function b_press(b) {
 	};
 }
 
+function vKeyPress(key,lo) {
+	if (finished==true) {
+		return;
+	}
+	voc_input_1.value+=key;
+	if (lo) {
+		document.getElementById('keys_lo').style.display='block';
+		document.getElementById('keys_up').style.display='none';
+	}
+	voc_input_1.focus();
+}
+
 
 function selectPhonUnit(unit) {
 	if (unit != currentPhonUnit) {
@@ -1161,6 +1167,7 @@ function selectPhonUnit(unit) {
 		finalC="all";
 		newSyllable("ex");
 		resetScore();
+		setHiKeys();
 	}
 }
 
@@ -1583,6 +1590,24 @@ function selectActivity(mode) {
 				selectScoreSplit(false);
 			break;
 
+			case "phon_listen_type":
+				document.getElementById("panelCont").src="images/buttons/b_"+currentPhonUnit+".png";
+				document.getElementById("panelCont2").src="images/buttons/b_"+currentPhonUnit+".png";
+				document.getElementById("panelLev").src="images/labels/l_"+currentPhonUnit+"_p.png";
+				document.getElementById("panelLev2").src="images/labels/l_"+currentPhonUnit+"_p.png";	
+				selectScoreSplit(false);
+				//setListenTypeArray();
+				setBingoArrays();
+				setHiKeys();
+				document.getElementById("listen_type_head").innerHTML="Phonics";
+			break;
+
+			case "voc_listen_type":
+				shuffle(vocArray);
+				document.getElementById("listen_type_head").innerHTML="Vocabulary";
+				setHiKeys();
+			break;
+
 			case "phon_bingo":
 				document.getElementById("panelCont").src="images/buttons/b_"+currentPhonUnit+".png";
 				document.getElementById("panelCont2").src="images/buttons/b_"+currentPhonUnit+".png";
@@ -1621,6 +1646,7 @@ function selectActivity(mode) {
 
 		if (curr_topic_title=="multi"){
 			setAllVocArray();
+			//shuffle(vocArray);
 		}
 		else if (curr_topic_title=="dot_and_Ben"){
 			selectDotandBen(currentBook);
@@ -1680,6 +1706,14 @@ function setActivityDisplays() {
 
 		case "read_say":
 			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"block",phonDisplay:"block",bing_class_display:"none",score:"block",timer:"block"});
+		break;
+
+		case "phon_listen_type":
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",listen_type_controls:"none",phonDisplay:"block",listen_type_display:"none",bing_class_display:"none",score:"block",timer:"block"});
+		break;
+
+		case "voc_listen_type":
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"block",livesDispTop:"none",listen_type_controls:"none",phonDisplay:"none",listen_type_display:"none",bing_class_display:"none",score:"block",timer:"block"});
 		break;
 
 		case "phon_bingo":
@@ -1745,6 +1779,7 @@ function selectLev(level, caller) {
 
 		if (curr_topic_title!="multi") {
 			setVocArrays();
+			shuffle(vocArray);
 		}
 
 		setAvailCats();
@@ -2363,7 +2398,15 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 		break;
 		
 		case "phon_bingo_class":
-			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Bingo: Classroom Version</span> is still under construction.';
+			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Bingo: Classroom Version</span> help is still under construction.';
+		break;
+
+		case "phon_listen_type":
+			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Listen and Type</span> help is still under construction.';
+		break;
+		
+		case "voc_listen_type":
+			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Vocabulary LIsten and Type </span> help is still under construction.';
 		break;
 		
 		case "voc_bingo_class":
@@ -2505,6 +2548,26 @@ function topicTitle(title) {
 		
 		case "describing":
 			return("Describing");
+		break;
+
+		case "bc_d_B_1":
+			return("Dot and Ben Book 1");
+		break;
+
+		case "bc_d_B_2":
+			return("Dot and Ben Book 2");
+		break;
+
+		case "bc_d_B_3":
+			return("Dot and Ben Book 3");
+		break;
+
+		case "bc_d_B_4":
+			return("Dot and Ben Book 4");
+		break;
+
+		case "bc_d_B_5":
+			return("Dot and Ben Book 5");
 		break;
 		
 		case "easy":
@@ -6784,6 +6847,11 @@ function resetBingTestArray() {
 	bingTestArray = new Array (bingoOut0, bingoOut1, bingoOut2, bingoOut3, bingoOut4, bingoOut5, bingoOut6, bingoOut7, bingoOut8, bingoOut9, bingoOut10, bingoOut11);
 }
 
+function setListenTypeArray () {
+	bingArray=["good bye","tomorrow","holiday","weekend","dream","summer","spring","winter","fall","season","rainy","warm","hail","rainbow","stormy","muggy","windy","foggy","snowy","cloudy","sunny","hazy","rainy","drizzle","thunder","lightning","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","January","February","March","April","May","June","July","August","September","October","November","December","add","plus","sum","subtract","minus","divide","fraction","percentage","negative","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty","grey","dark blue","light blue","brown","purple","orange","white","art","Chinese","English","history","math","music","science","social studies","classroom","blackboard","crayon","desk","eraser","globe","notebook","school bag","scissors","whiteboard","grandfather","grandmother","great-grandfather","great-grandmother","father-in-law","mother-in-law","uncle","aunt","elder brother","younger brother","elder sister","younger sister","husband","wife","brother-in-law","sister-in-law","son-in-law","daughter","nephew","niece","adopted child","armchair","curtain","wallpaper","photograph","picture frame","stereo","telephone","television","remote","flower","magazine","newspaper","comic book","dustbin","home-maker","sink","refrigerator","toaster","grater","toothpick","kettle","matchbox","mortar","rolling pin","mouse trap","broom","brush","bucket","electric panel","dryer","socket","plug","saw","drill","hammer","paint","crate","vacuum cleaner","iron","trash-can","bin"];
+	shuffle(bingArray);
+}
+
 
 function processSubst (ex) {
 	if (curr_topic_title=="multi") {
@@ -7260,11 +7328,11 @@ function splitSubst(subst){
 			//audVoc.play();
 			playVocab();
 		}
-		else if (uMode=="look_choose" || uMode=="voc_bingo" || uMode=="play_learn"){
+		else if (uMode=="look_choose" || uMode=="voc_bingo" || uMode=="play_learn" || uMode == "voc_listen_type"){
 			return dir+s;
 		}
 	}
-	else if (uMode=="look_choose" || uMode=="voc_bingo" || uMode=="phon_bingo" || uMode=="play_learn"){
+	else if (uMode=="look_choose" || uMode=="voc_bingo" || uMode=="phon_bingo" || uMode=="play_learn" || uMode == "voc_listen_type"){
 		return dir+subst;
 	}
 }
@@ -7314,7 +7382,7 @@ function playRV(vE,timbre){
 
 function playVocab() {
 
-	if (uMode!="phon_bingo" && uMode!="voc_bingo" && uMode!="num_bingo") {
+	if (uMode!="phon_bingo" && uMode!="voc_bingo" && uMode!="num_bingo" && uMode!="phon_listen_type" && uMode!="voc_listen_type") {
 		var timbre=setTimbre();
 		audVoc.pause();
 		if (audVoc.currentTime != 0) {
@@ -7342,6 +7410,9 @@ function playVocab() {
 			}*/
 
 		}
+	}
+	else if (uMode=="phon_listen_type" || uMode=="voc_listen_type") {
+		listenTypePlay();
 	}
 	else bingoPlay();
 }
@@ -7394,6 +7465,110 @@ function humanNumPlay(){
 		};
 	}
 }
+
+function setHiKeys() {
+	for (var i=0; i<26;i++) {
+		document.getElementById("key_"+String.fromCharCode(i+97)).src="images/buttons/key_"+String.fromCharCode(i+97)+"_lo.png";
+	}
+	if (uMode=="phon_listen_type") {
+		document.getElementById("key_a").src="images/buttons/key_a_hi.png";
+		document.getElementById("key_i").src="images/buttons/key_i_hi.png";
+		document.getElementById("key_o").src="images/buttons/key_o_hi.png";
+		document.getElementById("key_m").src="images/buttons/key_m_hi.png";
+		document.getElementById("key_p").src="images/buttons/key_p_hi.png";
+		document.getElementById("key_s").src="images/buttons/key_s_hi.png";
+		document.getElementById("key_t").src="images/buttons/key_t_hi.png";
+		if (parseInt(currentPhonUnit.slice(4))>1) {
+			document.getElementById("key_e").src="images/buttons/key_e_hi.png";
+			document.getElementById("key_u").src="images/buttons/key_u_hi.png";
+			document.getElementById("key_f").src="images/buttons/key_f_hi.png";
+			document.getElementById("key_h").src="images/buttons/key_h_hi.png";
+			document.getElementById("key_n").src="images/buttons/key_n_hi.png";
+		}
+		if (parseInt(currentPhonUnit.slice(4))>2) {
+			document.getElementById("key_b").src="images/buttons/key_b_hi.png";
+			document.getElementById("key_d").src="images/buttons/key_d_hi.png";
+			document.getElementById("key_z").src="images/buttons/key_z_hi.png";
+		}
+		if (parseInt(currentPhonUnit.slice(4))>3) {
+			document.getElementById("key_c").src="images/buttons/key_c_hi.png";
+			document.getElementById("key_k").src="images/buttons/key_k_hi.png";
+		}
+		if (parseInt(currentPhonUnit.slice(4))>4) {
+			document.getElementById("key_g").src="images/buttons/key_g_hi.png";
+			document.getElementById("key_j").src="images/buttons/key_j_hi.png";
+		}
+		if (parseInt(currentPhonUnit.slice(4))>7) {
+			document.getElementById("key_l").src="images/buttons/key_l_hi.png";
+			document.getElementById("key_r").src="images/buttons/key_r_hi.png";
+		}
+		if (parseInt(currentPhonUnit.slice(4))>12) {
+			document.getElementById("key_w").src="images/buttons/key_w_hi.png";
+			document.getElementById("key_y").src="images/buttons/key_y_hi.png";
+		}
+	}	
+}
+
+
+function listenTypePlay() {
+
+	if (curr_topic_title=="multi") {
+		var dir= "";
+	} 
+	else {
+		var dir= curr_topic_dir+"/";
+	}
+
+	if (uMode=="voc_listen_type" && localStorage.listen_type_display_mode=="images") {
+		document.getElementById("listen_type_list").innerHTML="<img style='width:11em; margin-left:3.2em' src='images/vocab/"+ dir+ vocArray[0] +".jpg' >";
+	}
+	
+	if (localStorage.listen_type_audio && localStorage.listen_type_audio=="off") {
+		return;
+	}
+
+	if (bingRepeat <3 ) {
+		if (uMode=="phon_listen_type") {
+			if (audArray.length==0) {
+				audArray=new Array (1,2,3);
+				shuffle (audArray);
+			}
+			var bingTone = audArray.pop();
+			if (currentPhonUnit.slice(4)>12 && document.getElementById("bing_current").innerHTML.length==2 && ["a","e","i","o","u"].indexOf(document.getElementById("bing_current").innerHTML.slice(-1))!= -1) {
+				bingTone=bingTone+3;
+			}
+			audVoc.pause();
+			audVoc.src ="audio/phonics/bingo/" + bingArray[0] + bingTone +".mp3";
+			audVoc.play();
+		}
+		else {
+			audVoc.pause();
+			vocArray[0]=splitSubst(vocArray[0]);
+			audVoc.src ="audio/vocab/"+ dir + vocArray[0] +".mp3";
+			var timbre=setTimbre();
+			if (timbre=="Ian") {
+				audVoc.play();
+			}
+			else {
+				if (curr_topic_title=="multi") {
+					vocEx = vocArray[0].slice(vocArray[0].indexOf("/")+1);
+				}
+				else {
+					vocEx = vocArray[0];
+				}
+				playRV(vocEx,timbre);
+			}
+		}
+		
+		if (localStorage.listen_type_limit && localStorage.listen_type_limit=="on") {
+			bingRepeat++;
+		}
+	}
+	document.getElementById("voc_input_1").focus;
+	document.getElementById("listen_type_repeat").innerHTML=3-bingRepeat;
+	voc_input_1.focus();
+}
+
 
 function bingoPlay() {
 	if (stopCount==true){
@@ -7464,11 +7639,12 @@ function bingoPlay() {
 		bingRepeat++;
 	}
 	else if (bingWords > 1) {
-		var syllInd = Math.floor(Math.random() * bingArray.length);
-		bingEx = bingArray[syllInd];
-		bingCalled.push(bingEx.toString());
-		bingArray.splice(syllInd,1);
-
+		if (uMode!="phon_listen_type") {
+			var syllInd = Math.floor(Math.random() * bingArray.length);
+			bingEx = bingArray[syllInd];
+			bingCalled.push(bingEx.toString());
+			bingArray.splice(syllInd,1);
+		}
 		if (uMode=="num_bingo"){
 			bingExAud=bingEx;
 			if (timbre=="Ian"){
@@ -7597,6 +7773,204 @@ function bingoCheck(ch) {
 	if (stopCount == false){
 		bingoPlay();
 	}
+}
+
+function ListenTypeOptions(caller,option) {
+	
+	switch (option) {
+
+		case "display":
+			if ((caller=="setup" && localStorage.listen_type_display=="on") || (caller.id=="b_listen_type_display" && localStorage.listen_type_display=="off")) {
+				document.getElementById("b_listen_type_display").src='images/buttons/yes_button.png';
+				document.getElementById("listen_type_list").style.display="block";
+				document.getElementById("b_listen_type_display_select").style.display="block";
+				document.getElementById("voc_input_1").style.marginTop= "5.6em";
+				localStorage.listen_type_display="on";
+			}
+			else {
+				document.getElementById("b_listen_type_display").src='images/buttons/no_button.png';
+				document.getElementById("listen_type_list").style.display="none";
+				document.getElementById("b_listen_type_display_select").style.display="none";
+				document.getElementById("voc_input_1").style.marginTop= "3em";
+				localStorage.listen_type_display="off";
+			}
+		break;
+
+		case "images":
+			document.getElementById("b_listen_type_images").src='images/buttons/yes_button.png';
+			document.getElementById("b_listen_type_voc_list").src='images/buttons/no_button.png';
+			if (curr_topic_title=="multi") {
+				var dir= "";
+			} 
+			else {
+				var dir= curr_topic_dir+"/";
+			}
+			document.getElementById("listen_type_list").innerHTML="<img style='width:11em; margin-left:3.2em' src='images/vocab/"+ dir+ vocArray[0] +".jpg' >";
+			localStorage.listen_type_display_mode="images";
+		break;
+
+		case "list":
+			document.getElementById("b_listen_type_voc_list").src='images/buttons/yes_button.png';
+			document.getElementById("b_listen_type_images").src='images/buttons/no_button.png';
+			document.getElementById("listen_type_list").innerHTML="";
+			setVocArrays();
+			var t_array = vocArray.toString().split(",");
+			t_array.sort();
+			for (var i=0; i<t_array.length; i++) {
+				if (curr_topic_title=="multi") {
+					t_array[i]=t_array[i].slice(t_array[i].indexOf("/")+1);
+				}
+				document.getElementById("listen_type_list").innerHTML += t_array[i]+ " <span style='color:#aab'>|</span> ";
+			}
+			localStorage.listen_type_display_mode="list";
+		break;
+
+		case "phon_list":
+			if ((caller=="phon_setup" && localStorage.listen_type_phon_list=="on")  || (caller.id=="b_listen_type_list" && localStorage.listen_type_phon_list=="off")) {
+				document.getElementById("b_listen_type_list").src='images/buttons/yes_button.png';
+				document.getElementById("listen_type_list").style.display="block";
+				document.getElementById("voc_input_1").style.marginTop= "5.6em";
+				localStorage.listen_type_phon_list="on";
+			}
+			else  {
+				document.getElementById("b_listen_type_list").src='images/buttons/no_button.png';
+				document.getElementById("listen_type_list").style.display="none";
+				document.getElementById("voc_input_1").style.marginTop= "3em";
+				localStorage.listen_type_phon_list="off";
+			}
+		break;
+
+		case "audio":
+			if ((caller=="setup" && localStorage.listen_type_audio=="on") || (caller.id=="b_listen_type_audio" && localStorage.listen_type_audio=="off")) {
+				document.getElementById("listen_type_play").style.display="block";
+				document.getElementById("b_listen_type_audio").src='images/buttons/yes_button.png';
+				document.getElementById("limit_playback").style.display="block";
+				localStorage.listen_type_audio="on";
+			}
+			else {
+				document.getElementById("listen_type_play").style.display="none";
+				document.getElementById("b_listen_type_audio").src='images/buttons/no_button.png';
+				document.getElementById("listen_type_repeat").style.display="none";
+				document.getElementById("limit_playback").style.display="none";
+				localStorage.listen_type_audio="off";
+			}
+			ListenTypeOptions("setup","limit");
+		break;
+
+		case "limit":
+			if (((caller=="setup" && localStorage.listen_type_limit=="on" ) || (caller.id=="b_limit_playback" && localStorage.listen_type_limit=="off")) && localStorage.listen_type_audio=="on") {
+				document.getElementById("b_limit_playback").src='images/buttons/yes_button.png';
+				document.getElementById("listen_type_repeat").style.display="block";
+				localStorage.listen_type_limit="on";
+			}
+			else {
+				document.getElementById("b_limit_playback").src='images/buttons/no_button.png';
+				document.getElementById("listen_type_repeat").style.display="none";
+				if (caller.id=="b_limit_playback") {
+					localStorage.listen_type_limit="off";
+				}
+			}
+		break;
+
+		case "phon_limit":
+			if (caller=="phon_setup" && localStorage.listen_type_phon_limit=="on"  || caller.id=="b_phon_limit_playback" && localStorage.listen_type_phon_limit=="off") {
+				document.getElementById("b_phon_limit_playback").src='images/buttons/yes_button.png';
+				document.getElementById("listen_type_repeat").style.display="block";
+				localStorage.listen_type_phon_limit="on";
+			}
+			else {
+				document.getElementById("b_phon_limit_playback").src='images/buttons/no_button.png';
+				document.getElementById("listen_type_repeat").style.display="none";
+				localStorage.listen_type_phon_limit="off";
+			}
+		break;
+
+		case "setup":
+			if (!localStorage.listen_type_display) {
+				localStorage.listen_type_display="on";
+				localStorage.listen_type_display_mode="images"
+				localStorage.listen_type_audio="on";
+				localStorage.listen_type_limit="off";
+			}
+			ListenTypeOptions("setup","audio");
+			ListenTypeOptions("setup","display");
+			ListenTypeOptions("setup",localStorage.listen_type_display_mode);
+		break;
+
+		case "phon_setup":
+			if (!localStorage.listen_type_phon_list) {
+				localStorage.listen_type_phon_list="on";
+				localStorage.listen_type_phon_limit="off";
+			}
+			ListenTypeOptions("phon_setup","phon_list");
+			ListenTypeOptions("phon_setup","phon_limit");
+		break;
+	}
+}
+
+
+function listenTypeCheck() {
+	if (finished==true) {
+		return;
+	}
+	
+	if (uMode=="phon_listen_type") {
+		var t_array=bingArray;
+	}
+	else {
+		var t_array=vocArray;
+		if (curr_topic_title=="multi") {
+			t_array[0]=t_array[0].slice(t_array[0].indexOf("/")+1);
+		}
+	}
+
+
+	if (voc_input_1.value==t_array[0]) {
+		dot_ben_fb.src = "audio/correct.mp3";
+		dot_ben_fb.play();
+		points++;
+		document.getElementById("score").innerHTML = "Score: " + Math.floor(points);
+		document.getElementById("listen_type_fb").innerHTML += "<div style='clear:both'><div style='float:left; color:#8f8'>" +t_array[0] + "</div> <div style='float:right'><img style='width:1.5em' src='images/buttons/yes_button.png' /></div></div>";
+		if (document.getElementById("listen_type_fb_img").src.indexOf("ben_incorrect")!= -1 || document.getElementById("listen_type_fb_img").src.indexOf("dot_correct")!= -1) {
+			document.getElementById("listen_type_fb_img").src="images/labels/ben_correct.jpg";
+		}
+		else {
+			document.getElementById("listen_type_fb_img").src="images/labels/dot_correct.jpg";
+		}
+	}
+	else {
+		dot_ben_fb.src = "audio/incorrect.mp3";
+		dot_ben_fb.play();
+		document.getElementById("listen_type_fb").innerHTML += "<div style='clear:both'><div style='float:left; color:#8f8'>"+t_array[0] +"<span style='margin-left:1em; color:#f88'>"+ voc_input_1.value+ "</span></div> <div style='float:right'><img style='width:1.5em' src='images/buttons/no_button.png' /></div></div>";
+		if (document.getElementById("listen_type_fb_img").src.indexOf("ben_correct")!= -1  || document.getElementById("listen_type_fb_img").src.indexOf("dot_incorrect")!= -1 ) {
+			document.getElementById("listen_type_fb_img").src="images/labels/ben_incorrect.jpg";
+		}
+		else {
+			document.getElementById("listen_type_fb_img").src="images/labels/dot_incorrect.jpg";
+		}
+	}
+	document.getElementById("listen_type_fb").scrollTop=100000;
+	if (t_array.length>1) {
+		t_array.splice(0,1);
+	}
+	else {
+		if (uMode=="phon_listen_type") {
+			setBingoArrays();
+			shuffle(bingArray);
+		}
+		else {
+			setVocArrays();
+			shuffle(vocArray);
+		}
+		//setListenTypeArray();
+	}
+	bingRepeat=0;
+	voc_input_1.value='';
+	voc_input_1.focus();
+	if (finished==true) {
+		return;
+	}
+	listenTypePlay();
 }
 
 function chAnswer(ch,imgInd,caller) {
@@ -9102,6 +9476,39 @@ function newImage(trigger) {
 			document.getElementById("ch2").style.display = "table-cell";
 			document.getElementById("ch3").style.display = "table-cell";
 			document.getElementById("ch4").style.display = "table-cell";
+		}
+		if (uMode == "phon_listen_type") {
+			document.getElementById("listen_type_list").innerHTML="";
+			var t_array = bingArray.toString().split(",");
+			t_array.sort();
+			for (var i=0; i<t_array.length; i++) {
+				document.getElementById("listen_type_list").innerHTML += t_array[i]+ " <span style='color:#aab'>|</span> ";
+			}
+			document.getElementById("imageDiv").style.display="none";
+			document.getElementById("phonDisplay").style.display="none";
+			document.getElementById("listen_type_display").style.display="block";
+			document.getElementById("listen_type_controls").style.display = "block";
+			document.getElementById("voc_list_type_options").style.display = "none";
+			document.getElementById("phon_list_type_options").style.display = "block";
+			document.getElementById("listen_type_fb").innerHTML="";
+			voc_input_1.focus();
+			voc_input_1.value="";
+			ListenTypeOptions("","phon_setup");
+			listenTypePlay();
+		}
+		if (uMode == "voc_listen_type") {
+			shuffle(vocArray);
+			document.getElementById("imageDiv").style.display="none";
+			document.getElementById("phonDisplay").style.display="none";
+			document.getElementById("listen_type_display").style.display="block";
+			document.getElementById("listen_type_controls").style.display = "block";
+			document.getElementById("voc_list_type_options").style.display = "block";
+			document.getElementById("phon_list_type_options").style.display = "none";
+			document.getElementById("listen_type_fb").innerHTML="";
+			voc_input_1.focus();
+			voc_input_1.value="";
+			ListenTypeOptions("","setup");
+			listenTypePlay();
 		}
 		if (curr_topic_title=="onet_full"){
 			onet_test_item=0;

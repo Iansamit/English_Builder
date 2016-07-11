@@ -669,6 +669,37 @@ display: none;
  	margin-bottom: 0.5em;
  }
 
+.keyHolder {
+	float:left;
+	position:relative;
+	width:0.7em;
+}
+.keyBedTop {
+	position:absolute;
+	bottom:1.8em;
+	width:1em;
+}
+
+.keyBedMid {
+	position:absolute;
+	bottom:0.9em;
+	width:1em;
+}
+
+.keyBedBase {
+	position:absolute;
+	bottom:0;
+	width:1em;
+}
+
+.key {
+	left:0;
+	right:0;
+	margin-left:auto;
+	margin-right:auto;
+	display:block;
+}
+
 .dlTitle {
   border-bottom: 1px solid #00cccc;
   background-color : #ffffff;
@@ -679,7 +710,7 @@ display: none;
   padding-left:10px;
   }
 
-  .dlTitleAg {
+.dlTitleAg {
   border-bottom: 1px solid #00cccc;
   background-color : #edffed;
   font-size:15px;
@@ -689,7 +720,7 @@ display: none;
   padding-left:60px;
   }
 
-    .dlTitleTd {
+.dlTitleTd {
   border-bottom: 1px solid #00cccc;
   background-color : #f8edff;
   font-size:15px;
@@ -700,7 +731,7 @@ display: none;
   }
 
 
-    .dlTitleAf {
+.dlTitleAf {
   border-bottom: 1px solid #00cccc;
   background-color : #ffffda;
   font-size:15px;
@@ -710,7 +741,7 @@ display: none;
   padding-left:60px;
   }
 
-  .dlTitleFc {
+.dlTitleFc {
   border-bottom: 1px solid #00cccc;
   background-color : #edffed;
   font-size:15px;
@@ -720,7 +751,7 @@ display: none;
   padding-left:60px;
   }
 
-    .dlTitleHo {
+.dlTitleHo {
   border-bottom: 1px solid #00cccc;
   background-color : #f8edff;
   font-size:15px;
@@ -730,7 +761,7 @@ display: none;
   padding-left:60px;
   }
 
-    .dlTitlePu {
+.dlTitlePu {
   border-bottom: 1px solid #00cccc;
   background-color : #ffffda;
   font-size:15px;
@@ -740,7 +771,7 @@ display: none;
   padding-left:60px;
   }
 
-      .dlTitleTl {
+.dlTitleTl {
   border-bottom: 1px solid #00cccc;
   background-color : #e8f0ff;
   font-size:15px;

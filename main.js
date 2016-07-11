@@ -1,9 +1,13 @@
-var app = require('app');  // Module to control application life.
-var BrowserWindow = require('browser-window');  // Module to create native browser window.
-var ipc = require('ipc');
+var app = require('electron').app
+var BrowserWindow = require('electron').BrowserWindow
+var ipc = require('electron').ipcMain
+
+//var app = require('app');  // Module to control application life.
+//var BrowserWindow = require('browser-window');  // Module to create native browser window.
+//var ipc = require('ipc');
 
 // Report crashes to our server.
-require('crash-reporter').start();
+//require('crash-reporter').start();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -22,14 +26,15 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
   // Create the browser window(s).
+
   splashWindow = new BrowserWindow({width: 600, height: 450, frame: false});
   mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname + '/images/formatting/e_b_icon.png'});
   mainWindow.minimize()
 
   // and load the html of the apps.
 
-  splashWindow.loadUrl('file://' + __dirname + '/splash.html');
-  mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  splashWindow.loadURL('file://' + __dirname + '/splash.html');
+  mainWindow.loadURL('file://' + __dirname + '/index.html');
   mainWindow.webContents.executeJavaScript("electron=true");
     
   ipc.on('nearly', function(event){mainWindow.webContents.executeJavaScript("audCtrls(startup, 'play');");});

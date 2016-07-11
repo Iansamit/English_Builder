@@ -21,9 +21,9 @@
 
 		<!--Scripts all the neat stuff! --><script type="text/javascript" src="tpf_scripts.js"></script>
 
-        <!--Cloze tests as js variables --><script type="text/javascript" src="onet_items.js"></script>
+        <!--Onet test items as js variables --><script type="text/javascript" src="onet_items.js"></script>
 
-		<!--inject.js for script loading --><script type="text/javascript" src="inject.js"></script>
+		<!--inject.js for external script loading --><script type="text/javascript" src="inject.js"></script>
 
 		<!--pdfmake for creating bingo sheets --><script type="text/javascript" src="pdfmake2.min.js"></script>
 
@@ -153,11 +153,11 @@
 		<!-- =============-->
 		<!-- Left Pane    -->
 		<!-- ============ -->
-		<div id="left_pane" style="position: absolute; z-index: 5; margin-left: 1%; top:1%; width: 15%; height:70%;">
+		<div id="left_pane" style="position: absolute; z-index:5; margin-left: 1%; top:1%; width: 15%">
 			<div id="timer" align="center" style="width: 90%; height: 15%; margin-left: auto; margin-right: auto; font: 100% 'Nunito', sans-serif; border:0.1em ridge #393; background-color:#000; color:#fff">
 				03:00
 			</div>
-			<div style="height: 1.86%;"> <!-- spacer -->
+			<div style="height: 0.2em; font:inherit;"> <!-- spacer -->
 
 			</div>
 				<div id="errDiv" align="right" style="width:100%; background:#f60; border:0.1em ridge #e40;">
@@ -346,8 +346,14 @@
 			|	3) (for ghosted) desaturate: luminosity; 4) brightness: +90, contrast: -20        |
 			=================================================================================== -->
 			<div id="contentSelect" align="center" style="position: absolute; z-index:9; width:100%; height: 85%; background-color:#b8e4ec; font:32% 'Nunito', sans-serif;display:none;"	>
-				<div style="border: 0.3em ridge #7bd8e8; background: black; color: white; width:97%; height: 9em; font:inherit; margin-top: 1%; margin-bottom: 1%">
-					<div style="float: left; margin-right: 1.2em; font: inherit">
+				<div style="position:relative; border: 0.3em ridge #7bd8e8; background: black; color: white; width:97%; height: 9em; font:inherit; margin-top: 1%; margin-bottom: 1%">
+					<div style="position:absolute; height:2em; width:7em; top: 0.5em; left:14.3em">
+						<div style="position: absolute; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto">
+							<img id="b_info" src='images/buttons/info_wide.png' style="width:100%" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setInfo(uMode,'open','#393','11em',3.5,0.5)" />
+						</div>
+					</div>
+					<div style="float: left; margin-right: 1.2em; font: inherit; text-align:center">
+						
 						<div style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
 							Activity Types
 						</div>
@@ -367,7 +373,7 @@
 									<img id="bas_onet" src="images/buttons/bas_onet_off.png" width="100%" onclick="selectActivityGroup ('onet')"  />
 								</div>
 							</div>
-
+							
 						</div>
 						<div style="float:left; margin-left: 0.2em; width: 6em">
 							<div style="position:relative; height:2em">
@@ -380,187 +386,199 @@
 									<img id="bas_readers" src="images/buttons/bas_readers_off.png" width="100%" onclick="selectActivityGroup ('readers')" />
 								</div>
 							</div>
-						</div>
-					</div>
-
-					<div id="vocab_activities" style="float: left">
-						<div id="voc_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
-							Vocabulary Activities
-						</div>
-						<div id="reader_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold; display: none">
-							Graded Reader Activities
-						</div>
-						<div id="onet_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold; display: none">
-							ONET Activities
-						</div>
-						<div id="book_trans_icon" style="float:left; margin-left: 0.5em; display: none">
-							<div class="activityButtonDiv">
-								<img id="b_book_trans"  src='images/buttons/ba_book_trans_off.png' class="activityButton" onclick="selectActivity('book_trans')"/>
-								<img id='b_book_trans_gl1' class="buttonGlow" src="images/buttons/ba_book_trans_glo1.png" />
-								<img id='b_book_trans_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_book_trans_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Read a Book
-								</div>
-							</div>
-						</div>
-						<div id="read_choose_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_read_choose"  src='images/buttons/ba_read_choose_off.png' class="activityButton" style="display:none" onclick="selectActivity('read_choose')"/>
-								<img id='b_read_choose_gl1' class="buttonGlow" style="display: block" src="images/buttons/ba_read_choose_glo1.png" />
-								<img id='b_read_choose_gl2' class="buttonGlow" style="opacity: 0; display: block" src="images/buttons/ba_read_choose_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Read and Choose
-								</div>
-							</div>
-						</div>
-						<div id="look_choose_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_look_choose"  src='images/buttons/ba_look_choose_off.png' class="activityButton" onclick="selectActivity('look_choose')"/>
-								<img id='b_look_choose_gl1' class="buttonGlow" src="images/buttons/ba_look_choose_glo1.png" />
-								<img id='b_look_choose_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_look_choose_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Look and Choose
-								</div>
-							</div>
-						</div>
-						<div id="list_choose_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_listen_choose"  src='images/buttons/ba_listen_choose_off.png' class="activityButton" onclick="selectActivity('listen_choose')"/>
-								<img id='b_listen_choose_gl1' class="buttonGlow" src="images/buttons/ba_listen_choose_glo2.png" />
-								<img id='b_listen_choose_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_listen_choose_glo1.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Listen and Choose
-								</div>
-							</div>
-						</div>
-						<div id="play_learn_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_play_learn"  src='images/buttons/ba_play_learn_off.png' class="activityButton" onclick="selectActivity('play_learn')"/>
-								<img id='b_play_learn_gl1' class="buttonGlow" src="images/buttons/ba_play_learn_glo1.png" />
-								<img id='b_play_learn_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_play_learn_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Play and Learn
-								</div>
-							</div>
-						</div>
-						<div id="say_word_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_say_word"  src='images/buttons/ba_say_word_off.png' class="activityButton" onclick="selectActivity('say_word')"/>
-								<img id='b_say_word_gl1' class="buttonGlow" src="images/buttons/ba_say_word_glo1.png" />
-								<img id='b_say_word_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_say_word_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Say the Word
-								</div>
-							</div>
-						</div>
-						<div id="voc_bingo_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_voc_bingo"  src='images/buttons/ba_voc_bingo_off.png' class="activityButton" onclick="selectActivity('voc_bingo')"/>
-								<img id='b_voc_bingo_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_glo1.png" />
-								<img id='b_voc_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_bingo_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Vocabulary Bingo
-								</div>
-							</div>
-						</div>
-						<div id="voc_bingo_class_icon" style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_voc_bingo_class"  src='images/buttons/ba_voc_bingo_class_off.png' class="activityButton" onclick="selectActivity('voc_bingo_class')"/>
-								<img id='b_voc_bingo_class_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_class_glo1.png" />
-								<img id='b_voc_bingo_class_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_bingo_class_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Bingo in Class
-								</div>
-							</div>
-						</div>
-						<div id="onet_act_icon" style="float:left; margin-left: 0.5em; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8; display: none">
-							<div style="position: relative; margin-top: 0.5em; width: 22em; height: 6.3em; margin-left: 0.2em; margin-right: 0.2em; font-size: 85%; font-weight: bold; color: black; text-align: center">
-								The activity is selected automatically for:
-								<img id="l_onet_topic" style="display:block; width:6.5em; margin-top:0.5em; margin-left:auto; margin-right:auto" /> 
-							</div>
-						</div>
-						<div id="onet_voc_set" style="position:relative; float:left; margin-left: 0.5em; width:8.5em; height:3.5em; padding-top:0.5em; text-align:center; font:inherit; font-weight:bold; display: none">
-							Onet Vocabulary
-							<div style="position:absolute; width:8em; bottom:0">
-								<img style="display:block; width:4.5em; margin-left:auto; margin-right:auto" src="images/buttons/setup_button.png" onclick="curr_topic_title='onet_voc';setVocChoiceTable('show_topic')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
-							</div>
-						</div>
-					</div>
-
-					<div id="phonics_activities" style="float: left; display: none">
-						<div style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
-							Phonics Activities
-						</div>
-						<div style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_read_say"  src='images/buttons/ba_read_say_off.png' class="activityButton" onclick="selectActivity('read_say')"/>
-								<img id='b_read_say_gl1' class="buttonGlow" src="images/buttons/ba_read_say_glo1.png" />
-								<img id='b_read_say_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_read_say_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Read and Say
-								</div>
-							</div>
-						</div>
-						<div style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_phon_bingo"  src='images/buttons/ba_phon_bingo_off.png' class="activityButton" onclick="selectActivity('phon_bingo')"/>
-								<img id='b_phon_bingo_gl1' class="buttonGlow" src="images/buttons/ba_phon_bingo_glo1.png" />
-								<img id='b_phon_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_phon_bingo_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Phonics Bingo
-								</div>
-							</div>
-						</div>
-						<div style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_phon_bingo_class"  src='images/buttons/ba_phon_bingo_class_off.png' class="activityButton" onclick="selectActivity('phon_bingo_class')"/>
-								<img id='b_phon_bingo_class_gl1' class="buttonGlow" src="images/buttons/ba_phon_bingo_class_glo1.png" />
-								<img id='b_phon_bingo_class_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_phon_bingo_class_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Bingo in Class
-								</div>
-							</div>
-						</div>
-					</div>
-					<div id="numbers_activities" style="float: left; display: none">
-						<div style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
-							Numbers Activities
-						</div>
-						<div style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_numbers"  src='images/buttons/ba_numbers_off.png' class="activityButton" onclick="selectActivity('numbers')"/>
-								<img id='b_numbers_gl1' class="buttonGlow" src="images/buttons/ba_numbers_glo1.png" />
-								<img id='b_numbers_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_numbers_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Say the Number
-								</div>
-							</div>
-						</div>
-						<div style="float:left; margin-left: 0.5em;">
-							<div class="activityButtonDiv">
-								<img id="b_num_bingo"  src='images/buttons/ba_voc_bingo_off.png' class="activityButton" onclick="selectActivity('num_bingo')"/>
-								<img id='b_num_bingo_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_glo1.png" />
-								<img id='b_num_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_bingo_glo2.png" />
-								<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
-									Numbers Bingo
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div style="float:right; width: 7.5em; ">
-						<div style="position:relative; height:4em; margin-top: 2em">
-							<div style="position: absolute; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto">
-								<img id="b_info" src='images/buttons/help button.png' style="width:4em" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="setInfo(uMode,'open','#393','11em',3.5,0.5)" />
-							</div>
-						</div>
-						<div style="position:relative; height:2em">
-							<div style="position: absolute; bottom: 0; width:100%">
-								<img id="b_options" src='images/buttons/options_button.png' style="width:80%; display:block; margin-top: 0.5em" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="optionsDiv('block')"/>
+							<div style="position:relative; height:2em">
+							<div style="position: absolute; bottom: 0.2em; width:6em">
+								<img id="b_options" src='images/buttons/options_button.png' style="width:5.6em; display:block; margin-left:auto; margin-right:auto" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="optionsDiv('block')"/>
 							</div>
 						</div>
 					</div>
 				</div>
+
+				<div id="vocab_activities" style="float: left">
+					<div id="voc_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
+						Vocabulary Activities
+					</div>
+					<div id="reader_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold; display: none">
+						Graded Reader Activities
+					</div>
+					<div id="onet_act_title" style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold; display: none">
+						ONET Activities
+					</div>
+					<div id="book_trans_icon" style="float:left; display: none">
+						<div class="activityButtonDiv">
+							<img id="b_book_trans"  src='images/buttons/ba_book_trans_off.png' class="activityButton" onclick="selectActivity('book_trans')"/>
+							<img id='b_book_trans_gl1' class="buttonGlow" src="images/buttons/ba_book_trans_glo1.png" />
+							<img id='b_book_trans_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_book_trans_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Read a Book
+							</div>
+						</div>
+					</div>
+					<div id="read_choose_icon" style="float:left;">
+						<div class="activityButtonDiv">
+							<img id="b_read_choose"  src='images/buttons/ba_read_choose_off.png' class="activityButton" style="display:none" onclick="selectActivity('read_choose')"/>
+							<img id='b_read_choose_gl1' class="buttonGlow" style="display: block" src="images/buttons/ba_read_choose_glo1.png" />
+							<img id='b_read_choose_gl2' class="buttonGlow" style="opacity: 0; display: block" src="images/buttons/ba_read_choose_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Read and Choose
+							</div>
+						</div>
+					</div>
+					<div id="look_choose_icon" style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_look_choose"  src='images/buttons/ba_look_choose_off.png' class="activityButton" onclick="selectActivity('look_choose')"/>
+							<img id='b_look_choose_gl1' class="buttonGlow" src="images/buttons/ba_look_choose_glo1.png" />
+							<img id='b_look_choose_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_look_choose_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Look and Choose
+							</div>
+						</div>
+					</div>
+					<div id="list_choose_icon" style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_listen_choose"  src='images/buttons/ba_listen_choose_off.png' class="activityButton" onclick="selectActivity('listen_choose')"/>
+							<img id='b_listen_choose_gl1' class="buttonGlow" src="images/buttons/ba_listen_choose_glo2.png" />
+							<img id='b_listen_choose_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_listen_choose_glo1.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Listen and Choose
+							</div>
+						</div>
+					</div>
+					<div id="play_learn_icon" style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_play_learn"  src='images/buttons/ba_play_learn_off.png' class="activityButton" onclick="selectActivity('play_learn')"/>
+							<img id='b_play_learn_gl1' class="buttonGlow" src="images/buttons/ba_play_learn_glo1.png" />
+							<img id='b_play_learn_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_play_learn_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Play and Learn
+							</div>
+						</div>
+					</div>
+					<div id="say_word_icon" style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_say_word"  src='images/buttons/ba_say_word_off.png' class="activityButton" onclick="selectActivity('say_word')"/>
+							<img id='b_say_word_gl1' class="buttonGlow" src="images/buttons/ba_say_word_glo1.png" />
+							<img id='b_say_word_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_say_word_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Say the Word
+							</div>
+						</div>
+					</div>
+					<div id="voc_bingo_icon" style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_voc_bingo"  src='images/buttons/ba_voc_bingo_off.png' class="activityButton" onclick="selectActivity('voc_bingo')"/>
+							<img id='b_voc_bingo_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_glo1.png" />
+							<img id='b_voc_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_bingo_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Vocabulary Bingo
+							</div>
+						</div>
+					</div>
+					<div id="voc_bingo_class_icon" style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_voc_bingo_class"  src='images/buttons/ba_voc_bingo_class_off.png' class="activityButton" onclick="selectActivity('voc_bingo_class')"/>
+							<img id='b_voc_bingo_class_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_class_glo1.png" />
+							<img id='b_voc_bingo_class_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_bingo_class_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Bingo in Class
+							</div>
+						</div>
+					</div>
+					<div style="float:left; margin-left: 0.4em;">
+						<div class="activityButtonDiv">
+							<img id="b_voc_listen_type"  src='images/buttons/ba_voc_listen_type_off.png' class="activityButton" onclick="selectActivity('voc_listen_type')"/>
+							<img id='b_voc_listen_type_gl1' class="buttonGlow" src="images/buttons/ba_voc_listen_type_glo1.png" />
+							<img id='b_voc_listen_type_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_listen_type_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Listen Look and Type
+							</div>
+						</div>
+					</div>
+					<div id="onet_act_icon" style="float:left; margin-left: 0.5em; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8; display: none">
+						<div style="position: relative; margin-top: 0.5em; width: 22em; height: 6.3em; margin-left: 0.2em; margin-right: 0.2em; font-size: 85%; font-weight: bold; color: black; text-align: center">
+							The activity is selected automatically for:
+							<img id="l_onet_topic" style="display:block; width:6.5em; margin-top:0.5em; margin-left:auto; margin-right:auto" /> 
+						</div>
+					</div>
+					<div id="onet_voc_set" style="position:relative; float:left; margin-left: 0.5em; width:8.5em; height:3.5em; padding-top:0.5em; text-align:center; font:inherit; font-weight:bold; display: none">
+						Onet Vocabulary
+						<div style="position:absolute; width:8em; bottom:0">
+							<img style="display:block; width:4.5em; margin-left:auto; margin-right:auto" src="images/buttons/setup_button.png" onclick="curr_topic_title='onet_voc';setVocChoiceTable('show_topic')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+						</div>
+					</div>
+				</div>
+
+				<div id="phonics_activities" style="float: left; display: none">
+					<div style="margin-top: 0.3em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
+						Phonics Activities
+					</div>
+					<div style="float:left; ">
+						<div class="activityButtonDiv">
+							<img id="b_read_say"  src='images/buttons/ba_read_say_off.png' class="activityButton" onclick="selectActivity('read_say')"/>
+							<img id='b_read_say_gl1' class="buttonGlow" src="images/buttons/ba_read_say_glo1.png" />
+							<img id='b_read_say_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_read_say_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Read and Say
+							</div>
+						</div>
+					</div>
+					<div style="float:left; margin-left: 0.5em;">
+						<div class="activityButtonDiv">
+							<img id="b_phon_bingo"  src='images/buttons/ba_phon_bingo_off.png' class="activityButton" onclick="selectActivity('phon_bingo')"/>
+							<img id='b_phon_bingo_gl1' class="buttonGlow" src="images/buttons/ba_phon_bingo_glo1.png" />
+							<img id='b_phon_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_phon_bingo_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Phonics Bingo
+							</div>
+						</div>
+					</div>
+					<div style="float:left; margin-left: 0.5em;">
+						<div class="activityButtonDiv">
+							<img id="b_phon_bingo_class"  src='images/buttons/ba_phon_bingo_class_off.png' class="activityButton" onclick="selectActivity('phon_bingo_class')"/>
+							<img id='b_phon_bingo_class_gl1' class="buttonGlow" src="images/buttons/ba_phon_bingo_class_glo1.png" />
+							<img id='b_phon_bingo_class_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_phon_bingo_class_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Bingo in Class
+							</div>
+						</div>
+					</div>
+					<div style="float:left; margin-left: 0.5em;">
+						<div class="activityButtonDiv">
+							<img id="b_phon_listen_type"  src='images/buttons/ba_phon_listen_type_off.png' class="activityButton" onclick="selectActivity('phon_listen_type')"/>
+							<img id='b_phon_listen_type_gl1' class="buttonGlow" src="images/buttons/ba_phon_listen_type_glo1.png" />
+							<img id='b_phon_listen_type_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_phon_listen_type_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Listen and Type
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="numbers_activities" style="float: left; display: none">
+					<div style="margin-top: 0.3em;margin-left:7em; margin-bottom: 0.3em; font-size: 120%; font-weight: bold">
+						Numbers Activities
+					</div>
+					<div style="float:left">
+						<div class="activityButtonDiv">
+							<img id="b_numbers"  src='images/buttons/ba_numbers_off.png' class="activityButton" onclick="selectActivity('numbers')"/>
+							<img id='b_numbers_gl1' class="buttonGlow" src="images/buttons/ba_numbers_glo1.png" />
+							<img id='b_numbers_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_numbers_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Say the Number
+							</div>
+						</div>
+					</div>
+					<div style="float:left; margin-left: 0.5em;">
+						<div class="activityButtonDiv">
+							<img id="b_num_bingo"  src='images/buttons/ba_voc_bingo_off.png' class="activityButton" onclick="selectActivity('num_bingo')"/>
+							<img id='b_num_bingo_gl1' class="buttonGlow" src="images/buttons/ba_voc_bingo_glo1.png" />
+							<img id='b_num_bingo_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_voc_bingo_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Numbers Bingo
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
 
 				<!-- =================================================================================
@@ -1322,6 +1340,8 @@
 				</table>
 
 				<div id="vocSelect" style="width: 95%; background:  #7bd8e8; border: 0.3em ridge  #7bd8e8; font: inherit">
+				<div style="float:left; width: 7.5em; ">
+					</div>
 					<table style="table-layout:fixed; width: 75%; margin-bottom: 0.5em; margin-left: auto; margin-right: auto; font: inherit; font-size: 80%">
 						<tr>
 							<td colspan="7" style="font:inherit; font-size:160%; font-weight: bold; padding-bottom: 0px;  text-align: center">
@@ -1889,6 +1909,212 @@
 			<!-- =============== -->
 			<!-- Main Displays	 -->
 			<!-- =============== -->
+			<div id="listen_type_display"  style="position:relative; z-index: 4; width: 100%; height: 85%; background-color:white; text-align: center; display: none">
+				<span id="listen_type_head">Phonics</span> Listen and Type<br>
+				<div id="listen_type_list" style="position:absolute; width:17.4em; height: 7em; left:7.5em; top: 2.4em; padding:0 0.2em; text-align:left; overflow-y: auto; border:0.13em ridge #393; font:60% 'Nunito'; display:none">
+					&nbsp;
+				</div>
+				<div id="keys_lo" style="position:absolute; left:2.1em; bottom:0.5em; font:inherit; ">
+					<div class="keyBedTop" style="z-index:-1; left:-2em; width:2em">
+						<img class="key" style="width:100%;" src="images/buttons/key_caps.png" onclick="document.getElementById('keys_lo').style.display='none';document.getElementById('keys_up').style.display='block'; voc_input_1.focus()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:13em; width:1em">
+						<img  class="key" style="width:100%;" src="images/buttons/key_enter.png" onclick="listenTypeCheck()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop">
+						<img id="key_a" class="key" style="width:100%;" src="images/buttons/key_a_lo.png" onclick="vKeyPress('a',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:1em">
+						<img id="key_b" class="key" style="width:100%;" src="images/buttons/key_b_lo.png" onclick="vKeyPress('b',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:2em">
+						<img id="key_c" class="key" style="width:100%;" src="images/buttons/key_c_lo.png" onclick="vKeyPress('c',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:3em">
+						<img id="key_d" class="key" style="width:100%;" src="images/buttons/key_d_lo.png" onclick="vKeyPress('d',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:4em">
+						<img id="key_e" class="key" style="width:100%;" src="images/buttons/key_e_lo.png" onclick="vKeyPress('e',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:5em">
+						<img id="key_f" class="key" style="width:100%;" src="images/buttons/key_f_lo.png" onclick="vKeyPress('f',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:6em">
+						<img id="key_g" class="key" style="width:100%;" src="images/buttons/key_g_lo.png" onclick="vKeyPress('g',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:7em">
+						<img id="key_h" class="key" style="width:100%;" src="images/buttons/key_h_lo.png" onclick="vKeyPress('h',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:8em">
+						<img id="key_i" class="key" style="width:100%;" src="images/buttons/key_i_lo.png" onclick="vKeyPress('i',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:9em">
+						<img id="key_j" class="key" style="width:100%;" src="images/buttons/key_j_lo.png" onclick="vKeyPress('j',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:10em">
+						<img id="key_k" class="key" style="width:100%;" src="images/buttons/key_k_lo.png" onclick="vKeyPress('k',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:11em">
+						<img id="key_l" class="key" style="width:100%;" src="images/buttons/key_l_lo.png" onclick="vKeyPress('l',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:12em">
+						<img id="key_m" class="key" style="width:100%;" src="images/buttons/key_m_lo.png" onclick="vKeyPress('m',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid">
+						<img id="key_n" class="key" style="width:100%;" src="images/buttons/key_n_lo.png" onclick="vKeyPress('n',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:1em">
+						<img id="key_o" class="key" style="width:100%;" src="images/buttons/key_o_lo.png" onclick="vKeyPress('o',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:2em">
+						<img id="key_p" class="key" style="width:100%;" src="images/buttons/key_p_lo.png" onclick="vKeyPress('p',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:3em">
+						<img id="key_q" class="key" style="width:100%;" src="images/buttons/key_q_lo.png" onclick="vKeyPress('q',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:4em">
+						<img id="key_r" class="key" style="width:100%;" src="images/buttons/key_r_lo.png" onclick="vKeyPress('r',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:5em">
+						<img id="key_s" class="key" style="width:100%;" src="images/buttons/key_s_lo.png" onclick="vKeyPress('s',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:6em">
+						<img id="key_t" class="key" style="width:100%;" src="images/buttons/key_t_lo.png" onclick="vKeyPress('t',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:7em">
+						<img id="key_u" class="key" style="width:100%;" src="images/buttons/key_u_lo.png" onclick="vKeyPress('u',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:8em">
+						<img id="key_v" class="key" style="width:100%;" src="images/buttons/key_v_lo.png" onclick="vKeyPress('v',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:9em">
+						<img id="key_w" class="key" style="width:100%;" src="images/buttons/key_w_lo.png" onclick="vKeyPress('w',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:10em">
+						<img id="key_x" class="key" style="width:100%;" src="images/buttons/key_x_lo.png" onclick="vKeyPress('x',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:11em">
+						<img id="key_y" class="key" style="width:100%;" src="images/buttons/key_y_lo.png" onclick="vKeyPress('y',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:12em">
+						<img id="key_z" class="key" style="width:100%;" src="images/buttons/key_z_lo.png" onclick="vKeyPress('z',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedBase" >
+						<img class="key" style="width:100%;" src="images/buttons/key_hyphen.png" onclick="vKeyPress('-',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedBase" style="width:7.3em; bottom: -0.02em; left:3em">
+						<img class="key" style="width:100%;" src="images/buttons/key_sp.png" onclick="vKeyPress(' ',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedBase" style="left:12em">
+						<img class="key" style="width:100%;" src="images/buttons/key_bs.png" onclick="voc_input_1.value=voc_input_1.value.slice(0,-1); voc_input_1.focus()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+				</div>
+				<div id="keys_up" style="position:absolute; left:2.1em; bottom:0.5em; font:inherit; display:none">
+					<div class="keyBedTop" style="z-index:14; left:-2em; width:2em">
+						<img class="key" style="width:100%;" src="images/buttons/key_caps.png" onclick="document.getElementById('keys_lo').style.display='none';document.getElementById('keys_up').style.display='block'; voc_input_1.focus()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:13em; width:1em">
+						<img  class="key" style="width:100%;" src="images/buttons/key_enter.png" onclick="listenTypeCheck()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop">
+						<img class="key" style="width:100%;" src="images/buttons/key_A_up.png" onclick="vKeyPress('A',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:1em">
+						<img class="key" style="width:100%;" src="images/buttons/key_B_up.png" onclick="vKeyPress('B',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:2em">
+						<img class="key" style="width:100%;" src="images/buttons/key_C_up.png" onclick="vKeyPress('C',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:3em">
+						<img class="key" style="width:100%;" src="images/buttons/key_D_up.png" onclick="vKeyPress('D',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:4em">
+						<img class="key" style="width:100%;" src="images/buttons/key_E_up.png" onclick="vKeyPress('E',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:5em">
+						<img class="key" style="width:100%;" src="images/buttons/key_F_up.png" onclick="vKeyPress('F',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:6em">
+						<img class="key" style="width:100%;" src="images/buttons/key_G_up.png" onclick="vKeyPress('G',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:7em">
+						<img class="key" style="width:100%;" src="images/buttons/key_H_up.png" onclick="vKeyPress('H',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:8em">
+						<img class="key" style="width:100%;" src="images/buttons/key_I_up.png" onclick="vKeyPress('I',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:9em">
+						<img class="key" style="width:100%;" src="images/buttons/key_J_up.png" onclick="vKeyPress('J',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:10em">
+						<img class="key" style="width:100%;" src="images/buttons/key_K_up.png" onclick="vKeyPress('K',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:11em">
+						<img class="key" style="width:100%;" src="images/buttons/key_L_up.png" onclick="vKeyPress('L',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedTop" style="left:12em">
+						<img class="key" style="width:100%;" src="images/buttons/key_M_up.png" onclick="vKeyPress('M',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid">
+						<img class="key" style="width:100%;" src="images/buttons/key_N_up.png" onclick="vKeyPress('N',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:1em">
+						<img class="key" style="width:100%;" src="images/buttons/key_O_up.png" onclick="vKeyPress('O',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:2em">
+						<img class="key" style="width:100%;" src="images/buttons/key_P_up.png" onclick="vKeyPress('P',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:3em">
+						<img class="key" style="width:100%;" src="images/buttons/key_Q_up.png" onclick="vKeyPress('Q',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:4em">
+						<img class="key" style="width:100%;" src="images/buttons/key_R_up.png" onclick="vKeyPress('R',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:5em">
+						<img class="key" style="width:100%;" src="images/buttons/key_S_up.png" onclick="vKeyPress('S',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:6em">
+						<img class="key" style="width:100%;" src="images/buttons/key_T_up.png" onclick="vKeyPress('T',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:7em">
+						<img class="key" style="width:100%;" src="images/buttons/key_U_up.png" onclick="vKeyPress('U',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:8em">
+						<img class="key" style="width:100%;" src="images/buttons/key_V_up.png" onclick="vKeyPress('V',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:9em">
+						<img class="key" style="width:100%;" src="images/buttons/key_W_up.png" onclick="vKeyPress('W',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:10em">
+						<img class="key" style="width:100%;" src="images/buttons/key_X_up.png" onclick="vKeyPress('X',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:11em">
+						<img class="key" style="width:100%;" src="images/buttons/key_Y_up.png" onclick="vKeyPress('Y',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedMid" style="left:12em">
+						<img class="key" style="width:100%;" src="images/buttons/key_Z_up.png" onclick="vKeyPress('Z',true)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedBase" >
+						<img class="key" style="width:100%;" src="images/buttons/key_hyphen.png" onclick="vKeyPress('-',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedBase" style="width:7.3em; bottom: -0.02em; left:3em">
+						<img class="key" style="width:100%;" src="images/buttons/key_sp.png" onclick="vKeyPress(' ',false)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+					<div class="keyBedBase" style="left:12em">
+						<img class="key" style="width:100%;" src="images/buttons/key_bs.png" onclick="voc_input_1.value=voc_input_1.value.slice(0,-1); voc_input_1.focus()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+					</div>
+				</div>
+				
+				<div style="position:absolute;z-index:5; left:0.5em; top:2.6em; font:inherit">
+					<img id="listen_type_fb_img" style="width:4em" ondragstart="return false;" src="images/labels/dot_correct.jpg" />
+				</div>
+				<div  style="position:absolute; right:0.6em; top:4em; width:20em; font:inherit; font-size:50%; background:black; border:0.13em ridge #393; color:white;">
+					Record
+					<div id="listen_type_fb" style="font:inherit; width:90%; padding:0.5em; height:15em; overflow:auto">
+					</div>
+				</div>
+				<input id="voc_input_1" type="text" autofocus style="float:left; width:35%; height: 1.5em; margin-left:6em; margin-top: 3em; text-align:center; background:black; border:0.13em ridge #393; color:white; font:85% 'Nunito';">
+			</div>
 			<div  id="welcomeDiv" style="position:relative; z-index: 8; width: 100%; height: 85%; background-color:#E3D5C9; text-align: center; display: block;">
 				<div style="position:absolute; right:1.5em; top:10em; font:inherit; font-size: 30%">
 					Version: <span id="version_display"></span>
@@ -2385,6 +2611,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div id="bing_class_phon"  style= "position:relative; z-index:5; float:left; width: 14.5em; margin-left:0.5em; margin-top:0.7em;text-align:center; font:inherit; font-size:80%">
 					<div style="background: #000; border: 0.12em ridge  #393; color:white; font:inherit; font-size:85%">
 						Phonics Bingo: Classroom Version
@@ -2516,7 +2743,7 @@
 							</div>
 						</div>
 						<p style="clear:left;">Each page contains 2 Bingo Sheets, so you only need to print out 1 page per 2 students. Make sure each student gets a <b>different</b> bingo sheet!</p>
-						<p style="">For more information and instructions, click <img style="width:2em;vertical-align: -0.2em" src='images/buttons/help button.png' onclick="setInfo(uMode,'open','#393','11em',1.5,13)" />.</p>
+						<p style="">For more information and instructions, click <img style="width:6em;vertical-align: -0.2em" src='images/buttons/info_wide.png' onclick="setInfo(uMode,'open','#393','11em',1.5,13)" />.</p>
 					</div>
 				</div>
 				<div style="position:absolute; bottom:3em; width:45%; font:inherit; font-size:70%">
@@ -2545,6 +2772,8 @@
 					</div>
 				</div>
 			</div>
+
+
 
 			<!-- =========== -->
 			<!-- Controls	-->
@@ -2579,6 +2808,104 @@
 							<img id="finishedButton" src='images/buttons/finished_button.png' alt="Finished!" style="width:4.55em; margin-left:auto; margin-right:auto; display: none" />
 							<img id="b_replay" style="display:none; width:1.9em; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png'
 								onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="playVocab()" />
+						</div>
+						<div id="listen_type_controls" style="display:none; position:relative; height:1.5em">
+							<div style="position:absolute; width:2em; left:0.5em; bottom:0">
+								<div id="listen_type_play" style="position: absolute; bottom: 0; left: 0; right: 0">
+									<img style="display:block; width:1.9em; margin-left:auto; margin-right:auto" src='images/buttons/replay_button.png'
+										onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="playVocab()" />
+								</div>
+							</div>
+							<div id="listen_type_repeat" style="position:absolute; top:0.1em; left:3em; width: 1em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; text-align:center; background:black; color:white; display:none">
+								3
+							</div>
+							<div  id="voc_list_type_options" style="position:absolute; top:0.1em; left:5em; width: 7em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white">
+								<div style="margin-top:-0.2em; font-size:30%; text-align:center">
+									Options
+								</div>
+								<div style="float:left; width:2em">
+									<div style="font: inherit; font-size: 18%">
+										<div style="height: 2.4em; font: inherit;">
+											<div style="width: 4em; float: left">
+												<img id="b_listen_type_display" style="width:2.7em; vertical-align: middle" 
+													onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'display')"/>
+											</div>
+											<div style="float: left; font: inherit;font-size: 1.7em">
+												Display
+											</div>
+										</div>
+										<div  style="height: 2.4em; ">
+											<div style="width: 4em; float: left">
+												<img id="b_listen_type_audio"	style="width:2.7em; vertical-align: middle" 
+													onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'audio')" />
+											</div>
+											<div style="float: left; font: inherit; font-size: 1.7em">
+												Audio
+											</div>
+										</div>	
+									</div>
+								</div>
+								<div style="float:left; width:4em; margin-left:0.5em">
+									<div style="font: inherit; font-size: 18%">
+										<div style="height: 2.4em; font: inherit;">
+											<div id="b_listen_type_display_select">
+												<div style="width: 4em; float: left">
+													<img id="b_listen_type_images" style="width:2.7em; vertical-align: middle" 
+														onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'images')" />
+												</div>
+												<div id="voc_listen_type_disp_options">
+													<div style="float: left; font: inherit;font-size: 1.7em">
+														Images
+													</div>
+													<div style="width: 4em; float: left; margin-left:3em">
+														<img id="b_listen_type_voc_list" style="width:2.7em; vertical-align: middle" 
+															onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'list')" />
+													</div>
+													<div style="float: left; font: inherit;font-size: 1.7em">
+														List
+													</div>
+												</div>
+											</div>
+										</div>
+										<div  style="height: 2.4em; ">
+											<div id ="limit_playback">
+												<div style="width: 4em; float: left">
+													<img id="b_limit_playback"	style="width:2.7em; vertical-align: middle" 
+														onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'limit')" />
+												</div>
+												<div style="float: left; font: inherit; font-size: 1.7em">
+													Limit Playback
+												</div>
+											</div>
+										</div>	
+									</div>
+								</div>
+							</div>
+							<div id="phon_list_type_options" style="position:absolute; top:0.1em; left:5em; width: 3em; height:1.2em; padding:0.05em;  border: 0.05em ridge #5bc8e8; font:inherit; background:black; color:white; display:none">
+								<div  style="margin-top:-0.2em; font-size:30%; text-align:center">
+									Options
+								</div>
+								<div style="font: inherit; font-size: 18%">
+									<div style="height: 2.4em; font: inherit;">
+										<div style="width: 4em; float: left">
+											<img id="b_listen_type_list" style="width:2.7em; vertical-align: middle"
+												onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'phon_list')"/>
+										</div>
+										<div style="float: left; font: inherit;font-size: 1.7em">
+											Display List
+										</div>
+									</div>
+									<div  style="height: 2.4em; ">
+										<div style="width: 4em; float: left">
+											<img id="b_phon_limit_playback"	style="width:2.7em; vertical-align: middle"
+												onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="ListenTypeOptions(this,'phon_limit')" />
+										</div>
+										<div style="float: left; font: inherit; font-size: 1.7em">
+											Limit Playback
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div id="yes_no_div" style="display:none; position:relative; height:1.5em">
 							<div style="position: absolute; width:1.65em; bottom: 0; left: 1em">
