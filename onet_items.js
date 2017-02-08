@@ -3432,6 +3432,7 @@ function setOnetVocab(){
                          {txt: "floor", src: "images/vocab/home/floor.jpg"},
                          {txt: "forget", src: "images/vocab/actions/forget.jpg"},
                          {txt: "France", src: ["images/vocab/places_and_transport/France.jpg", "images/vocab/places_and_transport/France1.jpg", "images/vocab/places_and_transport/France2.jpg"]},
+                         {txt: "furniture", src: ["images/vocab/home/furniture.jpg","images/vocab/home/furniture1.jpg","images/vocab/home/furniture2.jpg"]},
                          {txt: "French", src: "images/vocab/describing/French.jpg"},
                          {txt: "German", src: "images/vocab/describing/German.jpg"},
                          {txt: "Germany", src: ["images/vocab/places_and_transport/Germany.jpg", "images/vocab/places_and_transport/Germany1.jpg", "images/vocab/places_and_transport/Germany2.jpg", "images/vocab/places_and_transport/Germany3.jpg", "images/vocab/places_and_transport/Germany4.jpg", "images/vocab/places_and_transport/Germany5.jpg"]},
@@ -3466,31 +3467,45 @@ function setOnetVocab(){
                          {txt: "Malaysia", src: "images/vocab/places_and_transport/Malaysia.jpg"},
                          {txt: "math", src: "images/vocab/school/Math.jpg"},
                          {txt: "May", src: "images/vocab/time/May.jpg"},
+                         {txt: "medals", src: ["images/vocab/clothes/medals.jpg","images/vocab/clothes/medals1.jpg","images/vocab/clothes/medals2.jpg"]},
                          {txt: "more", src: "images/vocab/describing/more.jpg"},
                          {txt: "monk", src: "images/vocab/occupations/monk.jpg"},
                          {txt: "music", src: "images/vocab/school/Music.jpg"},
                          {txt: "near", src: "images/vocab/grammar/near.jpg"},
                          {txt: "never mind", src: "images/vocab/socialising/Never_mind.jpg"},
                          {txt: "nice", src: "images/vocab/dot_and_Ben/nice.jpg"},
+                         {txt: "noodles", src: "images/vocab/food/noodles.jpg"},
                          {txt: "of", src: "images/vocab/grammar/of.jpg"},
                          {txt: "on the left of", src: "images/vocab/grammar/on_the_left_of.jpg"},
                          {txt: "on the right of", src: "images/vocab/grammar/on_the_right_of.jpg"},
                          {txt: "onion", src: "images/vocab/food/onion.jpg"},
+                         {txt: "palace", src: ["images/vocab/places_and_transport/palace.jpg","images/vocab/places_and_transport/palace1.jpg","images/vocab/places_and_transport/palace2.jpg","images/vocab/places_and_transport/palace3.jpg","images/vocab/places_and_transport/palace4.jpg","images/vocab/places_and_transport/palace5.jpg",]},
                          {txt: "paper", src: "images/vocab/school/paper.jpg"},
+                         {txt: "people", src: "images/vocab/people/people.jpg"},
                          {txt: "picnic", src: "images/vocab/free_time/go_for_a_picnic.jpg"},
                          {txt: "picture", src: "images/vocab/home/picture.jpg"},
                          {txt: "play games", src: "images/vocab/free_time/play_games.jpg"},
                          {txt: "playground", src: "images/vocab/school/playground.jpg"},
                          {txt: "plane", src: "images/vocab/places_and_transport/plane.jpg"},
+                         {txt: "pork", src: ["images/vocab/food/pork.jpg","images/vocab/food/pork1.jpg","images/vocab/food/pork2.jpg","images/vocab/food/pork3.jpg"]},
+                         {txt: "post office", src: "images/vocab/places_and_transport/post_office.jpg"},
+                         {txt: "potatoes", src: ["images/vocab/food/potatoes.jpg","images/vocab/food/potatoes1.jpg","images/vocab/food/potatoes2.jpg","images/vocab/food/potatoes3.jpg","images/vocab/food/potatoes4.jpg"]},
+                         {txt: "pull", src: "images/vocab/actions/pull.jpg"},
+                         {txt: "puppy / puppies", src: ["images/vocab/animals/puppies.jpg","images/vocab/animals/puppies1.jpg","images/vocab/animals/puppy1.jpg","images/vocab/animals/puppy2.jpg","images/vocab/animals/puppy3.jpg","images/vocab/animals/puppy4.jpg","images/vocab/animals/puppy5.jpg","images/vocab/animals/puppy6.jpg"]},
                          {txt: "railway", src: "images/vocab/places_and_transport/train.jpg"},
                          {txt: "read", src: "images/vocab/actions/read.jpg"},
                          {txt: "refrigerator", src: "images/vocab/home/refrigerator.jpg"},
                          {txt: "ride", src: "images/vocab/actions/ride.jpg"},
                          {txt: "road", src: "images/vocab/places_and_transport/road.jpg"},
+                         {txt: "sailor", src: "images/vocab/occupations/sailor.jpg"},
                          {txt: "say", src: "images/vocab/actions/say.jpg"},
                          {txt: "science", src: "images/vocab/school/Science.jpg"},
                          {txt: "scissors", src: "images/vocab/school/scissors.jpg"},
+                         {txt: "soft drinks", src: "images/vocab/food/soft_drinks.jpg"},
                          {txt: "student", src: "images/vocab/occupations/student.jpg"},
+                         {txt: "studio", src: "images/vocab/places_and_transport/studio.jpg"},
+                         {txt: "sugar", src: "images/vocab/food/sugar.jpg"},
+                         {txt: "uncle", src: "images/vocab/people/uncle.jpg"},
                          {txt: "what", src: "images/vocab/grammar/what.jpg"},
                          {txt: "when", src: "images/vocab/grammar/when.jpg"},
                          {txt: "where", src: "images/vocab/grammar/where.jpg"},
@@ -3507,13 +3522,21 @@ var qa_when= {when:["April", "at night", "at noon", "August", "Christmas", "Dece
                 "in the evening", "in the morning", "January", "July", "June", "March", "May", "Monday", "November", "October", "Saturday",
                 "September", "Sunday", "Thursday", "tomorrow", "today", "Tuesday", "Wednesday", "yesterday", "on the weekend"]};
 var qa_where= {where:["It's next to the temple.","It's in front of the school.","It's behind the bus station.","It's opposite the coffee shop.",
-                 "go straight", "turn left", "turn right", "Just here, please!", "under the table", "It's in my pocket."]};
-var qa_what_time= {"what time":["7:15", "midnight", "lunch time", "half past two", "10:15 a.m.", "three o'clock"]};
-var qa_who= {who:["David", "Miss Jones", "my brother", "the teacher", "Khun Samit", "Khru Chanamon", "Mr. Thompson", "you", "him", "me", "us", "her"]};
+                 "go straight", "turn left", "turn right", "Just here, please!", "under the table", "It's in my pocket.", "Laos", "Vietnam", "Thailand", 
+		 "Myanmar", "It\'s next to the temple.", "It\'s in front of the school.", "It\'s behind the bus station.", "It\'s opposite the coffee shop.", 
+		 "He\'s at school.", "He\'s in a classrooom.", "He\'s in his bedroom.", "He\'s in his bathroom.", "in the street", "at school", "to the post office", 
+		 "at the police station", "He is at the bus stop", "He is behind the bus.", "He is in a train station.", "He is on a bus.", "at home", "at a restaurant", 
+		 "at the cinema", "They are going to China.", "It came from a bakery."]};
+var qa_what_time= {"what time":["7:15", "midnight", "lunch time", "half past two", "10:15 a.m.", "three o'clock", "midday", "6:00 A.M.", "6:00 P.M.",
+             "12:00 A.M.", "12:00 P.M."]};
+var qa_who= {who:["David", "Miss Jones", "my brother", "the teacher", "Khun Samit", "Khru Chanamon", "Mr. Thompson", "you", "him", "me", "us", "her",
+             "Suda is Manop\'s friend", "Brutus and Conan", "Conan and Popeye", "Charlie and Brutus", "Popeye and Charlie"]};
 var qa_why= {why:["because I like it","because it's boring", "because it's difficult", "because it's dangerous", "because it's interesting",
-                    "because it's Friday", "because he's my uncle", "because it was very dark", "because it's easy for me"]};
+                    "because it's Friday", "because he's my uncle", "because it was very dark", "because it's easy for me", "Because I had a toothache.", "Because I'm glad.", 
+		    "Because I'm angry.", "Because I'm sleepy.", "Because I'm bored.", "because it was very dark.", "I like English because it\'s easy for me."]};
 var qa_how={how:["by bus", "I'm OK", "310", "glad", "angry", "sleepy", "bored", "42 kilos", "It's delicious thank you!", "1200 Baht", "165,000,000", "by car", 
-                "by train", "I walk", "3 cups please"]};
+                "by train", "I walk", "3 cups please", "I am twelve years old", "5 days", "6 days", "2 months", "1 years", "fifty baht", "forty baht", "fifteen baht", 
+		"fourteen baht", "This book is eighty baht.", "There are four people.", "We have 6 dogs."]};
 
 
 var onet_full_array = new Array( single001, single002, single003, single004, single005, single006, single007, single008, single009, single010, single011,

@@ -118,7 +118,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9310";
+var version_num="0.9400";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -831,7 +831,7 @@ function showAttribution(caller){
 function categoryDiv(disp) {
 	resetScore();
 	setDisplays ({contentSelect:disp,welcomeDiv:"none",attributionDiv:"none"});
-	if (uMode!="read_say" && uMode!="phon_bingo" && uMode!="numbers" && uMode!="num_bingo" && uMode!="phon_bingo_class" && uMode!="phon_listen_type") {
+	if (uMode!="read_say" && uMode!="phon_bingo" && uMode!="numbers" && uMode!="num_bingo_class" && uMode!="num_bingo" && uMode!="phon_bingo_class" && uMode!="phon_listen_type") {
 		setDisplays ({imageDiv:"block"});
 	}
 	if (disp=="block"){
@@ -1046,7 +1046,7 @@ function resetScore(caller) {
 	if (uMode=="read_say" || uMode=="phon_bingo" || uMode=="phon_bingo_class") {
 		document.getElementById("phonDisplay").innerHTML = "</br>Phonics Unit <img style='width:1em' src='images/labels/l_"+currentPhonUnit+"_p.png' />";
 	}
-	else if (uMode=="numbers" || uMode == "num_bingo"){
+	else if (uMode=="numbers" || uMode == "num_bingo" || uMode=="num_bingo_class"){
 		document.getElementById("phonDisplay").innerHTML = "</br>Numbers Unit <img style='width:1em' src='images/labels/l_"+currentNumUnit+"_p.png' />";
 	}
 
@@ -1627,6 +1627,7 @@ function selectActivity(mode) {
 			break;
 
 			case "numbers":
+			case "num_bingo_class":
 				document.getElementById("panelCont").src="images/buttons/b_"+currentNumUnit+".png";
 				document.getElementById("panelCont2").src="images/buttons/b_"+currentNumUnit+".png";
 				document.getElementById("panelLev").src="images/labels/l_"+currentNumUnit+"_p.png";
@@ -1641,6 +1642,7 @@ function selectActivity(mode) {
 				selectScoreSplit(false);
 				setNumBingoSheet();
 			break;
+
 		}
 		setActivityDisplays();
 
@@ -1730,6 +1732,10 @@ function setActivityDisplays() {
 
 		case "num_bingo":
 			setDisplays({bingoDisplay:"none",bingoScore:"inline",bingoWords:"inline",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",score:"block",timer:"block"});
+		break;
+
+		case "num_bingo_class":
+			setDisplays({bingoDisplay:"none",bingoScore:"none",bingoWords:"none",book_overlay:"none",book_trans_fb:"none",choiceDiv:"none",errDiv:"none",imageDiv:"none",livesDispTop:"none",phonDisplay:"block",bing_class_display:"none",score:"none",timer:"none"});
 		break;
 	}
 }
@@ -2401,12 +2407,16 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Bingo: Classroom Version</span> help is still under construction.';
 		break;
 
+		case "num_bingo_class":
+			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Numbers Bingo: Classroom Version</span> help is still under construction.';
+		break;
+
 		case "phon_listen_type":
 			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Phonics Listen and Type</span> help is still under construction.';
 		break;
 		
 		case "voc_listen_type":
-			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Vocabulary LIsten and Type </span> help is still under construction.';
+			document.getElementById("helpBox").innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%; ">Under Construction</span></p><div style="text-align:center"><img style="width: 50%" src="images/labels/under_construction.gif" /></div>Sorry, <span style="color:cyan; font-weight:bold">Vocabulary Listen and Type </span> help is still under construction.';
 		break;
 		
 		case "voc_bingo_class":
@@ -2568,6 +2578,10 @@ function topicTitle(title) {
 
 		case "bc_d_B_5":
 			return("Dot and Ben Book 5");
+		break;
+		
+		case "bc_d_B_6":
+			return("Dot and Ben Book 6");
 		break;
 		
 		case "easy":
@@ -3417,7 +3431,7 @@ function makeVocBingoSheets (caller) {
 		var title="Vocabulary Bingo: "+currentLev+" "+topicTitle(curr_topic_title);
 		var game_code=Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+"_"+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString();
 		var game_id="VB_"+currentLev+"_"+curr_topic_title+"_"+game_code;
-		var doc_title="Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+game_id+".pdf";
+		var doc_title="Vocabulary_Bingo_"+currentLev+"_"+topicTitle(curr_topic_title)+"_"+game_id.slice(-10)+".pdf";
 
 		setVocBingSheet();
 
@@ -3440,9 +3454,15 @@ function makeVocBingoSheets (caller) {
 		t_string=t_string.slice(t_start,t_end);
 		bingArray=t_string.split(",");
 		t_string=localStorage.curr_vb_game;
-		var title="Vocabulary Bingo: "+t_string.slice(3,5)+" "+topicTitle(t_string.slice(6,-10));
 		var game_id=t_string;
-		var doc_title="Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+game_id+".pdf";
+		if (localStorage.curr_vb_game.slice(6,-13)=="num") {
+			var title="Numbers Bingo: Unit"+t_string.slice(11,-10);
+			var doc_title="Numbers_Bingo_ Unit_"+localStorage.curr_vb_game.slice(11,-10)+game_id.slice(-10)+".pdf";
+		}
+		else {
+			var title="Vocabulary Bingo: "+t_string.slice(3,5)+" "+topicTitle(t_string.slice(6,-10));
+			var doc_title="Vocabulary_Bingo_"+localStorage.curr_vb_game.slice(3,5)+"_"+topicTitle(localStorage.curr_vb_game.slice(6,-10))+game_id.slice(-10)+".pdf";
+		}
 	}
 
 	var font_sizes={};
@@ -3456,90 +3476,20 @@ function makeVocBingoSheets (caller) {
 		}
 	}
 
-	var t_array1 = bingArray.toString().split(",");
-	shuffle(t_array1);
-	var t_array2 = bingArray.toString().split(",");
-	shuffle(t_array2);
-	var t_array3 = bingArray.toString().split(",");
-	shuffle(t_array3);
-	var t_array4 = bingArray.toString().split(",");
-	shuffle(t_array4);
-	var t_array5 = bingArray.toString().split(",");
-	shuffle(t_array5);
-	var t_array6 = bingArray.toString().split(",");
-	shuffle(t_array6);
-	var t_array7 = bingArray.toString().split(",");
-	shuffle(t_array7);
-	var t_array8 = bingArray.toString().split(",");
-	shuffle(t_array8);
-	var t_array9 = bingArray.toString().split(",");
-	shuffle(t_array9);
-	var t_array10 = bingArray.toString().split(",");
-	shuffle(t_array10);
-	var t_array11 = bingArray.toString().split(",");
-	shuffle(t_array11);
-	var t_array12 = bingArray.toString().split(",");
-	shuffle(t_array12);
-	var t_array13 = bingArray.toString().split(",");
-	shuffle(t_array13);
-	var t_array14 = bingArray.toString().split(",");
-	shuffle(t_array14);
-	var t_array15 = bingArray.toString().split(",");
-	shuffle(t_array15);
-	var t_array16 = bingArray.toString().split(",");
-	shuffle(t_array16);
-	var t_array17 = bingArray.toString().split(",");
-	shuffle(t_array17);
-	var t_array18 = bingArray.toString().split(",");
-	shuffle(t_array18);
-	var t_array19 = bingArray.toString().split(",");
-	shuffle(t_array19);
-	var t_array20 = bingArray.toString().split(",");
-	shuffle(t_array20);
-	var t_array21 = bingArray.toString().split(",");
-	shuffle(t_array21);
-	var t_array22 = bingArray.toString().split(",");
-	shuffle(t_array22);
-	var t_array23 = bingArray.toString().split(",");
-	shuffle(t_array23);
-	var t_array24 = bingArray.toString().split(",");
-	shuffle(t_array24);
-	var t_array25 = bingArray.toString().split(",");
-	shuffle(t_array25);
-	var t_array26 = bingArray.toString().split(",");
-	shuffle(t_array26);
-	var t_array27 = bingArray.toString().split(",");
-	shuffle(t_array27);
-	var t_array28 = bingArray.toString().split(",");
-	shuffle(t_array28);
-	var t_array29 = bingArray.toString().split(",");
-	shuffle(t_array29);
-	var t_array30 = bingArray.toString().split(",");
-	shuffle(t_array30);
-	var t_array31 = bingArray.toString().split(",");
-	shuffle(t_array31);
-	var t_array32 = bingArray.toString().split(",");
-	shuffle(t_array32);
-	var t_array33 = bingArray.toString().split(",");
-	shuffle(t_array33);
-	var t_array34 = bingArray.toString().split(",");
-	shuffle(t_array34);
-	var t_array35 = bingArray.toString().split(",");
-	shuffle(t_array35);
-	var t_array36 = bingArray.toString().split(",");
-	shuffle(t_array36);
-	var t_array37 = bingArray.toString().split(",");
-	shuffle(t_array37);
-	var t_array38 = bingArray.toString().split(",");
-	shuffle(t_array38);
-	var t_array39 = bingArray.toString().split(",");
-	shuffle(t_array39);
-	var t_array40 = bingArray.toString().split(",");
-	shuffle(t_array40);
-	var t_array41 = bingArray.toString().split(",");
-	shuffle(t_array41);
-	var t_array42 = bingArray.toString().split(",");
-	shuffle(t_array42);
+	var t_array1=new Array();
+
+	for (var j=0;j<48;j++) {
+		t_array1[j] = bingArray.toString().split(",");
+		shuffle(t_array1[j]);
+		for (var i=0;i<24;i++) {
+			if (localStorage.curr_vb_game.slice(6,9)=="num" && isNaN(t_array1[j][i])) {
+				t_array1[j][i]={image: t_array1[j][i].toLowerCase()+'.jpg', width: 98, style: 't_cell',verticalAlign: 'center'};
+			}
+			else {
+				t_array1[j][i]={text: t_array1[j][i],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[j][i]]};
+			}
+		}
+	}
 	
 	pdfMake.fonts = {
 		Nunito: {
@@ -3606,11 +3556,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array1[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[0]]}, {text: t_array1[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[1]]}, {text: t_array1[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[2]]}, {text: t_array1[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[3]]}, {text: t_array1[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[4]]}],
-						[ {text: t_array1[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[5]]}, {text: t_array1[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[6]]}, {text: t_array1[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[7]]}, {text: t_array1[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[8]]}, {text: t_array1[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[9]]}],
-						[ {text: t_array1[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[10]]}, {text: t_array1[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[11]]}, {text: 'Set 1',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array1[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[12]]}, {text: t_array1[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[13]]}],
-						[ {text: t_array1[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[14]]}, {text: t_array1[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[15]]}, {text: t_array1[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[16]]}, {text: t_array1[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[17]]}, {text: t_array1[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[18]]}],
-						[ {text: t_array1[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[19]]}, {text: t_array1[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[20]]}, {text: t_array1[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[21]]}, {text: t_array1[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[22]]}, {text: t_array1[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[23]]}]
+						[ t_array1[0][0], t_array1[0][1], t_array1[0][2], t_array1[0][3], t_array1[0][4] ],
+						[ t_array1[0][5], t_array1[0][6], t_array1[0][7], t_array1[0][8], t_array1[0][9] ],
+						[ t_array1[0][10], t_array1[0][11], {text: 'Set 1',style: 'sheet_id',verticalAlign: 'center'}, t_array1[0][12], t_array1[0][13] ],
+						[ t_array1[0][14], t_array1[0][15], t_array1[0][16], t_array1[0][17], t_array1[0][18] ],
+						[ t_array1[0][19], t_array1[0][20], t_array1[0][21], t_array1[0][22], t_array1[0][23] ]
 					]
 				},
 			},
@@ -3624,11 +3574,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array2[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[0]]}, {text: t_array2[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[1]]}, {text: t_array2[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[2]]}, {text: t_array2[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[3]]}, {text: t_array2[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[4]]}],
-						[ {text: t_array2[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[5]]}, {text: t_array2[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[6]]}, {text: t_array2[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[7]]}, {text: t_array2[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[8]]}, {text: t_array2[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[9]]}],
-						[ {text: t_array2[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[10]]}, {text: t_array2[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[11]]}, {text: 'Set 2',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array2[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[12]]}, {text: t_array2[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[13]]}],
-						[ {text: t_array2[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[14]]}, {text: t_array2[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[15]]}, {text: t_array2[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[16]]}, {text: t_array2[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[17]]}, {text: t_array2[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[18]]}],
-						[ {text: t_array2[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[19]]}, {text: t_array2[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[20]]}, {text: t_array2[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[21]]}, {text: t_array2[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[22]]}, {text: t_array2[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array2[23]]}]
+						[ t_array1[1][0], t_array1[1][1], t_array1[1][2], t_array1[1][3], t_array1[1][4] ],
+						[ t_array1[1][5], t_array1[1][6], t_array1[1][7], t_array1[1][8], t_array1[1][9] ],
+						[ t_array1[1][10], t_array1[1][11], {text: 'Set 2',style: 'sheet_id',verticalAlign: 'center'}, t_array1[1][12], t_array1[1][13] ],
+						[ t_array1[1][14], t_array1[1][15], t_array1[1][16], t_array1[1][17], t_array1[1][18] ],
+						[ t_array1[1][19], t_array1[1][20], t_array1[1][21], t_array1[1][22], t_array1[1][23] ]
 					]
 				},
 			},
@@ -3642,11 +3592,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array3[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[0]]}, {text: t_array3[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[1]]}, {text: t_array3[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[2]]}, {text: t_array3[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[3]]}, {text: t_array3[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[4]]}],
-						[ {text: t_array3[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[5]]}, {text: t_array3[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[6]]}, {text: t_array3[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[7]]}, {text: t_array3[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[8]]}, {text: t_array3[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[9]]}],
-						[ {text: t_array3[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[10]]}, {text: t_array3[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[11]]}, {text: 'Set 3',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array3[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[12]]}, {text: t_array3[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[13]]}],
-						[ {text: t_array3[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[14]]}, {text: t_array3[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[15]]}, {text: t_array3[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[16]]}, {text: t_array3[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[17]]}, {text: t_array3[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[18]]}],
-						[ {text: t_array3[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[19]]}, {text: t_array3[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[20]]}, {text: t_array3[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[21]]}, {text: t_array3[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[22]]}, {text: t_array3[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array3[23]]}]
+						[ t_array1[2][0], t_array1[2][1], t_array1[2][2], t_array1[2][3], t_array1[2][4] ],
+						[ t_array1[2][5], t_array1[2][6], t_array1[2][7], t_array1[2][8], t_array1[2][9] ],
+						[ t_array1[2][10], t_array1[2][11], {text: 'Set 3',style: 'sheet_id',verticalAlign: 'center'}, t_array1[2][12], t_array1[2][13] ],
+						[ t_array1[2][14], t_array1[2][15], t_array1[2][16], t_array1[2][17], t_array1[2][18] ],
+						[ t_array1[2][19], t_array1[2][20], t_array1[2][21], t_array1[2][22], t_array1[2][23] ]
 					]
 				},
 			},
@@ -3660,11 +3610,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array4[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[0]]}, {text: t_array4[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[1]]}, {text: t_array4[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[2]]}, {text: t_array4[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[3]]}, {text: t_array4[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[4]]}],
-						[ {text: t_array4[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[5]]}, {text: t_array4[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[6]]}, {text: t_array4[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[7]]}, {text: t_array4[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[8]]}, {text: t_array4[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[9]]}],
-						[ {text: t_array4[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[10]]}, {text: t_array4[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[11]]}, {text: 'Set 4',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array4[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[12]]}, {text: t_array4[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[13]]}],
-						[ {text: t_array4[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[14]]}, {text: t_array4[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[15]]}, {text: t_array4[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[16]]}, {text: t_array4[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[17]]}, {text: t_array4[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[18]]}],
-						[ {text: t_array4[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[19]]}, {text: t_array4[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[20]]}, {text: t_array4[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[21]]}, {text: t_array4[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[22]]}, {text: t_array4[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array4[23]]}]
+						[ t_array1[3][0], t_array1[3][1], t_array1[3][2], t_array1[3][3], t_array1[3][4] ],
+						[ t_array1[3][5], t_array1[3][6], t_array1[3][7], t_array1[3][8], t_array1[3][9] ],
+						[ t_array1[3][10], t_array1[3][11], {text: 'Set 4',style: 'sheet_id',verticalAlign: 'center'}, t_array1[3][12], t_array1[3][13] ],
+						[ t_array1[3][14], t_array1[3][15], t_array1[3][16], t_array1[3][17], t_array1[3][18] ],
+						[ t_array1[3][19], t_array1[3][20], t_array1[3][21], t_array1[3][22], t_array1[3][23] ]
 					]
 				},
 			},
@@ -3678,11 +3628,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array5[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[0]]}, {text: t_array5[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[1]]}, {text: t_array5[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[2]]}, {text: t_array5[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[3]]}, {text: t_array5[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[4]]}],
-						[ {text: t_array5[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[5]]}, {text: t_array5[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[6]]}, {text: t_array5[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[7]]}, {text: t_array5[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[8]]}, {text: t_array5[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[9]]}],
-						[ {text: t_array5[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[10]]}, {text: t_array5[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[11]]}, {text: 'Set 5',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array5[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[12]]}, {text: t_array5[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[13]]}],
-						[ {text: t_array5[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[14]]}, {text: t_array5[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[15]]}, {text: t_array5[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[16]]}, {text: t_array5[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[17]]}, {text: t_array5[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[18]]}],
-						[ {text: t_array5[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[19]]}, {text: t_array5[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[20]]}, {text: t_array5[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[21]]}, {text: t_array5[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[22]]}, {text: t_array5[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array5[23]]}]
+						[ t_array1[4][0], t_array1[4][1], t_array1[4][2], t_array1[4][3], t_array1[4][4] ],
+						[ t_array1[4][5], t_array1[4][6], t_array1[4][7], t_array1[4][8], t_array1[4][9] ],
+						[ t_array1[4][10], t_array1[4][11], {text: 'Set 5',style: 'sheet_id',verticalAlign: 'center'}, t_array1[4][12], t_array1[4][13] ],
+						[ t_array1[4][14], t_array1[4][15], t_array1[4][16], t_array1[4][17], t_array1[4][18] ],
+						[ t_array1[4][19], t_array1[4][20], t_array1[4][21], t_array1[4][22], t_array1[4][23] ]
 					]
 				},
 			},
@@ -3696,11 +3646,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array6[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[0]]}, {text: t_array6[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[1]]}, {text: t_array6[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[2]]}, {text: t_array6[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[3]]}, {text: t_array6[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[4]]}],
-						[ {text: t_array6[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[5]]}, {text: t_array6[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[6]]}, {text: t_array6[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[7]]}, {text: t_array6[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[8]]}, {text: t_array6[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[9]]}],
-						[ {text: t_array6[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[10]]}, {text: t_array6[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[11]]}, {text: 'Set 6',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array6[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[12]]}, {text: t_array6[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[13]]}],
-						[ {text: t_array6[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[14]]}, {text: t_array6[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[15]]}, {text: t_array6[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[16]]}, {text: t_array6[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[17]]}, {text: t_array6[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[18]]}],
-						[ {text: t_array6[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[19]]}, {text: t_array6[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[20]]}, {text: t_array6[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[21]]}, {text: t_array6[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[22]]}, {text: t_array6[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array6[23]]}]
+						[ t_array1[5][0], t_array1[5][1], t_array1[5][2], t_array1[5][3], t_array1[5][4] ],
+						[ t_array1[5][5], t_array1[5][6], t_array1[5][7], t_array1[5][8], t_array1[5][9] ],
+						[ t_array1[5][10], t_array1[5][11], {text: 'Set 6',style: 'sheet_id',verticalAlign: 'center'}, t_array1[5][12], t_array1[5][13] ],
+						[ t_array1[5][14], t_array1[5][15], t_array1[5][16], t_array1[5][17], t_array1[5][18] ],
+						[ t_array1[5][19], t_array1[5][20], t_array1[5][21], t_array1[5][22], t_array1[5][23] ]
 					]
 				},
 			},
@@ -3714,11 +3664,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array7[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[0]]}, {text: t_array7[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[1]]}, {text: t_array7[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[2]]}, {text: t_array7[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[3]]}, {text: t_array7[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[4]]}],
-						[ {text: t_array7[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[5]]}, {text: t_array7[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[6]]}, {text: t_array7[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[7]]}, {text: t_array7[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[8]]}, {text: t_array7[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[9]]}],
-						[ {text: t_array7[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[10]]}, {text: t_array7[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[11]]}, {text: 'Set 7',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array7[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[12]]}, {text: t_array7[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[13]]}],
-						[ {text: t_array7[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[14]]}, {text: t_array7[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[15]]}, {text: t_array7[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[16]]}, {text: t_array7[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[17]]}, {text: t_array7[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[18]]}],
-						[ {text: t_array7[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[19]]}, {text: t_array7[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[20]]}, {text: t_array7[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[21]]}, {text: t_array7[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[22]]}, {text: t_array7[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array7[23]]}]
+						[ t_array1[6][0], t_array1[6][1], t_array1[6][2], t_array1[6][3], t_array1[6][4] ],
+						[ t_array1[6][5], t_array1[6][6], t_array1[6][7], t_array1[6][8], t_array1[6][9] ],
+						[ t_array1[6][10], t_array1[6][11], {text: 'Set 7',style: 'sheet_id',verticalAlign: 'center'}, t_array1[6][12], t_array1[6][13] ],
+						[ t_array1[6][14], t_array1[6][15], t_array1[6][16], t_array1[6][17], t_array1[6][18] ],
+						[ t_array1[6][19], t_array1[6][20], t_array1[6][21], t_array1[6][22], t_array1[6][23] ]
 					]
 				},
 			},
@@ -3732,11 +3682,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array8[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[0]]}, {text: t_array8[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[1]]}, {text: t_array8[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[2]]}, {text: t_array8[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[3]]}, {text: t_array8[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[4]]}],
-						[ {text: t_array8[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[5]]}, {text: t_array8[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[6]]}, {text: t_array8[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[7]]}, {text: t_array8[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[8]]}, {text: t_array8[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[9]]}],
-						[ {text: t_array8[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[10]]}, {text: t_array8[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[11]]}, {text: 'Set 8',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array8[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[12]]}, {text: t_array8[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[13]]}],
-						[ {text: t_array8[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[14]]}, {text: t_array8[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[15]]}, {text: t_array8[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[16]]}, {text: t_array8[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[17]]}, {text: t_array8[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[18]]}],
-						[ {text: t_array8[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[19]]}, {text: t_array8[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[20]]}, {text: t_array8[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[21]]}, {text: t_array8[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[22]]}, {text: t_array8[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array8[23]]}]
+						[ t_array1[7][0], t_array1[7][1], t_array1[7][2], t_array1[7][3], t_array1[7][4] ],
+						[ t_array1[7][5], t_array1[7][6], t_array1[7][7], t_array1[7][8], t_array1[7][9] ],
+						[ t_array1[7][10], t_array1[7][11], {text: 'Set 8',style: 'sheet_id',verticalAlign: 'center'}, t_array1[7][12], t_array1[7][13] ],
+						[ t_array1[7][14], t_array1[7][15], t_array1[7][16], t_array1[7][17], t_array1[7][18] ],
+						[ t_array1[7][19], t_array1[7][20], t_array1[7][21], t_array1[7][22], t_array1[7][23] ]
 					]
 				},
 			},
@@ -3750,11 +3700,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array9[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[0]]}, {text: t_array9[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[1]]}, {text: t_array9[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[2]]}, {text: t_array9[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[3]]}, {text: t_array9[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[4]]}],
-						[ {text: t_array9[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[5]]}, {text: t_array9[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[6]]}, {text: t_array9[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[7]]}, {text: t_array9[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[8]]}, {text: t_array9[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[9]]}],
-						[ {text: t_array9[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[10]]}, {text: t_array9[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[11]]}, {text: 'Set 9',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array9[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[12]]}, {text: t_array9[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[13]]}],
-						[ {text: t_array9[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[14]]}, {text: t_array9[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[15]]}, {text: t_array9[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[16]]}, {text: t_array9[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[17]]}, {text: t_array9[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[18]]}],
-						[ {text: t_array9[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[19]]}, {text: t_array9[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[20]]}, {text: t_array9[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[21]]}, {text: t_array9[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[22]]}, {text: t_array9[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array9[23]]}]
+						[ t_array1[8][0], t_array1[8][1], t_array1[8][2], t_array1[8][3], t_array1[8][4] ],
+						[ t_array1[8][5], t_array1[8][6], t_array1[8][7], t_array1[8][8], t_array1[8][9] ],
+						[ t_array1[8][10], t_array1[8][11], {text: 'Set 9',style: 'sheet_id',verticalAlign: 'center'}, t_array1[8][12], t_array1[8][13] ],
+						[ t_array1[8][14], t_array1[8][15], t_array1[8][16], t_array1[8][17], t_array1[8][18] ],
+						[ t_array1[8][19], t_array1[8][20], t_array1[8][21], t_array1[8][22], t_array1[8][23] ]
 					]
 				},
 			},
@@ -3768,11 +3718,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array10[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[0]]}, {text: t_array10[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[1]]}, {text: t_array10[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[2]]}, {text: t_array10[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[3]]}, {text: t_array10[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[4]]}],
-						[ {text: t_array10[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[5]]}, {text: t_array10[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[6]]}, {text: t_array10[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[7]]}, {text: t_array10[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[8]]}, {text: t_array10[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[9]]}],
-						[ {text: t_array10[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[10]]}, {text: t_array10[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[11]]}, {text: 'Set 10',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array10[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[12]]}, {text: t_array10[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[13]]}],
-						[ {text: t_array10[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[14]]}, {text: t_array10[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[15]]}, {text: t_array10[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[16]]}, {text: t_array10[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[17]]}, {text: t_array10[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[18]]}],
-						[ {text: t_array10[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[19]]}, {text: t_array10[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[20]]}, {text: t_array10[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[21]]}, {text: t_array10[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[22]]}, {text: t_array10[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array10[23]]}]
+						[ t_array1[9][0], t_array1[9][1], t_array1[9][2], t_array1[9][3], t_array1[9][4] ],
+						[ t_array1[9][5], t_array1[9][6], t_array1[9][7], t_array1[9][8], t_array1[9][9] ],
+						[ t_array1[9][10], t_array1[9][11], {text: 'Set 10',style: 'sheet_id',verticalAlign: 'center'}, t_array1[9][12], t_array1[9][13] ],
+						[ t_array1[9][14], t_array1[9][15], t_array1[9][16], t_array1[9][17], t_array1[9][18] ],
+						[ t_array1[9][19], t_array1[9][20], t_array1[9][21], t_array1[9][22], t_array1[9][23] ]
 					]
 				},
 			},
@@ -3786,11 +3736,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array11[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[0]]}, {text: t_array11[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[1]]}, {text: t_array11[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[2]]}, {text: t_array11[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[3]]}, {text: t_array11[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[4]]}],
-						[ {text: t_array11[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[5]]}, {text: t_array11[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[6]]}, {text: t_array11[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[7]]}, {text: t_array11[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[8]]}, {text: t_array11[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[9]]}],
-						[ {text: t_array11[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[10]]}, {text: t_array11[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[11]]}, {text: 'Set 11',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array11[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[12]]}, {text: t_array11[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[13]]}],
-						[ {text: t_array11[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[14]]}, {text: t_array11[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[15]]}, {text: t_array11[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[16]]}, {text: t_array11[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[17]]}, {text: t_array11[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[18]]}],
-						[ {text: t_array11[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[19]]}, {text: t_array11[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[20]]}, {text: t_array11[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[21]]}, {text: t_array11[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[22]]}, {text: t_array11[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array11[23]]}]
+						[ t_array1[10][0], t_array1[10][1], t_array1[10][2], t_array1[10][3], t_array1[10][4] ],
+						[ t_array1[10][5], t_array1[10][6], t_array1[10][7], t_array1[10][8], t_array1[10][9] ],
+						[ t_array1[10][10], t_array1[10][11], {text: 'Set 11',style: 'sheet_id',verticalAlign: 'center'}, t_array1[10][12], t_array1[10][13] ],
+						[ t_array1[10][14], t_array1[10][15], t_array1[10][16], t_array1[10][17], t_array1[10][18] ],
+						[ t_array1[10][19], t_array1[10][20], t_array1[10][21], t_array1[10][22], t_array1[10][23] ]
 					]
 				},
 			},
@@ -3804,11 +3754,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array12[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[0]]}, {text: t_array12[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[1]]}, {text: t_array12[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[2]]}, {text: t_array12[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[3]]}, {text: t_array12[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[4]]}],
-						[ {text: t_array12[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[5]]}, {text: t_array12[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[6]]}, {text: t_array12[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[7]]}, {text: t_array12[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[8]]}, {text: t_array12[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[9]]}],
-						[ {text: t_array12[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[10]]}, {text: t_array12[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[11]]}, {text: 'Set 12',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array12[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[12]]}, {text: t_array12[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[13]]}],
-						[ {text: t_array12[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[14]]}, {text: t_array12[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[15]]}, {text: t_array12[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[16]]}, {text: t_array12[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[17]]}, {text: t_array12[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[18]]}],
-						[ {text: t_array12[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[19]]}, {text: t_array12[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[20]]}, {text: t_array12[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[21]]}, {text: t_array12[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[22]]}, {text: t_array12[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array12[23]]}]
+						[ t_array1[11][0], t_array1[11][1], t_array1[11][2], t_array1[11][3], t_array1[11][4] ],
+						[ t_array1[11][5], t_array1[11][6], t_array1[11][7], t_array1[11][8], t_array1[11][9] ],
+						[ t_array1[11][10], t_array1[11][11], {text: 'Set 12',style: 'sheet_id',verticalAlign: 'center'}, t_array1[11][12], t_array1[11][13] ],
+						[ t_array1[11][14], t_array1[11][15], t_array1[11][16], t_array1[11][17], t_array1[11][18] ],
+						[ t_array1[11][19], t_array1[11][20], t_array1[11][21], t_array1[11][22], t_array1[11][23] ]
 					]
 				},
 			},
@@ -3822,11 +3772,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array13[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[0]]}, {text: t_array13[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[1]]}, {text: t_array13[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[2]]}, {text: t_array13[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[3]]}, {text: t_array13[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[4]]}],
-						[ {text: t_array13[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[5]]}, {text: t_array13[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[6]]}, {text: t_array13[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[7]]}, {text: t_array13[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[8]]}, {text: t_array13[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[9]]}],
-						[ {text: t_array13[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[10]]}, {text: t_array13[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[11]]}, {text: 'Set 13',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array13[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[12]]}, {text: t_array13[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[13]]}],
-						[ {text: t_array13[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[14]]}, {text: t_array13[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[15]]}, {text: t_array13[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[16]]}, {text: t_array13[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[17]]}, {text: t_array13[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[18]]}],
-						[ {text: t_array13[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[19]]}, {text: t_array13[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[20]]}, {text: t_array13[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[21]]}, {text: t_array13[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[22]]}, {text: t_array13[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array13[23]]}]
+						[ t_array1[12][0], t_array1[12][1], t_array1[12][2], t_array1[12][3], t_array1[12][4] ],
+						[ t_array1[12][5], t_array1[12][6], t_array1[12][7], t_array1[12][8], t_array1[12][9] ],
+						[ t_array1[12][10], t_array1[12][11], {text: 'Set 13',style: 'sheet_id',verticalAlign: 'center'}, t_array1[12][12], t_array1[12][13] ],
+						[ t_array1[12][14], t_array1[12][15], t_array1[12][16], t_array1[12][17], t_array1[12][18] ],
+						[ t_array1[12][19], t_array1[12][20], t_array1[12][21], t_array1[12][22], t_array1[12][23] ]
 					]
 				},
 			},
@@ -3840,11 +3790,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array14[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[0]]}, {text: t_array14[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[1]]}, {text: t_array14[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[2]]}, {text: t_array14[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[3]]}, {text: t_array14[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[4]]}],
-						[ {text: t_array14[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[5]]}, {text: t_array14[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[6]]}, {text: t_array14[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[7]]}, {text: t_array14[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[8]]}, {text: t_array14[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[9]]}],
-						[ {text: t_array14[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[10]]}, {text: t_array14[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[11]]}, {text: 'Set 14',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array14[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[12]]}, {text: t_array14[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[13]]}],
-						[ {text: t_array14[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[14]]}, {text: t_array14[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[15]]}, {text: t_array14[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[16]]}, {text: t_array14[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[17]]}, {text: t_array14[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[18]]}],
-						[ {text: t_array14[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[19]]}, {text: t_array14[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[20]]}, {text: t_array14[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[21]]}, {text: t_array14[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[22]]}, {text: t_array14[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array14[23]]}]
+						[ t_array1[13][0], t_array1[13][1], t_array1[13][2], t_array1[13][3], t_array1[13][4] ],
+						[ t_array1[13][5], t_array1[13][6], t_array1[13][7], t_array1[13][8], t_array1[13][9] ],
+						[ t_array1[13][10], t_array1[13][11], {text: 'Set 14',style: 'sheet_id',verticalAlign: 'center'}, t_array1[13][12], t_array1[13][13] ],
+						[ t_array1[13][14], t_array1[13][15], t_array1[13][16], t_array1[13][17], t_array1[13][18] ],
+						[ t_array1[13][19], t_array1[13][20], t_array1[13][21], t_array1[13][22], t_array1[13][23] ]
 					]
 				},
 			},
@@ -3858,11 +3808,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array15[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[0]]}, {text: t_array15[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[1]]}, {text: t_array15[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[2]]}, {text: t_array15[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[3]]}, {text: t_array15[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[4]]}],
-						[ {text: t_array15[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[5]]}, {text: t_array15[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[6]]}, {text: t_array15[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[7]]}, {text: t_array15[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[8]]}, {text: t_array15[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[9]]}],
-						[ {text: t_array15[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[10]]}, {text: t_array15[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[11]]}, {text: 'Set 15',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array15[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[12]]}, {text: t_array15[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[13]]}],
-						[ {text: t_array15[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[14]]}, {text: t_array15[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[15]]}, {text: t_array15[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[16]]}, {text: t_array15[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[17]]}, {text: t_array15[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[18]]}],
-						[ {text: t_array15[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[19]]}, {text: t_array15[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[20]]}, {text: t_array15[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[21]]}, {text: t_array15[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[22]]}, {text: t_array15[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array15[23]]}]
+						[ t_array1[14][0], t_array1[14][1], t_array1[14][2], t_array1[14][3], t_array1[14][4] ],
+						[ t_array1[14][5], t_array1[14][6], t_array1[14][7], t_array1[14][8], t_array1[14][9] ],
+						[ t_array1[14][10], t_array1[14][11], {text: 'Set 15',style: 'sheet_id',verticalAlign: 'center'}, t_array1[14][12], t_array1[14][13] ],
+						[ t_array1[14][14], t_array1[14][15], t_array1[14][16], t_array1[14][17], t_array1[14][18] ],
+						[ t_array1[14][19], t_array1[14][20], t_array1[14][21], t_array1[14][22], t_array1[14][23] ]
 					]
 				},
 			},
@@ -3876,11 +3826,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array16[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[0]]}, {text: t_array16[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[1]]}, {text: t_array16[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[2]]}, {text: t_array16[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[3]]}, {text: t_array16[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[4]]}],
-						[ {text: t_array16[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[5]]}, {text: t_array16[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[6]]}, {text: t_array16[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[7]]}, {text: t_array16[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[8]]}, {text: t_array16[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[9]]}],
-						[ {text: t_array16[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[10]]}, {text: t_array16[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[11]]}, {text: 'Set 16',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array16[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[12]]}, {text: t_array16[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[13]]}],
-						[ {text: t_array16[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[14]]}, {text: t_array16[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[15]]}, {text: t_array16[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[16]]}, {text: t_array16[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[17]]}, {text: t_array16[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[18]]}],
-						[ {text: t_array16[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[19]]}, {text: t_array16[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[20]]}, {text: t_array16[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[21]]}, {text: t_array16[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[22]]}, {text: t_array16[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array16[23]]}]
+						[ t_array1[15][0], t_array1[15][1], t_array1[15][2], t_array1[15][3], t_array1[15][4] ],
+						[ t_array1[15][5], t_array1[15][6], t_array1[15][7], t_array1[15][8], t_array1[15][9] ],
+						[ t_array1[15][10], t_array1[15][11], {text: 'Set 16',style: 'sheet_id',verticalAlign: 'center'}, t_array1[15][12], t_array1[15][13] ],
+						[ t_array1[15][14], t_array1[15][15], t_array1[15][16], t_array1[15][17], t_array1[15][18] ],
+						[ t_array1[15][19], t_array1[15][20], t_array1[15][21], t_array1[15][22], t_array1[15][23] ]
 					]
 				},
 			},
@@ -3894,11 +3844,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array17[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[0]]}, {text: t_array17[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[1]]}, {text: t_array17[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[2]]}, {text: t_array17[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[3]]}, {text: t_array17[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[4]]}],
-						[ {text: t_array17[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[5]]}, {text: t_array17[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[6]]}, {text: t_array17[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[7]]}, {text: t_array17[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[8]]}, {text: t_array17[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[9]]}],
-						[ {text: t_array17[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[10]]}, {text: t_array17[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[11]]}, {text: 'Set 17',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array17[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[12]]}, {text: t_array17[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[13]]}],
-						[ {text: t_array17[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[14]]}, {text: t_array17[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[15]]}, {text: t_array17[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[16]]}, {text: t_array17[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[17]]}, {text: t_array17[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[18]]}],
-						[ {text: t_array17[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[19]]}, {text: t_array17[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[20]]}, {text: t_array17[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[21]]}, {text: t_array17[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[22]]}, {text: t_array17[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array17[23]]}]
+						[ t_array1[16][0], t_array1[16][1], t_array1[16][2], t_array1[16][3], t_array1[16][4] ],
+						[ t_array1[16][5], t_array1[16][6], t_array1[16][7], t_array1[16][8], t_array1[16][9] ],
+						[ t_array1[16][10], t_array1[16][11], {text: 'Set 17',style: 'sheet_id',verticalAlign: 'center'}, t_array1[16][12], t_array1[16][13] ],
+						[ t_array1[16][14], t_array1[16][15], t_array1[16][16], t_array1[16][17], t_array1[16][18] ],
+						[ t_array1[16][19], t_array1[16][20], t_array1[16][21], t_array1[16][22], t_array1[16][23] ]
 					]
 				},
 			},
@@ -3912,11 +3862,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array18[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[0]]}, {text: t_array18[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[1]]}, {text: t_array18[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[2]]}, {text: t_array18[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[3]]}, {text: t_array18[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[4]]}],
-						[ {text: t_array18[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[5]]}, {text: t_array18[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[6]]}, {text: t_array18[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[7]]}, {text: t_array18[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[8]]}, {text: t_array18[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[9]]}],
-						[ {text: t_array18[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[10]]}, {text: t_array18[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[11]]}, {text: 'Set 18',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array18[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[12]]}, {text: t_array18[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[13]]}],
-						[ {text: t_array18[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[14]]}, {text: t_array18[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[15]]}, {text: t_array18[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[16]]}, {text: t_array18[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[17]]}, {text: t_array18[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[18]]}],
-						[ {text: t_array18[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[19]]}, {text: t_array18[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[20]]}, {text: t_array18[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[21]]}, {text: t_array18[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[22]]}, {text: t_array18[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array18[23]]}]
+						[ t_array1[17][0], t_array1[17][1], t_array1[17][2], t_array1[17][3], t_array1[17][4] ],
+						[ t_array1[17][5], t_array1[17][6], t_array1[17][7], t_array1[17][8], t_array1[17][9] ],
+						[ t_array1[17][10], t_array1[17][11], {text: 'Set 18',style: 'sheet_id',verticalAlign: 'center'}, t_array1[17][12], t_array1[17][13] ],
+						[ t_array1[17][14], t_array1[17][15], t_array1[17][16], t_array1[17][17], t_array1[17][18] ],
+						[ t_array1[17][19], t_array1[17][20], t_array1[17][21], t_array1[17][22], t_array1[17][23] ]
 					]
 				},
 			},
@@ -3930,11 +3880,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array19[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[0]]}, {text: t_array19[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[1]]}, {text: t_array19[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[2]]}, {text: t_array19[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[3]]}, {text: t_array19[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[4]]}],
-						[ {text: t_array19[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[5]]}, {text: t_array19[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[6]]}, {text: t_array19[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[7]]}, {text: t_array19[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[8]]}, {text: t_array19[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[9]]}],
-						[ {text: t_array19[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[10]]}, {text: t_array19[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[11]]}, {text: 'Set 19',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array19[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[12]]}, {text: t_array19[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[13]]}],
-						[ {text: t_array19[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[14]]}, {text: t_array19[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[15]]}, {text: t_array19[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[16]]}, {text: t_array19[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[17]]}, {text: t_array19[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[18]]}],
-						[ {text: t_array19[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[19]]}, {text: t_array19[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[20]]}, {text: t_array19[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[21]]}, {text: t_array19[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[22]]}, {text: t_array19[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array19[23]]}]
+						[ t_array1[18][0], t_array1[18][1], t_array1[18][2], t_array1[18][3], t_array1[18][4] ],
+						[ t_array1[18][5], t_array1[18][6], t_array1[18][7], t_array1[18][8], t_array1[18][9] ],
+						[ t_array1[18][10], t_array1[18][11], {text: 'Set 19',style: 'sheet_id',verticalAlign: 'center'}, t_array1[18][12], t_array1[18][13] ],
+						[ t_array1[18][14], t_array1[18][15], t_array1[18][16], t_array1[18][17], t_array1[18][18] ],
+						[ t_array1[18][19], t_array1[18][20], t_array1[18][21], t_array1[18][22], t_array1[18][23] ]
 					]
 				},
 			},
@@ -3948,11 +3898,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array20[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[0]]}, {text: t_array20[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[1]]}, {text: t_array20[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[2]]}, {text: t_array20[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[3]]}, {text: t_array20[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[4]]}],
-						[ {text: t_array20[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[5]]}, {text: t_array20[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[6]]}, {text: t_array20[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[7]]}, {text: t_array20[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[8]]}, {text: t_array20[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[9]]}],
-						[ {text: t_array20[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[10]]}, {text: t_array20[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[11]]}, {text: 'Set 20',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array20[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[12]]}, {text: t_array20[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[13]]}],
-						[ {text: t_array20[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[14]]}, {text: t_array20[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[15]]}, {text: t_array20[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[16]]}, {text: t_array20[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[17]]}, {text: t_array20[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[18]]}],
-						[ {text: t_array20[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[19]]}, {text: t_array20[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[20]]}, {text: t_array20[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[21]]}, {text: t_array20[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[22]]}, {text: t_array20[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array20[23]]}]
+						[ t_array1[19][0], t_array1[19][1], t_array1[19][2], t_array1[19][3], t_array1[19][4] ],
+						[ t_array1[19][5], t_array1[19][6], t_array1[19][7], t_array1[19][8], t_array1[19][9] ],
+						[ t_array1[19][10], t_array1[19][11], {text: 'Set 20',style: 'sheet_id',verticalAlign: 'center'}, t_array1[19][12], t_array1[19][13] ],
+						[ t_array1[19][14], t_array1[19][15], t_array1[19][16], t_array1[19][17], t_array1[19][18] ],
+						[ t_array1[19][19], t_array1[19][20], t_array1[19][21], t_array1[19][22], t_array1[19][23] ]
 					]
 				},
 			},
@@ -3966,11 +3916,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array21[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[0]]}, {text: t_array21[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[1]]}, {text: t_array21[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[2]]}, {text: t_array21[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[3]]}, {text: t_array21[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[4]]}],
-						[ {text: t_array21[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[5]]}, {text: t_array21[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[6]]}, {text: t_array21[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[7]]}, {text: t_array21[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[8]]}, {text: t_array21[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[9]]}],
-						[ {text: t_array21[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[10]]}, {text: t_array21[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[11]]}, {text: 'Set 21',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array21[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[12]]}, {text: t_array21[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[13]]}],
-						[ {text: t_array21[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[14]]}, {text: t_array21[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[15]]}, {text: t_array21[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[16]]}, {text: t_array21[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[17]]}, {text: t_array21[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[18]]}],
-						[ {text: t_array21[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[19]]}, {text: t_array21[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[20]]}, {text: t_array21[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[21]]}, {text: t_array21[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[22]]}, {text: t_array21[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array21[23]]}]
+						[ t_array1[20][0], t_array1[20][1], t_array1[20][2], t_array1[20][3], t_array1[20][4] ],
+						[ t_array1[20][5], t_array1[20][6], t_array1[20][7], t_array1[20][8], t_array1[20][9] ],
+						[ t_array1[20][10], t_array1[20][11], {text: 'Set 21',style: 'sheet_id',verticalAlign: 'center'}, t_array1[20][12], t_array1[20][13] ],
+						[ t_array1[20][14], t_array1[20][15], t_array1[20][16], t_array1[20][17], t_array1[20][18] ],
+						[ t_array1[20][19], t_array1[20][20], t_array1[20][21], t_array1[20][22], t_array1[20][23] ]
 					]
 				},
 			},
@@ -3984,11 +3934,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array22[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[0]]}, {text: t_array22[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[1]]}, {text: t_array22[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[2]]}, {text: t_array22[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[3]]}, {text: t_array22[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[4]]}],
-						[ {text: t_array22[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[5]]}, {text: t_array22[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[6]]}, {text: t_array22[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[7]]}, {text: t_array22[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[8]]}, {text: t_array22[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[9]]}],
-						[ {text: t_array22[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[10]]}, {text: t_array22[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[11]]}, {text: 'Set 22',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array22[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[12]]}, {text: t_array22[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[13]]}],
-						[ {text: t_array22[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[14]]}, {text: t_array22[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[15]]}, {text: t_array22[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[16]]}, {text: t_array22[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[17]]}, {text: t_array22[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[18]]}],
-						[ {text: t_array22[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[19]]}, {text: t_array22[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[20]]}, {text: t_array22[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[21]]}, {text: t_array22[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[22]]}, {text: t_array22[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array22[23]]}]
+						[ t_array1[21][0], t_array1[21][1], t_array1[21][2], t_array1[21][3], t_array1[21][4] ],
+						[ t_array1[21][5], t_array1[21][6], t_array1[21][7], t_array1[21][8], t_array1[21][9] ],
+						[ t_array1[21][10], t_array1[21][11], {text: 'Set 22',style: 'sheet_id',verticalAlign: 'center'}, t_array1[21][12], t_array1[21][13] ],
+						[ t_array1[21][14], t_array1[21][15], t_array1[21][16], t_array1[21][17], t_array1[21][18] ],
+						[ t_array1[21][19], t_array1[21][20], t_array1[21][21], t_array1[21][22], t_array1[21][23] ]
 					]
 				},
 			},
@@ -4002,11 +3952,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array23[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[0]]}, {text: t_array23[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[1]]}, {text: t_array23[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[2]]}, {text: t_array23[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[3]]}, {text: t_array23[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[4]]}],
-						[ {text: t_array23[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[5]]}, {text: t_array23[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[6]]}, {text: t_array23[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[7]]}, {text: t_array23[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[8]]}, {text: t_array23[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[9]]}],
-						[ {text: t_array23[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[10]]}, {text: t_array23[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[11]]}, {text: 'Set 23',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array23[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[12]]}, {text: t_array23[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[13]]}],
-						[ {text: t_array23[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[14]]}, {text: t_array23[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[15]]}, {text: t_array23[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[16]]}, {text: t_array23[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[17]]}, {text: t_array23[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[18]]}],
-						[ {text: t_array23[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[19]]}, {text: t_array23[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[20]]}, {text: t_array23[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[21]]}, {text: t_array23[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[22]]}, {text: t_array23[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array23[23]]}]
+						[ t_array1[22][0], t_array1[22][1], t_array1[22][2], t_array1[22][3], t_array1[22][4] ],
+						[ t_array1[22][5], t_array1[22][6], t_array1[22][7], t_array1[22][8], t_array1[22][9] ],
+						[ t_array1[22][10], t_array1[22][11], {text: 'Set 23',style: 'sheet_id',verticalAlign: 'center'}, t_array1[22][12], t_array1[22][13] ],
+						[ t_array1[22][14], t_array1[22][15], t_array1[22][16], t_array1[22][17], t_array1[22][18] ],
+						[ t_array1[22][19], t_array1[22][20], t_array1[22][21], t_array1[22][22], t_array1[22][23] ]
 					]
 				},
 			},
@@ -4020,11 +3970,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array24[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[0]]}, {text: t_array24[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[1]]}, {text: t_array24[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[2]]}, {text: t_array24[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[3]]}, {text: t_array24[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[4]]}],
-						[ {text: t_array24[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[5]]}, {text: t_array24[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[6]]}, {text: t_array24[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[7]]}, {text: t_array24[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[8]]}, {text: t_array24[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[9]]}],
-						[ {text: t_array24[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[10]]}, {text: t_array24[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[11]]}, {text: 'Set 24',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array24[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[12]]}, {text: t_array24[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[13]]}],
-						[ {text: t_array24[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[14]]}, {text: t_array24[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[15]]}, {text: t_array24[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[16]]}, {text: t_array24[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[17]]}, {text: t_array24[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[18]]}],
-						[ {text: t_array24[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[19]]}, {text: t_array24[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[20]]}, {text: t_array24[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[21]]}, {text: t_array24[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[22]]}, {text: t_array24[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array24[23]]}]
+						[ t_array1[23][0], t_array1[23][1], t_array1[23][2], t_array1[23][3], t_array1[23][4] ],
+						[ t_array1[23][5], t_array1[23][6], t_array1[23][7], t_array1[23][8], t_array1[23][9] ],
+						[ t_array1[23][10], t_array1[23][11], {text: 'Set 24',style: 'sheet_id',verticalAlign: 'center'}, t_array1[23][12], t_array1[23][13] ],
+						[ t_array1[23][14], t_array1[23][15], t_array1[23][16], t_array1[23][17], t_array1[23][18] ],
+						[ t_array1[23][19], t_array1[23][20], t_array1[23][21], t_array1[23][22], t_array1[23][23] ]
 					]
 				},
 			},
@@ -4038,11 +3988,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array25[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[0]]}, {text: t_array25[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[1]]}, {text: t_array25[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[2]]}, {text: t_array25[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[3]]}, {text: t_array25[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[4]]}],
-						[ {text: t_array25[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[5]]}, {text: t_array25[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[6]]}, {text: t_array25[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[7]]}, {text: t_array25[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[8]]}, {text: t_array25[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[9]]}],
-						[ {text: t_array25[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[10]]}, {text: t_array25[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[11]]}, {text: 'Set 25',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array25[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[12]]}, {text: t_array25[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[13]]}],
-						[ {text: t_array25[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[14]]}, {text: t_array25[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[15]]}, {text: t_array25[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[16]]}, {text: t_array25[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[17]]}, {text: t_array25[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[18]]}],
-						[ {text: t_array25[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[19]]}, {text: t_array25[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[20]]}, {text: t_array25[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[21]]}, {text: t_array25[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[22]]}, {text: t_array25[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array25[23]]}]
+						[ t_array1[24][0], t_array1[24][1], t_array1[24][2], t_array1[24][3], t_array1[24][4] ],
+						[ t_array1[24][5], t_array1[24][6], t_array1[24][7], t_array1[24][8], t_array1[24][9] ],
+						[ t_array1[24][10], t_array1[24][11], {text: 'Set 25',style: 'sheet_id',verticalAlign: 'center'}, t_array1[24][12], t_array1[24][13] ],
+						[ t_array1[24][14], t_array1[24][15], t_array1[24][16], t_array1[24][17], t_array1[24][18] ],
+						[ t_array1[24][19], t_array1[24][20], t_array1[24][21], t_array1[24][22], t_array1[24][23] ]
 					]
 				},
 			},
@@ -4056,11 +4006,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array26[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[0]]}, {text: t_array26[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[1]]}, {text: t_array26[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[2]]}, {text: t_array26[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[3]]}, {text: t_array26[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[4]]}],
-						[ {text: t_array26[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[5]]}, {text: t_array26[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[6]]}, {text: t_array26[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[7]]}, {text: t_array26[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[8]]}, {text: t_array26[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[9]]}],
-						[ {text: t_array26[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[10]]}, {text: t_array26[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[11]]}, {text: 'Set 26',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array26[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[12]]}, {text: t_array26[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[13]]}],
-						[ {text: t_array26[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[14]]}, {text: t_array26[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[15]]}, {text: t_array26[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[16]]}, {text: t_array26[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[17]]}, {text: t_array26[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[18]]}],
-						[ {text: t_array26[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[19]]}, {text: t_array26[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[20]]}, {text: t_array26[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[21]]}, {text: t_array26[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[22]]}, {text: t_array26[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array26[23]]}]
+						[ t_array1[25][0], t_array1[25][1], t_array1[25][2], t_array1[25][3], t_array1[25][4] ],
+						[ t_array1[25][5], t_array1[25][6], t_array1[25][7], t_array1[25][8], t_array1[25][9] ],
+						[ t_array1[25][10], t_array1[25][11], {text: 'Set 26',style: 'sheet_id',verticalAlign: 'center'}, t_array1[25][12], t_array1[25][13] ],
+						[ t_array1[25][14], t_array1[25][15], t_array1[25][16], t_array1[25][17], t_array1[25][18] ],
+						[ t_array1[25][19], t_array1[25][20], t_array1[25][21], t_array1[25][22], t_array1[25][23] ]
 					]
 				},
 			},
@@ -4074,11 +4024,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array27[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[0]]}, {text: t_array27[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[1]]}, {text: t_array27[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[2]]}, {text: t_array27[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[3]]}, {text: t_array27[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[4]]}],
-						[ {text: t_array27[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[5]]}, {text: t_array27[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[6]]}, {text: t_array27[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[7]]}, {text: t_array27[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[8]]}, {text: t_array27[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[9]]}],
-						[ {text: t_array27[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[10]]}, {text: t_array27[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[11]]}, {text: 'Set 27',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array27[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[12]]}, {text: t_array27[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[13]]}],
-						[ {text: t_array27[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[14]]}, {text: t_array27[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[15]]}, {text: t_array27[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[16]]}, {text: t_array27[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[17]]}, {text: t_array27[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[18]]}],
-						[ {text: t_array27[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[19]]}, {text: t_array27[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[20]]}, {text: t_array27[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[21]]}, {text: t_array27[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[22]]}, {text: t_array27[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array27[23]]}]
+						[ t_array1[26][0], t_array1[26][1], t_array1[26][2], t_array1[26][3], t_array1[26][4] ],
+						[ t_array1[26][5], t_array1[26][6], t_array1[26][7], t_array1[26][8], t_array1[26][9] ],
+						[ t_array1[26][10], t_array1[26][11], {text: 'Set 27',style: 'sheet_id',verticalAlign: 'center'}, t_array1[26][12], t_array1[26][13] ],
+						[ t_array1[26][14], t_array1[26][15], t_array1[26][16], t_array1[26][17], t_array1[26][18] ],
+						[ t_array1[26][19], t_array1[26][20], t_array1[26][21], t_array1[26][22], t_array1[26][23] ]
 					]
 				},
 			},
@@ -4092,11 +4042,48 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array28[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[0]]}, {text: t_array28[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[1]]}, {text: t_array28[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[2]]}, {text: t_array28[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[3]]}, {text: t_array28[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[4]]}],
-						[ {text: t_array28[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[5]]}, {text: t_array28[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[6]]}, {text: t_array28[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[7]]}, {text: t_array28[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[8]]}, {text: t_array28[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[9]]}],
-						[ {text: t_array28[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[10]]}, {text: t_array28[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[11]]}, {text: 'Set 28',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array28[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[12]]}, {text: t_array28[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[13]]}],
-						[ {text: t_array28[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[14]]}, {text: t_array28[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[15]]}, {text: t_array28[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[16]]}, {text: t_array28[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[17]]}, {text: t_array28[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[18]]}],
-						[ {text: t_array28[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[19]]}, {text: t_array28[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[20]]}, {text: t_array28[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[21]]}, {text: t_array28[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[22]]}, {text: t_array28[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array28[23]]}]
+						[ t_array1[27][0], t_array1[27][1], t_array1[27][2], t_array1[27][3], t_array1[27][4] ],
+						[ t_array1[27][5], t_array1[27][6], t_array1[27][7], t_array1[27][8], t_array1[27][9] ],
+						[ t_array1[27][10], t_array1[27][11], {text: 'Set 28',style: 'sheet_id',verticalAlign: 'center'}, t_array1[27][12], t_array1[27][13] ],
+						[ t_array1[27][14], t_array1[27][15], t_array1[27][16], t_array1[27][17], t_array1[27][18] ],
+						[ t_array1[27][19], t_array1[27][20], t_array1[27][21], t_array1[27][22], t_array1[27][23] ]
+					]
+				},
+			},
+			
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ t_array1[28][0], t_array1[28][1], t_array1[28][2], t_array1[28][3], t_array1[28][4] ],
+						[ t_array1[28][5], t_array1[28][6], t_array1[28][7], t_array1[28][8], t_array1[28][9] ],
+						[ t_array1[28][10], t_array1[28][11], {text: 'Set 29',style: 'sheet_id',verticalAlign: 'center'}, t_array1[28][12], t_array1[28][13] ],
+						[ t_array1[28][14], t_array1[28][15], t_array1[28][16], t_array1[28][17], t_array1[28][18] ],
+						[ t_array1[28][19], t_array1[28][20], t_array1[28][21], t_array1[28][22], t_array1[28][23] ]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ t_array1[29][0], t_array1[29][1], t_array1[29][2], t_array1[29][3], t_array1[29][4] ],
+						[ t_array1[29][5], t_array1[29][6], t_array1[29][7], t_array1[29][8], t_array1[29][9] ],
+						[ t_array1[29][10], t_array1[29][11], {text: 'Set 30',style: 'sheet_id',verticalAlign: 'center'}, t_array1[29][12], t_array1[29][13] ],
+						[ t_array1[29][14], t_array1[29][15], t_array1[29][16], t_array1[29][17], t_array1[29][18] ],
+						[ t_array1[29][19], t_array1[29][20], t_array1[29][21], t_array1[29][22], t_array1[29][23] ]
 					]
 				},
 			},
@@ -4110,11 +4097,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array29[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[0]]}, {text: t_array29[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[1]]}, {text: t_array29[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[2]]}, {text: t_array29[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[3]]}, {text: t_array29[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[4]]}],
-						[ {text: t_array29[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[5]]}, {text: t_array29[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[6]]}, {text: t_array29[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[7]]}, {text: t_array29[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[8]]}, {text: t_array29[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[9]]}],
-						[ {text: t_array29[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[10]]}, {text: t_array29[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[11]]}, {text: 'Set 29',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array29[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[12]]}, {text: t_array29[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[13]]}],
-						[ {text: t_array29[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[14]]}, {text: t_array29[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[15]]}, {text: t_array29[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[16]]}, {text: t_array29[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[17]]}, {text: t_array29[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[18]]}],
-						[ {text: t_array29[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[19]]}, {text: t_array29[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[20]]}, {text: t_array29[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[21]]}, {text: t_array29[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[22]]}, {text: t_array29[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array29[23]]}]
+						[ t_array1[30][0], t_array1[30][1], t_array1[30][2], t_array1[30][3], t_array1[30][4] ],
+						[ t_array1[30][5], t_array1[30][6], t_array1[30][7], t_array1[30][8], t_array1[30][9] ],
+						[ t_array1[30][10], t_array1[30][11], {text: 'Set 31',style: 'sheet_id',verticalAlign: 'center'}, t_array1[30][12], t_array1[30][13] ],
+						[ t_array1[30][14], t_array1[30][15], t_array1[30][16], t_array1[30][17], t_array1[30][18] ],
+						[ t_array1[30][19], t_array1[30][20], t_array1[30][21], t_array1[30][22], t_array1[30][23] ]
 					]
 				},
 			},
@@ -4128,11 +4115,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array30[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[0]]}, {text: t_array30[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[1]]}, {text: t_array30[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[2]]}, {text: t_array30[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[3]]}, {text: t_array30[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[4]]}],
-						[ {text: t_array30[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[5]]}, {text: t_array30[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[6]]}, {text: t_array30[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[7]]}, {text: t_array30[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[8]]}, {text: t_array30[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[9]]}],
-						[ {text: t_array30[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[10]]}, {text: t_array30[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[11]]}, {text: 'Set 30',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array30[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[12]]}, {text: t_array30[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[13]]}],
-						[ {text: t_array30[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[14]]}, {text: t_array30[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[15]]}, {text: t_array30[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[16]]}, {text: t_array30[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[17]]}, {text: t_array30[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[18]]}],
-						[ {text: t_array30[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[19]]}, {text: t_array30[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[20]]}, {text: t_array30[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[21]]}, {text: t_array30[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[22]]}, {text: t_array30[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array30[23]]}]
+						[ t_array1[31][0], t_array1[31][1], t_array1[31][2], t_array1[31][3], t_array1[31][4] ],
+						[ t_array1[31][5], t_array1[31][6], t_array1[31][7], t_array1[31][8], t_array1[31][9] ],
+						[ t_array1[31][10], t_array1[31][11], {text: 'Set 32',style: 'sheet_id',verticalAlign: 'center'}, t_array1[31][12], t_array1[31][13] ],
+						[ t_array1[31][14], t_array1[31][15], t_array1[31][16], t_array1[31][17], t_array1[31][18] ],
+						[ t_array1[31][19], t_array1[31][20], t_array1[31][21], t_array1[31][22], t_array1[31][23] ]
 					]
 				},
 			},
@@ -4146,11 +4133,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array31[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[0]]}, {text: t_array31[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[1]]}, {text: t_array31[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[2]]}, {text: t_array31[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[3]]}, {text: t_array31[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[4]]}],
-						[ {text: t_array31[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[5]]}, {text: t_array31[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[6]]}, {text: t_array31[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[7]]}, {text: t_array31[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[8]]}, {text: t_array31[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[9]]}],
-						[ {text: t_array31[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[10]]}, {text: t_array31[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[11]]}, {text: 'Set 31',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array31[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[12]]}, {text: t_array31[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[13]]}],
-						[ {text: t_array31[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[14]]}, {text: t_array31[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[15]]}, {text: t_array31[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[16]]}, {text: t_array31[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[17]]}, {text: t_array31[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[18]]}],
-						[ {text: t_array31[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[19]]}, {text: t_array31[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[20]]}, {text: t_array31[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[21]]}, {text: t_array31[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[22]]}, {text: t_array31[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array31[23]]}]
+						[ t_array1[32][0], t_array1[32][1], t_array1[32][2], t_array1[32][3], t_array1[32][4] ],
+						[ t_array1[32][5], t_array1[32][6], t_array1[32][7], t_array1[32][8], t_array1[32][9] ],
+						[ t_array1[32][10], t_array1[32][11], {text: 'Set 33',style: 'sheet_id',verticalAlign: 'center'}, t_array1[32][12], t_array1[32][13] ],
+						[ t_array1[32][14], t_array1[32][15], t_array1[32][16], t_array1[32][17], t_array1[32][18] ],
+						[ t_array1[32][19], t_array1[32][20], t_array1[32][21], t_array1[32][22], t_array1[32][23] ]
 					]
 				},
 			},
@@ -4164,11 +4151,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array32[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[0]]}, {text: t_array32[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[1]]}, {text: t_array32[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[2]]}, {text: t_array32[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[3]]}, {text: t_array32[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[4]]}],
-						[ {text: t_array32[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[5]]}, {text: t_array32[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[6]]}, {text: t_array32[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[7]]}, {text: t_array32[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[8]]}, {text: t_array32[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[9]]}],
-						[ {text: t_array32[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[10]]}, {text: t_array32[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[11]]}, {text: 'Set 32',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array32[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[12]]}, {text: t_array32[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[13]]}],
-						[ {text: t_array32[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[14]]}, {text: t_array32[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[15]]}, {text: t_array32[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[16]]}, {text: t_array32[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[17]]}, {text: t_array32[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[18]]}],
-						[ {text: t_array32[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[19]]}, {text: t_array32[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[20]]}, {text: t_array32[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[21]]}, {text: t_array32[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[22]]}, {text: t_array32[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array32[23]]}]
+						[ t_array1[33][0], t_array1[33][1], t_array1[33][2], t_array1[33][3], t_array1[33][4] ],
+						[ t_array1[33][5], t_array1[33][6], t_array1[33][7], t_array1[33][8], t_array1[33][9] ],
+						[ t_array1[33][10], t_array1[33][11], {text: 'Set 34',style: 'sheet_id',verticalAlign: 'center'}, t_array1[33][12], t_array1[33][13] ],
+						[ t_array1[33][14], t_array1[33][15], t_array1[33][16], t_array1[33][17], t_array1[33][18] ],
+						[ t_array1[33][19], t_array1[33][20], t_array1[33][21], t_array1[33][22], t_array1[33][23] ]
 					]
 				},
 			},
@@ -4182,11 +4169,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array33[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[0]]}, {text: t_array33[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[1]]}, {text: t_array33[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[2]]}, {text: t_array33[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[3]]}, {text: t_array33[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[4]]}],
-						[ {text: t_array33[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[5]]}, {text: t_array33[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[6]]}, {text: t_array33[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[7]]}, {text: t_array33[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[8]]}, {text: t_array33[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[9]]}],
-						[ {text: t_array33[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[10]]}, {text: t_array33[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[11]]}, {text: 'Set 33',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array33[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[12]]}, {text: t_array33[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[13]]}],
-						[ {text: t_array33[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[14]]}, {text: t_array33[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[15]]}, {text: t_array33[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[16]]}, {text: t_array33[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[17]]}, {text: t_array33[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[18]]}],
-						[ {text: t_array33[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[19]]}, {text: t_array33[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[20]]}, {text: t_array33[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[21]]}, {text: t_array33[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[22]]}, {text: t_array33[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array33[23]]}]
+						[ t_array1[34][0], t_array1[34][1], t_array1[34][2], t_array1[34][3], t_array1[34][4] ],
+						[ t_array1[34][5], t_array1[34][6], t_array1[34][7], t_array1[34][8], t_array1[34][9] ],
+						[ t_array1[34][10], t_array1[34][11], {text: 'Set 35',style: 'sheet_id',verticalAlign: 'center'}, t_array1[34][12], t_array1[34][13] ],
+						[ t_array1[34][14], t_array1[34][15], t_array1[34][16], t_array1[34][17], t_array1[34][18] ],
+						[ t_array1[34][19], t_array1[34][20], t_array1[34][21], t_array1[34][22], t_array1[34][23] ]
 					]
 				},
 			},
@@ -4200,11 +4187,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array34[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[0]]}, {text: t_array34[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[1]]}, {text: t_array34[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[2]]}, {text: t_array34[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[3]]}, {text: t_array34[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[4]]}],
-						[ {text: t_array34[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[5]]}, {text: t_array34[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[6]]}, {text: t_array34[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[7]]}, {text: t_array34[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[8]]}, {text: t_array34[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[9]]}],
-						[ {text: t_array34[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[10]]}, {text: t_array34[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[11]]}, {text: 'Set 34',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array34[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[12]]}, {text: t_array34[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[13]]}],
-						[ {text: t_array34[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[14]]}, {text: t_array34[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[15]]}, {text: t_array34[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[16]]}, {text: t_array34[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[17]]}, {text: t_array34[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[18]]}],
-						[ {text: t_array34[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[19]]}, {text: t_array34[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[20]]}, {text: t_array34[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[21]]}, {text: t_array34[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[22]]}, {text: t_array34[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array34[23]]}]
+						[ t_array1[35][0], t_array1[35][1], t_array1[35][2], t_array1[35][3], t_array1[35][4] ],
+						[ t_array1[35][5], t_array1[35][6], t_array1[35][7], t_array1[35][8], t_array1[35][9] ],
+						[ t_array1[35][10], t_array1[35][11], {text: 'Set 36',style: 'sheet_id',verticalAlign: 'center'}, t_array1[35][12], t_array1[35][13] ],
+						[ t_array1[35][14], t_array1[35][15], t_array1[35][16], t_array1[35][17], t_array1[35][18] ],
+						[ t_array1[35][19], t_array1[35][20], t_array1[35][21], t_array1[35][22], t_array1[35][23] ]
 					]
 				},
 			},
@@ -4218,11 +4205,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array35[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[0]]}, {text: t_array35[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[1]]}, {text: t_array35[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[2]]}, {text: t_array35[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[3]]}, {text: t_array35[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[4]]}],
-						[ {text: t_array35[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[5]]}, {text: t_array35[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[6]]}, {text: t_array35[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[7]]}, {text: t_array35[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[8]]}, {text: t_array35[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[9]]}],
-						[ {text: t_array35[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[10]]}, {text: t_array35[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[11]]}, {text: 'Set 35',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array35[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[12]]}, {text: t_array35[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[13]]}],
-						[ {text: t_array35[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[14]]}, {text: t_array35[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[15]]}, {text: t_array35[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[16]]}, {text: t_array35[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[17]]}, {text: t_array35[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[18]]}],
-						[ {text: t_array35[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[19]]}, {text: t_array35[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[20]]}, {text: t_array35[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[21]]}, {text: t_array35[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[22]]}, {text: t_array35[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array35[23]]}]
+						[ t_array1[36][0], t_array1[36][1], t_array1[36][2], t_array1[36][3], t_array1[36][4] ],
+						[ t_array1[36][5], t_array1[36][6], t_array1[36][7], t_array1[36][8], t_array1[36][9] ],
+						[ t_array1[36][10], t_array1[36][11], {text: 'Set 37',style: 'sheet_id',verticalAlign: 'center'}, t_array1[36][12], t_array1[36][13] ],
+						[ t_array1[36][14], t_array1[36][15], t_array1[36][16], t_array1[36][17], t_array1[36][18] ],
+						[ t_array1[36][19], t_array1[36][20], t_array1[36][21], t_array1[36][22], t_array1[36][23] ]
 					]
 				},
 			},
@@ -4236,11 +4223,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array36[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[0]]}, {text: t_array36[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[1]]}, {text: t_array36[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[2]]}, {text: t_array36[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[3]]}, {text: t_array36[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[4]]}],
-						[ {text: t_array36[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[5]]}, {text: t_array36[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[6]]}, {text: t_array36[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[7]]}, {text: t_array36[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[8]]}, {text: t_array36[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[9]]}],
-						[ {text: t_array36[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[10]]}, {text: t_array36[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[11]]}, {text: 'Set 36',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array36[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[12]]}, {text: t_array36[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[13]]}],
-						[ {text: t_array36[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[14]]}, {text: t_array36[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[15]]}, {text: t_array36[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[16]]}, {text: t_array36[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[17]]}, {text: t_array36[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[18]]}],
-						[ {text: t_array36[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[19]]}, {text: t_array36[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[20]]}, {text: t_array36[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[21]]}, {text: t_array36[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[22]]}, {text: t_array36[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array36[23]]}]
+						[ t_array1[37][0], t_array1[37][1], t_array1[37][2], t_array1[37][3], t_array1[37][4] ],
+						[ t_array1[37][5], t_array1[37][6], t_array1[37][7], t_array1[37][8], t_array1[37][9] ],
+						[ t_array1[37][10], t_array1[37][11], {text: 'Set 38',style: 'sheet_id',verticalAlign: 'center'}, t_array1[37][12], t_array1[37][13] ],
+						[ t_array1[37][14], t_array1[37][15], t_array1[37][16], t_array1[37][17], t_array1[37][18] ],
+						[ t_array1[37][19], t_array1[37][20], t_array1[37][21], t_array1[37][22], t_array1[37][23] ]
 					]
 				},
 			},
@@ -4254,11 +4241,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array37[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[0]]}, {text: t_array37[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[1]]}, {text: t_array37[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[2]]}, {text: t_array37[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[3]]}, {text: t_array37[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[4]]}],
-						[ {text: t_array37[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[5]]}, {text: t_array37[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[6]]}, {text: t_array37[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[7]]}, {text: t_array37[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[8]]}, {text: t_array37[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[9]]}],
-						[ {text: t_array37[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[10]]}, {text: t_array37[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[11]]}, {text: 'Set 37',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array37[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[12]]}, {text: t_array37[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[13]]}],
-						[ {text: t_array37[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[14]]}, {text: t_array37[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[15]]}, {text: t_array37[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[16]]}, {text: t_array37[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[17]]}, {text: t_array37[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[18]]}],
-						[ {text: t_array37[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[19]]}, {text: t_array37[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[20]]}, {text: t_array37[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[21]]}, {text: t_array37[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[22]]}, {text: t_array37[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array37[23]]}]
+						[ t_array1[38][0], t_array1[38][1], t_array1[38][2], t_array1[38][3], t_array1[38][4] ],
+						[ t_array1[38][5], t_array1[38][6], t_array1[38][7], t_array1[38][8], t_array1[38][9] ],
+						[ t_array1[38][10], t_array1[38][11], {text: 'Set 39',style: 'sheet_id',verticalAlign: 'center'}, t_array1[38][12], t_array1[38][13] ],
+						[ t_array1[38][14], t_array1[38][15], t_array1[38][16], t_array1[38][17], t_array1[38][18] ],
+						[ t_array1[38][19], t_array1[38][20], t_array1[38][21], t_array1[38][22], t_array1[38][23] ]
 					]
 				},
 			},
@@ -4272,11 +4259,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array38[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[0]]}, {text: t_array38[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[1]]}, {text: t_array38[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[2]]}, {text: t_array38[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[3]]}, {text: t_array38[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[4]]}],
-						[ {text: t_array38[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[5]]}, {text: t_array38[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[6]]}, {text: t_array38[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[7]]}, {text: t_array38[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[8]]}, {text: t_array38[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[9]]}],
-						[ {text: t_array38[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[10]]}, {text: t_array38[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[11]]}, {text: 'Set 38',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array38[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[12]]}, {text: t_array38[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[13]]}],
-						[ {text: t_array38[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[14]]}, {text: t_array38[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[15]]}, {text: t_array38[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[16]]}, {text: t_array38[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[17]]}, {text: t_array38[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[18]]}],
-						[ {text: t_array38[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[19]]}, {text: t_array38[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[20]]}, {text: t_array38[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[21]]}, {text: t_array38[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[22]]}, {text: t_array38[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array38[23]]}]
+						[ t_array1[39][0], t_array1[39][1], t_array1[39][2], t_array1[39][3], t_array1[39][4] ],
+						[ t_array1[39][5], t_array1[39][6], t_array1[39][7], t_array1[39][8], t_array1[39][9] ],
+						[ t_array1[39][10], t_array1[39][11], {text: 'Set 40',style: 'sheet_id',verticalAlign: 'center'}, t_array1[39][12], t_array1[39][13] ],
+						[ t_array1[39][14], t_array1[39][15], t_array1[39][16], t_array1[39][17], t_array1[39][18] ],
+						[ t_array1[39][19], t_array1[39][20], t_array1[39][21], t_array1[39][22], t_array1[39][23] ]
 					]
 				},
 			},
@@ -4290,11 +4277,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array39[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[0]]}, {text: t_array39[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[1]]}, {text: t_array39[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[2]]}, {text: t_array39[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[3]]}, {text: t_array39[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[4]]}],
-						[ {text: t_array39[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[5]]}, {text: t_array39[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[6]]}, {text: t_array39[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[7]]}, {text: t_array39[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[8]]}, {text: t_array39[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[9]]}],
-						[ {text: t_array39[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[10]]}, {text: t_array39[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[11]]}, {text: 'Set 39',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array39[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[12]]}, {text: t_array39[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[13]]}],
-						[ {text: t_array39[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[14]]}, {text: t_array39[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[15]]}, {text: t_array39[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[16]]}, {text: t_array39[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[17]]}, {text: t_array39[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[18]]}],
-						[ {text: t_array39[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[19]]}, {text: t_array39[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[20]]}, {text: t_array39[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[21]]}, {text: t_array39[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[22]]}, {text: t_array39[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array39[23]]}]
+						[ t_array1[40][0], t_array1[40][1], t_array1[40][2], t_array1[40][3], t_array1[40][4] ],
+						[ t_array1[40][5], t_array1[40][6], t_array1[40][7], t_array1[40][8], t_array1[40][9] ],
+						[ t_array1[40][10], t_array1[40][11], {text: 'Set 41',style: 'sheet_id',verticalAlign: 'center'}, t_array1[40][12], t_array1[40][13] ],
+						[ t_array1[40][14], t_array1[40][15], t_array1[40][16], t_array1[40][17], t_array1[40][18] ],
+						[ t_array1[40][19], t_array1[40][20], t_array1[40][21], t_array1[40][22], t_array1[40][23] ]
 					]
 				},
 			},
@@ -4308,11 +4295,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array40[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[0]]}, {text: t_array40[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[1]]}, {text: t_array40[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[2]]}, {text: t_array40[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[3]]}, {text: t_array40[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[4]]}],
-						[ {text: t_array40[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[5]]}, {text: t_array40[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[6]]}, {text: t_array40[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[7]]}, {text: t_array40[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[8]]}, {text: t_array40[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[9]]}],
-						[ {text: t_array40[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[10]]}, {text: t_array40[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[11]]}, {text: 'Set 40',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array40[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[12]]}, {text: t_array40[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[13]]}],
-						[ {text: t_array40[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[14]]}, {text: t_array40[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[15]]}, {text: t_array40[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[16]]}, {text: t_array40[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[17]]}, {text: t_array40[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[18]]}],
-						[ {text: t_array40[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[19]]}, {text: t_array40[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[20]]}, {text: t_array40[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[21]]}, {text: t_array40[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[22]]}, {text: t_array40[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array40[23]]}]
+						[ t_array1[41][0], t_array1[41][1], t_array1[41][2], t_array1[41][3], t_array1[41][4] ],
+						[ t_array1[41][5], t_array1[41][6], t_array1[41][7], t_array1[41][8], t_array1[41][9] ],
+						[ t_array1[41][10], t_array1[41][11], {text: 'Set 42',style: 'sheet_id',verticalAlign: 'center'}, t_array1[41][12], t_array1[41][13] ],
+						[ t_array1[41][14], t_array1[41][15], t_array1[41][16], t_array1[41][17], t_array1[41][18] ],
+						[ t_array1[41][19], t_array1[41][20], t_array1[41][21], t_array1[41][22], t_array1[41][23] ]
 					]
 				},
 			},
@@ -4326,11 +4313,11 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array41[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[0]]}, {text: t_array41[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[1]]}, {text: t_array41[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[2]]}, {text: t_array41[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[3]]}, {text: t_array41[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[4]]}],
-						[ {text: t_array41[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[5]]}, {text: t_array41[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[6]]}, {text: t_array41[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[7]]}, {text: t_array41[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[8]]}, {text: t_array41[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[9]]}],
-						[ {text: t_array41[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[10]]}, {text: t_array41[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[11]]}, {text: 'Set 41',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array41[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[12]]}, {text: t_array41[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[13]]}],
-						[ {text: t_array41[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[14]]}, {text: t_array41[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[15]]}, {text: t_array41[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[16]]}, {text: t_array41[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[17]]}, {text: t_array41[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[18]]}],
-						[ {text: t_array41[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[19]]}, {text: t_array41[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[20]]}, {text: t_array41[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[21]]}, {text: t_array41[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[22]]}, {text: t_array41[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array41[23]]}]
+						[ t_array1[42][0], t_array1[42][1], t_array1[42][2], t_array1[42][3], t_array1[42][4] ],
+						[ t_array1[42][5], t_array1[42][6], t_array1[42][7], t_array1[42][8], t_array1[42][9] ],
+						[ t_array1[42][10], t_array1[42][11], {text: 'Set 43',style: 'sheet_id',verticalAlign: 'center'}, t_array1[42][12], t_array1[42][13] ],
+						[ t_array1[42][14], t_array1[42][15], t_array1[42][16], t_array1[42][17], t_array1[42][18] ],
+						[ t_array1[42][19], t_array1[42][20], t_array1[42][21], t_array1[42][22], t_array1[42][23] ]
 					]
 				},
 			},
@@ -4344,14 +4331,87 @@ function makeVocBingoSheets (caller) {
 					widths: [ 98, 99, 98, 99, 99 ],
 					height:63,
 					body: [
-						[ {text: t_array42[0],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[0]]}, {text: t_array42[1],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[1]]}, {text: t_array42[2],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[2]]}, {text: t_array42[3],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[3]]}, {text: t_array42[4],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[4]]}],
-						[ {text: t_array42[5],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[5]]}, {text: t_array42[6],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[6]]}, {text: t_array42[7],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[7]]}, {text: t_array42[8],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[8]]}, {text: t_array42[9],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[9]]}],
-						[ {text: t_array42[10],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[10]]}, {text: t_array42[11],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[11]]}, {text: 'Set 42',style: 'sheet_id',verticalAlign: 'center'}, {text: t_array42[12],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[12]]}, {text: t_array42[13],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[13]]}],
-						[ {text: t_array42[14],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[14]]}, {text: t_array42[15],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[15]]}, {text: t_array42[16],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[16]]}, {text: t_array42[17],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[17]]}, {text: t_array42[18],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[18]]}],
-						[ {text: t_array42[19],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[19]]}, {text: t_array42[20],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[20]]}, {text: t_array42[21],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[21]]}, {text: t_array42[22],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[22]]}, {text: t_array42[23],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array42[23]]}]
+						[ t_array1[43][0], t_array1[43][1], t_array1[43][2], t_array1[43][3], t_array1[43][4] ],
+						[ t_array1[43][5], t_array1[43][6], t_array1[43][7], t_array1[43][8], t_array1[43][9] ],
+						[ t_array1[43][10], t_array1[43][11], {text: 'Set 44',style: 'sheet_id',verticalAlign: 'center'}, t_array1[43][12], t_array1[43][13] ],
+						[ t_array1[43][14], t_array1[43][15], t_array1[43][16], t_array1[43][17], t_array1[43][18] ],
+						[ t_array1[43][19], t_array1[43][20], t_array1[43][21], t_array1[43][22], t_array1[43][23] ]
 					]
 				},
 			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ t_array1[44][0], t_array1[44][1], t_array1[44][2], t_array1[44][3], t_array1[44][4] ],
+						[ t_array1[44][5], t_array1[44][6], t_array1[44][7], t_array1[44][8], t_array1[44][9] ],
+						[ t_array1[44][10], t_array1[44][11], {text: 'Set 45',style: 'sheet_id',verticalAlign: 'center'}, t_array1[44][12], t_array1[44][13] ],
+						[ t_array1[44][14], t_array1[44][15], t_array1[44][16], t_array1[44][17], t_array1[44][18] ],
+						[ t_array1[44][19], t_array1[44][20], t_array1[44][21], t_array1[44][22], t_array1[44][23] ]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ t_array1[45][0], t_array1[45][1], t_array1[45][2], t_array1[45][3], t_array1[45][4] ],
+						[ t_array1[45][5], t_array1[45][6], t_array1[45][7], t_array1[45][8], t_array1[45][9] ],
+						[ t_array1[45][10], t_array1[45][11], {text: 'Set 46',style: 'sheet_id',verticalAlign: 'center'}, t_array1[45][12], t_array1[45][13] ],
+						[ t_array1[45][14], t_array1[45][15], t_array1[45][16], t_array1[45][17], t_array1[45][18] ],
+						[ t_array1[45][19], t_array1[45][20], t_array1[45][21], t_array1[45][22], t_array1[45][23] ]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ t_array1[46][0], t_array1[46][1], t_array1[46][2], t_array1[46][3], t_array1[46][4] ],
+						[ t_array1[46][5], t_array1[46][6], t_array1[46][7], t_array1[46][8], t_array1[46][9] ],
+						[ t_array1[46][10], t_array1[46][11], {text: 'Set 47',style: 'sheet_id',verticalAlign: 'center'}, t_array1[46][12], t_array1[46][13] ],
+						[ t_array1[46][14], t_array1[46][15], t_array1[46][16], t_array1[46][17], t_array1[46][18] ],
+						[ t_array1[46][19], t_array1[46][20], t_array1[46][21], t_array1[46][22], t_array1[46][23] ]
+					]
+				},
+			},
+			{	columns: [
+					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+				]
+			},
+			{
+				table: {
+					widths: [ 98, 99, 98, 99, 99 ],
+					height:63,
+					body: [
+						[ t_array1[47][0], t_array1[47][1], t_array1[47][2], t_array1[47][3], t_array1[47][4] ],
+						[ t_array1[47][5], t_array1[47][6], t_array1[47][7], t_array1[47][8], t_array1[47][9] ],
+						[ t_array1[47][10], t_array1[47][11], {text: 'Set 48',style: 'sheet_id',verticalAlign: 'center'}, t_array1[47][12], t_array1[47][13] ],
+						[ t_array1[47][14], t_array1[47][15], t_array1[47][16], t_array1[47][17], t_array1[47][18] ],
+						[ t_array1[47][19], t_array1[47][20], t_array1[47][21], t_array1[47][22], t_array1[47][23] ]
+					]
+				},
+			},
+
 		],
 		pageMargins: [ 28, 46, 28, 28 ],
 		styles: {
@@ -6189,56 +6249,56 @@ function setVocArrays() {
 				break;
 			//Book 5
 			case "d_B_5_1_1":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Bud  มีกระเป๋า", "Bud  มีถุง", "Bud  มีถุงผ้า", "Bud  ปวดหลัง");
+				vocEx="Bud  มีกระเป๋า";
 				break;
 			case "d_B_5_1_2":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("มีอัญมณีเม็ดใหญ่อยู่ในกระเป๋า", "มีเพชรพลอยสวยมากยู่ในกระเป๋า", "Dot  เจอเพชรพลอยเม็ดใหญ่", "Dot  เจอเพชรพลอยสวยมาก");
+				vocEx="มีอัญมณีเม็ดใหญ่อยู่ในกระเป๋า";
 				break;
 			case "d_B_5_1_3":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Jack  และ  Gus  เตะอัญมณี", "Jack  และ  Gus  สะดุดเพชรพลอย", "Jack  และ  Gus  สะดุดอัญมณี", "Jack  และ  Gus  ตีอัญมณี");
+				vocEx="Jack  และ  Gus  เตะอัญมณี";
 				break;
 			case "d_B_5_1_4":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Doctor Zogue  เป็นนักปราชญ์วิเศษ", "Doctor Zogue  เป็นนักธุรกิจ", "Doctor Zogue  เป็นนักปราชซึ่งชอบกินสมุนไพร", "Doctor Zogue  มีสมุนไพรวิเศษ");
+				vocEx="Doctor Zogue  เป็นนักปราชญ์วิเศษ";
 				break;
 			case "d_B_5_1_5":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Sue  และ  Joe  เป็นหนูวิเศษ", "Sue  และ  Joe  เป็นหนูซึ่งพูดได้", "Sue  และ  Joe  เป็นหนูน่ารักซึ่งชอบเวทมนต์", "Sue  และ  Joe  เป็นหนูสัตว์เลี้ยงซึ่งมีเวทมนต์");
+				vocEx="Sue  และ  Joe  เป็นหนูวิเศษ";
 				break;
 			case "d_B_5_1_6":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมสามารถส่งคุณไปยังบ้านของผมที่ทะเลสาบ", "ผมสามารถส่งคุณไปยังบ้านของผม", "ผมสามารถส่งคุณไปยังบ้านที่ทะเลสาบ", "ผมอยากจะส่งคุณไปยังบ้านของผมที่ทะเลสาบ");
+				vocEx="ผมสามารถส่งคุณไปยังบ้านของผมที่ทะเลสาบ";
 				break;
 			case "d_B_5_1_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราสามารถไปได้ไหม  Dot", "พวกเราสามารถไป  Dot", "พวกเราไม่สามารถไป  Dot", "พวกเราควรจะไป  Dot");
+				vocEx="พวกเราสามารถไปได้ไหม  Dot";
 				break;
 			case "d_B_5_1_8":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เราสามารถไปบ้านของ  Doctor Zogue  ที่ทะเลสาบได้ไหม", "เราไม่สามารถไปบ้านของ  Doctor Zogue  ที่แม่น้ำได้ไหม", "เราสามารถไปบ้านของ  Doctor Zogue  ที่แม่น้ำ", "เราสามารถไปบ้านของ  Doctor Zogue  ที่ทะเลสาบ");
+				vocEx="เราสามารถไปบ้านของ  Doctor Zogue  ที่ทะเลสาบได้ไหม";
 				break;
 			case "d_B_5_1_9":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราไม่สามารถไป  Ben", "พวกเราสามารถไป  Ben", "พวกเราสามารถไปได้ไหม  Ben", "พวกเราไม่ควรจะไป  Ben");
+				vocEx="พวกเราไม่สามารถไป  Ben";
 				break;
 			case "d_B_5_1_10":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราไม่มีเวทมนต์และเราไม่มีเวลา", "พวกเรามีเวทมนต์ และเรามีเวลา", "พวกเราไม่มีเวทมนต์แต่เรามีเวลา", "พวกเรามีเวทมนต์แต่เราไม่มีเวลา");
+				vocEx="พวกเราไม่มีเวทมนต์และเราไม่มีเวลา";
 				break;
 			case "d_B_5_3_1":
 				vocArray = new Array ("แต่ Sue และ Joe สามารถอบพายและขนมเค้ก", "หรือ Sue และ Joe เอาพายและขนมเค้ก", "และ Sue กับ Joe กินพายและขนมเค้กในกระป๋อง", "แต่ว่า Sue และ Joe ชอบกินพายและขนมเค้ก");
 				vocEx="แต่ Sue และ Joe สามารถอบพายและขนมเค้ก";
 				break;
 			case "d_B_5_3_2":
-				vocArray = new Array ("กูชอบพายและขนมเค้ก  Dot", "ฉันสามารถอบพายและขนมเค้ก  Dot", "มีพายและขนมเค้กที่ทะเลสาบ  Dot", "Ben  อยากกินพายและขนมเค้กที่ทะเลสาบ  Dot");
+				vocArray = new Array ("หนูชอบพายและขนมเค้ก  Dot", "ฉันสามารถอบพายและขนมเค้ก  Dot", "มีพายและขนมเค้กที่ทะเลสาบ  Dot", "Ben  อยากกินพายและขนมเค้กที่ทะเลสาบ  Dot");
 				vocEx="กูชอบพายและขนมเค้ก  Dot";
 				break;
 			case "d_B_5_3_3":
-				vocArray = new Array ("กูสามารถกินพายและขนมเค้กในบ้านที่ทะเลสาบ", "ผมอยากกินพายและขนมเค้กในกกระท่อมที่ทะเลสาบ", "ผมอยากกินพายและขนมเค้กในกกระท่อมที่กลางแจ้ง", "กูสามารถกินข้าวในกกระท่อมที่กลางแจ้ง");
-				vocEx="กูสามารถกินพายและขนมเค้กในบ้านที่ทะเลสาบ";
+				vocArray = new Array ("หนูสามารถกินพายและขนมเค้กในบ้านที่ทะเลสาบ", "ผมอยากกินพายและขนมเค้กในกระท่อมที่ทะเลสาบ", "ผมอยากกินพายและขนมเค้กในบ้านที่กลางแจ้ง", "หนูสามารถกินข้าวในกระท่อมที่กลางแจ้ง");
+				vocEx="หนูสามารถกินพายและขนมเค้กในบ้านที่ทะเลสาบ";
 				break;
 			case "d_B_5_3_4":
 				vocArray = new Array ("Dot โกรธ  ใบหน้าของเขาสีชมพู", "Dot บ้า  ใบหน้าของเขาสีแดง", "Dot อาย  หน้าแตก", "Dot โกรธ  ใบหน้าของเขาดูแย่");
@@ -6253,36 +6313,36 @@ function setVocArrays() {
 				vocEx="แต่เราไม่มีเวลา  เราไม่สามารถไป";
 				break;
 			case "d_B_5_3_7":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("แต่ผมเป็นนักปราชญ์วิเศษ  Dot", "และผมเป็นนักปราชญ์วิเศษ  Dot", "และผมมีสมุนไพรวิเศษ  Dot", "แต่ผมมีสมุนไพรวิเศษ  Dot");
+				vocEx="แต่ผมเป็นนักปราชญ์วิเศษ  Dot";
 				break;
 			case "d_B_5_3_8":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมสามารถสั่งเวลากลับไปได้", "ผมสามารถสั่งเวลากลับไปได้ไหม", "ผมไม่สามารถสั่งเวลากลับไปได้", "ผมสั่งเวลากลับไปแล้ว");
+				vocEx="ผมสามารถสั่งเวลากลับไปได้";
 				break;
 			case "d_B_5_3_9":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("พวกเราสามารถไปชั่วเวลา  1  สัปดาห์  และไม่ใช้เวลา", "พวกเราสามารถไปชั่วเวลา  1  วัน  และไม่ใช้เวลา", "พวกเราสามารถไปชั่วเวลา  1  เดือน  และไม่ใช้เวลา", "พวกเราสามารถไปชั่วเวลา  1  ชั่วโมง  และไม่ใช้เวลา");
+				vocEx="พวกเราสามารถไปชั่วเวลา  1  สัปดาห์  และไม่ใช้เวลา";
 				break;
 			case "d_B_5_3_10":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เราไม่ใช้เวลาหรือเปล่า", "เราไม่ใช้เวลา", "เราใช้เวลาหรือเปล่า", "เราใช้เวลาเท่าไร");
+				vocEx="เราไม่ใช้เวลาหรือเปล่า";
 				break;
 			case "d_B_5_3_11":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("เราไม่ใช้เวลา  Dot", "เราไม่ใช้เวลาหรือเปล่า  Dot", "เราใช้เวลาหรือเปล่า  Dot", "เราใช้เวลาเท่าไร  Dot");
+				vocEx="เราไม่ใช้เวลา  Dot";
 				break;
 			case "d_B_5_3_12":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมสามารถสั่งพระอาทิตย์กลับขึ้นได้", "ผมสามารถสั่งพระอาทิตย์กลับขึ้นได้ไหม", "ผมไม่สามารถสั่งพระอาทิตย์กลับขึ้นได้", "ผมสั่งพระอาทิตย์กลับขึ้นแล้ว");
+				vocEx="ผมสามารถสั่งพระอาทิตย์กลับขึ้นได้";
 				break;
 			case "d_B_5_3_13":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("ผมแตะไม้เท้าของผม  และร้องเพลงของผม", "ผมดื่มน้ำอ้อยของผม  และร้องเพลงของผม", "ผมแตะไม้เท้าของผม  และร้องเพลงวิเศษ", "ผมดื่มน้ำอ้อยของผม  และร้องเพลงวิเศษ");
+				vocEx="ผมแตะไม้เท้าของผม  และร้องเพลงของผม";
 				break;
 			case "d_B_5_3_14":
-				vocArray = new Array ("this one", "not this one", "another one", "filler");
-				vocEx="this one";
+				vocArray = new Array ("Sue  และ  Joe  ตีฆ้อง", "Sue  และ  Joe  ออกเสียงระเบิด", "Sue  ตี  Joe  ทำไม", "Sue  และ  Joe  เล่นดนตรี");
+				vocEx="Sue  และ  Joe  ตีฆ้อง";
 				break;
 			case "d_B_5_5_1":
 				vocArray = new Array ("พระอาทิตย์กลับขึ้นใหม่  เป็นเวลาเดิม", "แสงแดดขึ้นสว่าง  นาฬิกาหมุนกลับ", "พระอาทิตขึ้นความร้อน  นาฬิกาหมุนกลับ", "กลางแจ้งขึ้นความร้อน  เป็นเวลาเดิม");
@@ -6313,7 +6373,7 @@ function setVocArrays() {
 				vocEx="เราสามารถกินพายและขนมเค้กในบ้านที่ทะเลสาบ";
 				break;
 			case "d_B_5_7_5":
-				vocArray = new Array ("เราสามารถไปในรถเมล์ของคุณ  Ben", "เราไปในรถบัสของ  Ben  ได้ไหม", "เราไม่สามารถไปในรถบัสของ  Ben  มันเล็กไป", "รถเมล์ของ  Ben  สวยมาก  ขอดูน้อย");
+				vocArray = new Array ("เราสามารถไปในรถเมล์ของคุณ  Ben", "เราไปในรถบัสของ  Ben  ได้ไหม", "เราไม่สามารถไปในรถบัสของ  Ben  มันเล็กไป", "รถเมล์ของ  Ben  สวยมาก  ขอดูหน่อย");
 				vocEx="เราสามารถไปในรถเมล์ของคุณ  Ben";
 				break;
 			case "d_B_5_7_6":
@@ -6405,7 +6465,7 @@ function setVocArrays() {
 				vocEx="เราร้องเพลงวิเศษหรือ";
 				break;
 			case "d_B_5_11_5":
-				vocArray = new Array ("คุณร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม", "เราร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม", "คุณร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม", "ฉันร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม");
+				vocArray = new Array ("คุณร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม", "เราร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม", "คุณร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและเราไม่สามารถจม", "ฉันร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและเราไม่สามารถจม");
 				vocEx="คุณร้องเพลงวิเศษ  Sue  และ  Joe  ตีฆ้องและคุณไม่สามารถจม";
 				break;
 			case "d_B_5_13_1":
@@ -7447,6 +7507,10 @@ function humanNumPlay(){
 	if (typeof responsiveVoice!="undefined") {
 		responsiveVoice.cancel();
 	}
+	if (isNaN(bingEx)) {
+		audVoc.src = "audio/numbers/"+bingEx.toLowerCase()+ ".mp3";
+		return;
+	}
 	var rem=(bingEx-((Math.floor(bingEx/100))*100));
 	if (bingEx <100 || rem==0) {
 		audVoc.src = "audio/numbers/"+bingEx.toString()+ ".mp3";
@@ -8457,6 +8521,7 @@ function activity(button){
 		document.getElementById("bing_class_phon").style.display="none";
 		document.getElementById("bing_class_display").style.display="block";
 		document.getElementById("bing_class_voc").style.display="block";
+		document.getElementById("bing_class_num").style.display="none";
 		document.getElementById("bing_items_1").innerHTML="";
 		document.getElementById("bing_items_2").innerHTML="";
 		document.getElementById("bing_items_3").innerHTML="";
@@ -8477,6 +8542,7 @@ function activity(button){
 		document.getElementById("welcomeDiv").style.display="none";
 		document.getElementById("contentSelect").style.display="none";
 		document.getElementById("bing_class_voc").style.display="none";
+		document.getElementById("bing_class_num").style.display="none";
 		document.getElementById("bing_class_display").style.display="block";
 		document.getElementById("bing_class_phon").style.display="block";
 		document.getElementById('bing_index').style.fontSize="130%";
@@ -8494,10 +8560,78 @@ function activity(button){
 			activity("bingo_class_cont");
 		}
 	}
+	else if (uMode=="num_bingo_class") {
+		document.getElementById("bing_class_controls").style.display = "block";
+		document.getElementById("b_start").style.display = "none";
+		document.getElementById("b_help").style.display = "none";
+		document.getElementById("b_reset").style.display = "block";
+		document.getElementById("phonDisplay").style.display="none";
+		document.getElementById("imageDiv").style.display="none";
+		document.getElementById("welcomeDiv").style.display="none";
+		document.getElementById("contentSelect").style.display="none";
+		document.getElementById("bing_class_voc").style.display="none";
+		document.getElementById("bing_class_num").style.display="block";
+		document.getElementById("bing_class_display").style.display="block";
+		document.getElementById("bing_class_phon").style.display="none";
+		document.getElementById('bing_index').style.fontSize="130%";
+		document.getElementById('bing_current').style.fontSize="130%"
+		document.getElementById("bing_items_1").innerHTML="";
+		document.getElementById("bing_items_2").innerHTML="";
+		document.getElementById("bing_items_3").innerHTML="";
+		document.getElementById("bing_items_4").innerHTML="";
+		document.getElementById("bing_index").innerHTML="";
+		document.getElementById('bing_current').innerHTML="";
+	}
+
 
   	else{
 		newImage(button);
 	}
+}
+
+function startNumBingoGame() {
+	
+	tempArray.length=0;
+	bingArray.length=0;
+	bing_index=0;
+	procVocBingGame("","open");
+
+	switch (currentNumUnit) {
+		case "num1":
+		bingArray=[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,3,4,5,6,"sick","T","tree","sick","T","tree"];
+		break;
+
+		case "num2":
+		bingArray=[10,20,30,40,50,60,70,80,90,10,20,30,40,50,60,70,80,90,10,20,30,40,50,60,70,80,90,20,30,50,60,70];
+		break;
+
+		case "num3":
+		bingArray=[22,23,27,28,30,32,35,36,40,45,49,51,53,55,57,64,67,68,69,70,71,76,79,81,82,86,88,89,90,93,96,97];
+		break;
+
+		case "num4":
+		bingArray=[10,11,12,13,14,15,16,17,18,19,10,11,12,13,14,15,16,17,18,19,10,11,12,13,14,15,16,17,18,19,"elephant","elephant"];
+		break;
+
+		case "num5":
+		bingArray=[11,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,25,75,3,3,6,6,"sick","sick","T","T","tree","tree","elephant","elephant"];
+		break;
+		
+		case "num6":
+		bingArray=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,24,25,30,32,40,42,50,90,99,100];
+		break;
+
+		case "num7":
+		bingArray=[420,125,42,168,180,64,850,313,944,220,240,999,670,862,950,360,254,910,688,721,99,450,92,175,48,245,762,100,330,56,198,823];
+		break;
+		
+	}
+	
+	shuffle(bingArray);
+	localStorage.num_bing_back=bingArray;
+	localStorage.num_bing_back_ind=0;
+	localStorage.num_bing_back_unit=currentNumUnit;
+	bingClassProc('next');
 }
 
 function procVocBingGame(game_id,action) {
@@ -8519,10 +8653,18 @@ function procVocBingGame(game_id,action) {
 	else {
 		return;
 	}
-	document.getElementById("panelCont").src="images/buttons/"+localStorage.curr_vb_game.slice(6,-10)+".jpg";
-	document.getElementById("panelCont2").src="images/buttons/"+localStorage.curr_vb_game.slice(6,-10)+".jpg";
-	document.getElementById("panelLev").src="images/buttons/b_"+localStorage.curr_vb_game.slice(3,5)+".png";
-	document.getElementById("panelLev2").src="images/buttons/b_"+localStorage.curr_vb_game.slice(3,5)+".png";
+	if (localStorage.curr_vb_game.slice(6,-13)=="num") {
+		document.getElementById("panelCont").src="images/buttons/b_num"+localStorage.curr_vb_game.slice(11,-10)+".png";
+		document.getElementById("panelCont2").src="images/buttons/b_num"+localStorage.curr_vb_game.slice(11,-10)+".png";
+		document.getElementById("panelLev").src="images/labels/l_num"+localStorage.curr_vb_game.slice(11,-10)+"_p.png";
+		document.getElementById("panelLev2").src="images/labels/l_num"+localStorage.curr_vb_game.slice(11,-10)+"_p.png";
+	}
+	else {
+		document.getElementById("panelCont").src="images/buttons/"+localStorage.curr_vb_game.slice(6,-10)+".jpg";
+		document.getElementById("panelCont2").src="images/buttons/"+localStorage.curr_vb_game.slice(6,-10)+".jpg";
+		document.getElementById("panelLev").src="images/buttons/b_"+localStorage.curr_vb_game.slice(3,5)+".png";
+		document.getElementById("panelLev2").src="images/buttons/b_"+localStorage.curr_vb_game.slice(3,5)+".png";
+	}
 	var t_start=t_string.indexOf("bingArray")+12;
 	var t_end=t_string.lastIndexOf(")");
 	t_string=t_string.slice(t_start,t_end);
@@ -8629,7 +8771,12 @@ function listVBGames(){
 		var bing_games=localStorage.voc_bing_games.split(",");
 		var t_string="";
 		for (var i=0; i<bing_games.length;i++) {
-			t_string=bing_games[i].slice(3,5) + ' ' +topicTitle(bing_games[i].slice(6,-10));
+			if (bing_games[i].slice(6,-13)=="num") {
+				t_string=bing_games[i].slice(3,5) + ' Numbers Unit ' +bing_games[i].slice(11,-10);
+			}
+			else {
+				t_string=bing_games[i].slice(3,5) + ' ' +topicTitle(bing_games[i].slice(6,-10));
+			}
 			document.getElementById("voc_bing_list").innerHTML+='<div class="voc_bing_li" onclick="procVocBingGame(this.childNodes[1],\'open\')">'+t_string+'<div style="display:none" >'+bing_games[i]+'</div></div>';
 		}
 		hiVocBingGame();
@@ -8653,6 +8800,9 @@ function bingClassProc(caller) {
 			document.getElementById("bing_current").innerHTML= bingArray[n];
 			if (uMode=="phon_bingo_class") {
 				localStorage.phon_bing_back_ind=n;
+			}
+			else if (uMode=="num_bingo_class") {
+				localStorage.num_bing_back_ind=n;
 			}
 			else {
 				localStorage[localStorage.curr_vb_game]=localStorage[localStorage.curr_vb_game].replace("game_ind: ("+(n-1),"game_ind: ("+(n));
@@ -8689,6 +8839,16 @@ function bingClassProc(caller) {
 				document.getElementById("panelLev").src="images/labels/l_"+localStorage.phon_bing_back_unit+"_p.png";
 				document.getElementById("panelLev2").src="images/labels/l_"+localStorage.phon_bing_back_unit+"_p.png";
 			}
+			else if (uMode=="num_bingo_class") {
+				bingArray=localStorage.num_bing_back.split(",");
+				for (var i=0;i<localStorage.num_bing_back_ind;i++) {
+					tempArray[i]=bingArray[i];
+				}
+				document.getElementById("panelCont").src="images/buttons/b_"+localStorage.num_bing_back_unit+".png";
+				document.getElementById("panelCont2").src="images/buttons/b_"+localStorage.num_bing_back_unit+".png";
+				document.getElementById("panelLev").src="images/labels/l_"+localStorage.num_bing_back_unit+"_p.png";
+				document.getElementById("panelLev2").src="images/labels/l_"+localStorage.num_bing_back_unit+"_p.png";
+			}
 			else {
 				var ind = localStorage[localStorage.curr_vb_game].slice(localStorage[localStorage.curr_vb_game].indexOf("game_ind: (")+11);
 				ind=ind.slice(0,ind.indexOf(")"));
@@ -8701,14 +8861,22 @@ function bingClassProc(caller) {
 					tempArray[i]=bingArray[i];
 				}
 			}
-			tempArray.sort();
+			tempArray=sortByDigits(tempArray);
 			bingClassProc("next");
 		break;
 
 		case "display":
 			tempArray=bingArray.toString().split(",");
-			tempArray.sort();
+			tempArray=sortByDigits(tempArray);
 		break;
+	}
+
+	function sortByDigits(array) {
+		var re = /\D/g;
+		array.sort(function(a, b) {
+			return(parseInt(a.replace(re, ""), 10) - parseInt(b.replace(re, ""), 10));
+		});
+		return(array);
 	}
 			
 	document.getElementById("bing_items_1").innerHTML="";
@@ -8778,7 +8946,11 @@ function BingClassPlay() {
 		}
 		audVoc.pause();
 		audVoc.src ="audio/phonics/bingo/" + document.getElementById("bing_current").innerHTML + bingTone +".mp3";
-	} 
+	}
+	else if (uMode=="num_bingo_class") {
+		bingEx=document.getElementById("bing_current").innerHTML;
+		humanNumPlay();
+	}
 	else {
 		var dir=localStorage.curr_vb_game.slice(6,-10);
 		audVoc.src ="audio/vocab/" +dir+"/"+document.getElementById("bing_current").innerHTML +".mp3";

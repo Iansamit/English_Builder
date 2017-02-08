@@ -577,6 +577,16 @@
 							</div>
 						</div>
 					</div>
+					<div style="float:left; margin-left: 0.5em;">
+						<div class="activityButtonDiv">
+							<img id="b_num_bingo_class"  src='images/buttons/ba_phon_bingo_class_off.png' class="activityButton" onclick="selectActivity('num_bingo_class')"/>
+							<img id='b_num_bingo_class_gl1' class="buttonGlow" src="images/buttons/ba_num_bingo_class_glo1.png" />
+							<img id='b_num_bingo_class_gl2' class="buttonGlow" style="opacity: 0" src="images/buttons/ba_num_bingo_class_glo2.png" />
+							<div style="position: absolute; bottom: 0; font: inherit; left: 0; right:0; margin-left: auto; margin-right: auto">
+								Bingo in Class
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -2608,6 +2618,72 @@
 								</div>
 								<div style="position:relative; margin-top:2.5em; height:1em">Instructions</div>
 							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="bing_class_num"  style= "position:relative; z-index:5; float:left; width: 14.7em; margin-left:0.5em; margin-top:0.7em;text-align:center; font:inherit; font-size:80%">
+					<div style="background: #000; border: 0.12em ridge  #393; color:white; font:inherit; font-size:80%">
+						Numbers Bingo: Classroom Version
+					</div>
+					<div style= "font:inherit; font-size:45%">
+						<div style="text-align:justify; margin-bottom:0.5em; font:inherit;">
+							<p>To prepare for this activity, you will need to print out one Bingo Sheet for each student.</p>
+							<p style="margin-top:0.5em; ">Click the <img style='width: 1.6em;vertical-align: -0.3em' src=images/buttons/b_download.png /> icon below to download the Bingo Sheets pdf file for that unit.</p>
+						</div>
+						
+						<div style="margin-top:0.2em; margin-bottom: 1em; margin-left:9em; font:inherit; font-size: 90%">
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon1_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_1_3092_5884.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon2_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_2_4720_4560.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon3_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_3_4789_7115.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon4_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_4_5085_9181.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon5_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_5_2469_4166.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon6_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_6_3294_6354.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+							<div style="float:left; width:2.3em">
+								<img style='display:block; width: 2.1em' src=images/labels/l_phon7_p.png />
+								<a href="bingo_sheets/Numbers_Bingo_ Unit_7_9876_5433.pdf" download=""><img style='width: 2.1em;' src=images/buttons/b_download.png /></a>
+							</div>
+						</div>
+					</div>
+					<div style="clear:left; margin-top:1em; text-align:justify; font:inherit; font-size:45%">
+						<p>Each page contains 2 Bingo Sheets, so you only need to print out 1 page per 2 students. Make sure each student gets a <b>different</b> bingo sheet!</p>
+					</div>
+					<div class="optGrp" style="width:11em; height:4.8em; margin-left:9.5em; font:inherit; font-size:45%; font-weight:bold;">
+						<div style="position:relative; float:left; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
+								<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_start.png" onclick="startNumBingoGame()" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+							</div>
+							<div style="position:relative; margin-top:2.5em; height:1em">New Game</div>
+						</div>
+						<div style="position:relative; float:right; width:49%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
+								<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/bing_continue.png" onclick="bingClassProc('backup')" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+							</div>
+							<div style="position:relative; margin-top:2.5em; height:1em">Previous Game</div>
+						</div>
+						<div style="position:relative; float:left; margin-top:1em; width:100%; height:2.5em; font:inherit; font-size:70%" >
+							<div style="position: absolute; bottom: 0; width:100%; font: inherit; text-align: center">
+								<img style="display:block; width: 7em; left:0; right:0; margin-left:auto; margin-right:auto" src="images/buttons/info_wide.png" onclick="setInfo(uMode,'open','#393','11em',1.5,13)" onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" />
+							</div>
+							<div style="position:relative; margin-top:2.5em; height:1em">Instructions</div>
 						</div>
 					</div>
 				</div>
