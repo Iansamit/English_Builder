@@ -1,6 +1,8 @@
-var app = require('electron').app
-var BrowserWindow = require('electron').BrowserWindow
-var ipc = require('electron').ipcMain
+var app = require('electron').app;
+var BrowserWindow = require('electron').BrowserWindow;
+var ipc = require('electron').ipcMain;
+var server = require("./server");
+
 
 //var app = require('app');  // Module to control application life.
 //var BrowserWindow = require('browser-window');  // Module to create native browser window.
@@ -27,23 +29,25 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
   // Create the browser window(s).
 
-  splashWindow = new BrowserWindow({width: 600, height: 450, frame: false});
-  mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname + '/images/formatting/e_b_icon.png'});
-  mainWindow.minimize()
+splashWindow = new BrowserWindow({width: 600, height: 450, frame: false});
+mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname + '/images/formatting/e_b_icon.png'});
+mainWindow.minimize();
 
   // and load the html of the apps.
 
   splashWindow.loadURL('file://' + __dirname + '/splash.html');
   mainWindow.loadURL('file://' + __dirname + '/index.html');
-  mainWindow.webContents.executeJavaScript("electron=true");
+  //mainWindow.webContents.executeJavaScript("electron=true");
     
   ipc.on('nearly', function(event){mainWindow.webContents.executeJavaScript("audCtrls(startup, 'play');");});
   ipc.on('finished', function(event) {startMain ();});
+  ipc.on('devtools',function(event) {mainWindow.webContents.toggleDevTools();});
 
   function startMain () {
     mainWindow.maximize();
     mainWindow.setMenuBarVisibility(true);
     splashWindow.close()
+    //splashWindow.webContents.toggleDevTools();
   }
 
 

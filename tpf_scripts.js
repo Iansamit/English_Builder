@@ -1,5 +1,6 @@
 var	activity_group ="vocab";
 var	all_voc_array = new Array ("");
+var android = false;
 var anim_glow_on=false;
 var	audArray = [];
 var	audDLRemaining;
@@ -118,7 +119,7 @@ var undo_obj =  {};
 var user_settings= {};
 var user_changes=false;
 var	vArray=new Array("a","i","o","");
-var version_num="0.9400";
+var version_num="0.9.50";
 var	vIndex;
 var	vocArray = new Array("close", "come", "cook", "count", "cry", "cut", "dig", "drink", "eat", "go", "jump", "open", "play", "read", "run", "sing", "sit", "sleep", "speak", "stand", "walk", "write");
 var voc_table_state="topics";
@@ -131,6 +132,9 @@ var	vSpecIndex;
 
 
 function init() {
+	if (navigator.userAgent.match(/Electron/)) {
+		electron=true;
+	}
 	if (!localStorage.version) {
 		localStorage.clear();
 	}
@@ -148,7 +152,17 @@ function init() {
 	document.getElementById("choiceTable").addEventListener("touchstart", function(event){ event.stopPropagation(); event.preventDefault(); });
 	document.getElementById("imChoiceDiv").addEventListener("touchstart", function(event){ event.stopPropagation(); event.preventDefault(); });
 
-	initAudio();
+	if (!android) {
+		initAudio();
+	}
+	else {
+		document.addEventListener("deviceready", onDeviceReady, false);
+
+		function onDeviceReady() {
+			console.log("device is ready");
+			initMedia();
+		}
+	}
 	initOptions();
 	initUserVocab();
 	resize();
@@ -180,26 +194,27 @@ function init() {
 	b_save_img.style="width: 3.8em; vertical-align: middle;";
 	
 	selectLev("K2");
+}
 	
-	setTimeout(function(){
-		if (electron==false){
-			audCtrls(startup, "play");
-		}
-		else{
-			var ipc = require('electron').ipcRenderer
-			ipc.send('tickVol', 0.6);
-		}
-		if (electron==true) {
-			document.getElementById("optGrp_hosts").style.display="block";
-			document.getElementById("bing_dl_notes_norm").style.display="none";
-			document.getElementById("bing_dl_notes_electron").style.display="block";
-			document.getElementById("bing_dl_normal").style.display="none";
-			document.getElementById("bing_dl_electron").style.display="block";
-			setHost();
-		}
-	},400);
-	//localStorage.host="peer";
-	//setHost();
+
+function finalPrep() {
+	if (electron) {
+		var ipc = require('electron').ipcRenderer
+		ipc.send('tickVol', 0.6);
+	}
+	else {
+		audCtrls(startup, "play");
+	}
+
+
+	if (electron || android) {
+		document.getElementById("optGrp_hosts").style.display="block";
+		document.getElementById("bing_dl_notes_norm").style.display="none";
+		document.getElementById("bing_dl_notes_electron").style.display="block";
+		document.getElementById("bing_dl_normal").style.display="none";
+		document.getElementById("bing_dl_electron").style.display="block";
+		setHost();
+	}
 }
 
 
@@ -220,11 +235,19 @@ function setHost() {
 		document.getElementById("host_logo1").src="images/labels/hosts/"+localStorage.host+"/host_logo.png";
 		document.getElementById("host_logo2").src="images/labels/hosts/"+localStorage.host+"/host_logo.png";
 		document.getElementById("bingo_logo").style.backgroundImage= "url('images/labels/hosts/"+localStorage.host+"/host_logo_wide.png')";
+		if (localStorage.host=="ewap") {
+			document.getElementById("welcome_text").innerHTML="Welcome to ";
+		}
+		else {
+			document.getElementById("welcome_text").innerHTML="Welcome to the ";
+		}
 		document.getElementById("b_" + localStorage.host).style.width = "91%";
-		document.getElementById("b_" + localStorage.host).style.border = "0.2em outset #7bd8e8";			
+		document.getElementById("b_" + localStorage.host).style.border = "0.2em outset #7bd8e8";
+		document.title = topicTitle (localStorage.host);
 	}
 	else {
-		localStorage.host="srn";
+		localStorage.host="ewap";
+		setHost();
 	}
 }
 
@@ -406,7 +429,10 @@ function processKey(ev) {
 		resetScore();
 	}
 	else if (ev.keyCode==73 && ev.ctrlKey && electron) {
-		require('remote').getCurrentWindow().toggleDevTools();
+		var ipc = require('electron').ipcRenderer;
+		ipc.send('devtools');
+
+		//require('remote').getCurrentWindow().toggleDevTools();
 	}
 	else if (finished==false || finished=="nearly") {
 		switch (uMode) {
@@ -550,6 +576,7 @@ function attrResize(){
 
 
 function initAudio() {
+
 	if (window.Audio) {
 		finAudio = new Audio("audio/doom_bell.mp3");
 		var mp3Check = finAudio.canPlayType("audio/mp3");
@@ -568,7 +595,6 @@ function initAudio() {
 			cheer= new Audio ("audio/cheer.mp3");
 			dot_ben_fb= new Audio ();
 		} 
-
 		function loadRV() {
 			console.log("Trying to load RV");
 			inject.js('https://code.responsivevoice.org/responsivevoice.js', function() {
@@ -642,6 +668,8 @@ function initAudio() {
 
 		adjustVolume("dot_ben_fb",localStorage.dot_ben_fb*10);
 		document.getElementById("sli_dot_ben_fb").style.top=((1-localStorage.dot_ben_fb)*5)+"em";
+
+		finalPrep();
 		
 		// Code below could replace responsiveVoice code if/when other browsers get their act together!!!
 		/*if (window.speechSynthesis) {
@@ -679,8 +707,149 @@ function initAudio() {
 	}
 }
 
+
+function initMedia() {
+
+	finAudio = new Media("/android_asset/www/audio/doom_bell.mp3");
+	tickFast = new Media("/android_asset/www/audio/clock_ticking_fast.mp3");
+	//tickFast.loop = true;
+	tick = new Media("/android_asset/www/audio/tick_slow.mp3");
+	tock = new Media("/android_asset/www/audio/tock_slow.mp3");
+	aclick = new Media("/android_asset/www/audio/click.mp3");
+	aswitch = new Media("/android_asset/www/audio/switch.mp3");
+	fanfare = new Media("/android_asset/www/audio/fanfare.mp3");
+	msg_sound = new Media ("/android_asset/www/audio/msg_sound.mp3");
+	success = new Media ("/android_asset/www/audio/correct.mp3");
+	startup= new Media ("/android_asset/www/audio/startup.mp3");
+	warning= new Media ("/android_asset/www/audio/warning_bells.mp3");
+	cheer= new Media ("/android_asset/www/audio/cheer.mp3");
+
+
+	dot_ben_fb ={
+		src: "",
+		volume : 0.5,
+		av : new Media("/android_asset/www/"+ this.src),
+		old_src: "",
+
+		pause : function() {
+			this.av.stop();
+		},
+
+		play : function() {
+			if (this.src != this.old_src) {
+				this.av.release();
+				this.av = new Media("/android_asset/www/"+ this.src);
+				this.old_src=this.src;
+			}
+			this.av.play();
+			this.av.setVolume(this.volume);
+		}
+	};
+
+
+	audVoc ={
+		src: "",
+		volume : 0.5,
+		av : new Media("/android_asset/www/"+ this.src),
+		old_src: "",
+
+		pause : function() {
+			this.av.stop();
+		},
+
+		play : function() {
+			if (this.src != this.old_src) {
+				this.av.release();
+				this.av = new Media("/android_asset/www/"+ this.src);
+				this.old_src=this.src;
+			}
+			this.av.play();
+			this.av.setVolume(this.volume);
+		}
+	};
+
+
+	if (!localStorage.music){
+		localStorage.setItem("music", 0.45);
+		localStorage.setItem("clicks", 0.23);
+		localStorage.setItem("ticktock", 0.27);
+		localStorage.setItem("ian", 0.42);
+		localStorage.setItem("vox", 0.65);
+		localStorage.setItem("bells", 0.65);
+	}
+	if (!localStorage.dot_ben_fb) {
+		localStorage.setItem("dot_ben_fb", 0.65);
+	}
+
+	adjustVolume("music",localStorage.music*10);
+	document.getElementById("sli_music").style.top=((1-localStorage.music)*5)+"em";
+
+	adjustVolume("clicks",localStorage.clicks*10);
+	document.getElementById("sli_clicks").style.top=((1-localStorage.clicks)*5)+"em";
+
+	adjustVolume("ticktock",localStorage.ticktock*10);
+	document.getElementById("sli_ticktock").style.top=((1-localStorage.ticktock)*5)+"em";
+
+	adjustVolume("ian",localStorage.ian*10);
+	document.getElementById("sli_ian").style.top=((1-localStorage.ian)*5)+"em";
+
+	adjustVolume("bells",localStorage.bells*10);
+	document.getElementById("sli_bells").style.top=((1-localStorage.bells)*5)+"em";
+
+	adjustVolume("dot_ben_fb",localStorage.dot_ben_fb*10);
+	document.getElementById("sli_dot_ben_fb").style.top=((1-localStorage.dot_ben_fb)*5)+"em";
+	
+	function loadRV() {
+	console.log("Trying to load RV");
+	inject.js('https://code.responsivevoice.org/responsivevoice.js', function() {
+		if (typeof responsiveVoice!="undefined"){
+			clearInterval(net_check);
+			console.log("RV loaded");
+
+			document.getElementById("vox_Ian_toggle").style.display="table-cell";
+			document.getElementById("vox_UK English Female_toggle").style.display="table-cell";
+			document.getElementById("vox_UK English Male_toggle").style.display="table-cell";
+			document.getElementById("vox_US English Female_toggle").style.display="table-cell";
+			document.getElementById("vox_none").style.display="none";					
+			if (localStorage.timbreArray){
+				timbreArray.length=0;
+				
+				timbreArray = localStorage.timbreArray.split(",");
+
+			}
+			else {
+				timbreArray= new Array ("US English Female","UK English Female","UK English Male","Ian");
+			}
+
+			for (var i=0;i<timbreArray.length;i++){
+				document.getElementById("vox_"+timbreArray[i]+"_toggle").className="optSelected";
+			}
+
+
+
+			if (localStorage.vox){
+				adjustVolume("vox",localStorage.vox*10);
+				document.getElementById("sli_vox").style.top=((1-localStorage.vox)*5)+"em";
+			}
+		}
+		else {
+			console.log("RV load failed");
+		}
+	});
+}
+
+var net_check =setInterval(function(){
+	loadRV();
+},60000);
+loadRV();
+	
+	finalPrep();
+
+}
+
+
 function audCtrls(aud, cont, param) {
-	if (window.Audio) {
+	if (!android && window.Audio) {
 		if (cont == "play") {
 			aud.currentTime = 0;
 			aud.play();
@@ -695,7 +864,23 @@ function audCtrls(aud, cont, param) {
 			aud.volume = param;
 		}
 	}
+	else {
+		if (cont == "play") {
+			aud.seekTo(0);
+			aud.play();
+		}
+		else if (cont == "pause") {
+			aud.pause();
+		}
+		else if (cont == "rewind") {
+			aud.seekTo(0);
+		}
+		else if (cont == "volume") {
+			aud.setVolume(param);
+		}
+	}
 }
+
 
 function adjustVolume(aud,vol){
 
@@ -722,7 +907,7 @@ function adjustVolume(aud,vol){
 			document.getElementById("disp_bells").innerHTML= Math.floor(vol*10);
 		break;
 		case "dot_ben_fb":
-			audCtrls(dot_ben_fb,"volume",(vol*0.1));
+			dot_ben_fb.volume=(vol*0.1);
 			document.getElementById("disp_dot_ben_fb").innerHTML= Math.floor(vol*10);
 		break;
 		case "ian":
@@ -781,13 +966,13 @@ function optionsDiv(disp) {
 	}
 	if (disp!="block") {
 		localStorage.setItem("settings", "stored");
-		localStorage.setItem("music", fanfare.volume);
-		localStorage.setItem("clicks", aclick.volume);
-		localStorage.setItem("ticktock", tick.volume);
+		localStorage.setItem("music", document.getElementById("disp_music").innerHTML/100);
+		localStorage.setItem("clicks", document.getElementById("disp_clicks").innerHTML/100);
+		localStorage.setItem("ticktock", document.getElementById("disp_ticktock").innerHTML/100);
 		localStorage.setItem("dot_ben_fb", dot_ben_fb.volume);
 		localStorage.setItem("ian", audVoc.volume);
 		localStorage.setItem("vox", aud_rv_vol);
-		localStorage.setItem("bells", finAudio.volume);
+		localStorage.setItem("bells", document.getElementById("disp_bells").innerHTML/100);
 		localStorage.setItem("optGrp_vocab", document.getElementById("optGrp_vocab").style.display);
 		localStorage.setItem("optGrp_timer", document.getElementById("optGrp_timer").style.display);
 		localStorage.setItem("optGrp_scoring", document.getElementById("optGrp_scoring").style.display);
@@ -874,7 +1059,7 @@ function tAControls (mode) {
 	localStorage.setItem("tAControls", mode);
 }
 
-		
+
 function countDown(){
 	var ipc = require('electron').ipcRenderer
 	tick = new Audio("audio/tick_slow.mp3");
@@ -888,6 +1073,7 @@ function countDown(){
 	setTimeout(function() {document.getElementById("counter").innerHTML=1; audCtrls(tick,"pause");audCtrls(tock,"play");}, 4000);
 	setTimeout(function() {document.getElementById("counter").innerHTML=0;ipc.send('finished');}, 5000);
 }
+
 
 function newCount() {
 	finished = false;
@@ -2167,7 +2353,7 @@ function scrollDiv(evt,caller){
 }
 
 
-function setMsg(content,response_type,string_1,string_2) {
+function setMsg(content,response_type,string_1,string_2,width) {
 	if (response_type == "success") {
 		audCtrls(success, "play");
 	}
@@ -2176,6 +2362,12 @@ function setMsg(content,response_type,string_1,string_2) {
 	}
 	var oK_response = "";
 	var msg_box=document.getElementById("msg_box");
+	if (width!=null) {
+		document.getElementById("msg_win").style.width = width;
+	}
+	else {
+		document.getElementById("msg_win").style.width = "6em";
+	}
 
 	document.getElementById("modal_back").style.display="block";
 	document.getElementById("msg_win").style.top ="0.1em";
@@ -2183,6 +2375,7 @@ function setMsg(content,response_type,string_1,string_2) {
 	document.getElementById("msg_win").style.borderColor = "#f60";
 
 	switch (response_type) {
+
 		case "OK_Cancel":
 			setDisplays({msg_close:"none",msg_OK_cancel:"block",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none",msg_delete_cancel:"none"});
 		break;
@@ -2212,7 +2405,7 @@ function setMsg(content,response_type,string_1,string_2) {
 		break;
 
 		default:
-			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none"});
+			setDisplays({msg_close:"block",msg_OK_cancel:"none",msg_box_clone:"none",msg_edit_delete:"none",msg_new_continue:"none",msg_delete_cancel:"none"});
 		break;
 	}
 
@@ -2224,6 +2417,33 @@ function setMsg(content,response_type,string_1,string_2) {
 			document.getElementById("msg_new").onclick= function() {activity("bingo_class_cont");setDisplays({modal_back:'none'})};
 			document.getElementById("msg_continue").onclick= function() {bingClassProc("backup");};
 			document.getElementById("msg_load").onclick= function() {document.getElementById('input_load_bingo').click();};
+		break;
+
+		case "voc_bingo_sheets":
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:0.5em"><span style="font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em">Congratulations!</span></p>\
+			<p style="text-align:left">Your game is saved with ID: '+string_1+'. Would you like to:</p>\
+				<p style="clear:both; height: 2em; margin-top:0.5em">\
+					<div style="position:relative; float:left; height: 1em; width: 6em">\
+						<img style="display:block; position: absolute;  bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0; width:5em" src="images/buttons/bing_text.png"\
+						onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="makeVocBingoSheets(\'text\'); setDisplays({modal_back:\'none\'})" />\
+					</div>\
+					Create bingo sheets with text?\
+				</p>\
+				<p style="clear:both; height: 2em;"><div style="position:relative; float:left; height: 1em; width: 6em">\
+						<img style="display:block; position: absolute;  bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0; width:5em" src="images/buttons/bing_images.png"\
+						onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="makeVocBingoSheets(\'images\'); setDisplays({modal_back:\'none\'})" />\
+				</div>Create bingo sheets with images?</p>\
+				<p style="height: 2em"><div style="position:relative; float:left; height: 1em; width: 6em">\
+						<img style="display:block; position: absolute;  bottom: 0; margin-left: auto; margin-right: auto; left:0; right: 0; width:5em" src="images/buttons/ba_voc_bingo_class_off.png"\
+						onmousedown="b_press(this)" ontouchstart="b_press(this); event.preventDefault()" onclick="resetScore(); activity(); setDisplays({modal_back:\'none\'})"/>\
+				</div>Return to the Bingo in Class activity?</p>\
+			</p>\
+			<p style="margin-top:1em; margin-bottom: 0.5em">You can create bingo sheets at any time from within the activity.</p>'
+		break;
+
+		case "err_android":
+			msg_box.innerHTML='<p style="text-align:center; margin-bottom:1em;"><span style="padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge;  font-weight:bold; font-size:150%;">Sorry</span></p>\
+			<p style="margin-bottom: 0.5em">'+string_1+'has not yet been implemented on Andoid devices. Please use a PC for this.</p><p>'+string_2+'</p>';
 		break;
 
 		case "err_pron_points":
@@ -2355,7 +2575,7 @@ function setMsg(content,response_type,string_1,string_2) {
 	}
 }
 
-function setInfo(content,action,bCol,w,yPos,xPos) {
+function setInfo(content,action,bCol,w,yPos,xPos,string_1) {
 	switch (content) {
 		case "read_choose":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Read and Choose:</span> develops learners' ability to identify the meaning of vocabulary quickly and accurately. They read the words or phrases at the top of the screen and must select matching images or translations below.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct choice on first attempt; 1/2 point on second attempt. Each incorrect choice results in a 5 second penalty.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_A.png' /> top left choice</div><div style='float:right'>top right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_dub_quote.png' /></div><div style='clear:left; float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Z.png' /> bottom left choice</div><div style='float:right'>bottom right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_qm.png' /></div><div style='clear:both'><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</div><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
@@ -2386,7 +2606,7 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 		case "listen_choose":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Listen and Choose:</span> is similar to Read and Choose but develops listening skills rather than reading. Learners listen to words or phrases and must select matching images or translations.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> 1 point for correct choice on first attempt; 1/2 point on second attempt. Each incorrect choice results in a 5 second penalty.</p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_A.png' /> top left choice</div><div style='float:right'>top right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_dub_quote.png' /></div><div style='clear:left; float:left'><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Z.png' /> bottom left choice</div><div style='float:right'>bottom right choice <img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_qm.png' /></div><div style='clear:both'><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start / Repeat Item</div><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
 		break;
-		
+
 		case "say_word":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Say the Word:</span> develops speaking and pronunciation skills. Learners are presented with an image or Thai text, and must say the corresponding word or phrase as clearly as possible.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> This is a human-assessed activity, meaning that a teacher, parent or more advanced student is needed to award points. Generally, 1 point is given if a word or phrase is vaguely recognisable, and 2 points if it is clear. You can split the points for words and clarity in the <img style='width: 4em; vertical-align:middle' src='images/buttons/options_button.png' /> section. </p><p style='padding-top:0.5em; padding-bottom:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span></p><div style='margin:0.2em 7em 0.5em 7em'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p style='color:red'>incorrect</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p style='color:#f60'>correct</p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p style='color:green'>correct and clear</p><p>(2 points)</p></div></div><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
 		break;
@@ -2431,30 +2651,57 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 				<p style="padding-top:0.5em; padding-bottom:0.5em; margin-top:0.5em"><span style="font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em">Actions:</span> \
 				Click on a button for more information.</p>\
 				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_start.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_start.png\';bing_info.innerHTML=\'  Shuffles the vocabulary and starts the game from the first word.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_start.png\';bing_info.innerHTML=\'  \
+					Shuffles the vocabulary and starts the game from the first word.\'" />\
 				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_continue.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_continue.png\';bing_info.innerHTML=\' If you do not have time to finish a game, this starts from the vocabulary item where you left off.\'" />\
-				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_pdf.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_pdf.png\';bing_info.innerHTML=\' This creates bingo sheets for the selected game, which you can print out or save.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_continue.png\';bing_info.innerHTML=\' \
+					If you do not have time to finish a game, this starts from the vocabulary item where you left off.\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_txt_pdf.png" \
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_txt_pdf.png\';bing_info.innerHTML=\' \
+					This creates bingo sheets containing text from the selected game, which you can save to disk, then print.\'" />\
+				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_img_pdf.png" \
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_img_pdf.png\';bing_info.innerHTML=\' \
+					This creates bingo sheets containing images from the selected game, which you can save to disk, then print.\'" />\
 				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_delete.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_delete.png\';bing_info.innerHTML=\' This deletes the selected game from the list. It is a good idea to save this game to disk first in case you change your mind!\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_delete.png\';bing_info.innerHTML=\' \
+					This deletes the selected game from the list. It is a good idea to save this game to disk first in case you change your mind!\'" />\
 				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_display.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_display.png\';bing_info.innerHTML=\' This displays all the vocabulary of the selected game.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_display.png\';bing_info.innerHTML=\' \
+					This displays all the vocabulary of the selected game.\'" />\
 				<img style="width: 5em; vertical-align:middle" src="images/buttons/bing_setup.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_setup.png\';bing_info.innerHTML=\' This takes you to the Vocabulary Bingo Setup page where you can create a new game. Further instructions are on that page.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/bing_setup.png\';bing_info.innerHTML=\' \
+					This takes you to the Vocabulary Bingo Setup page where you can create a new game. Further instructions are on that page.\'" />\
 				<img style="width: 3.4em; vertical-align:middle" src="images/buttons/next_button.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'4em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/next_button.png\';bing_info.innerHTML=\' This proceeds to the next vocabulary item, which will then appear in the Ordered List on the right of the screen.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'4em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/next_button.png\';bing_info.innerHTML=\' \
+					This proceeds to the next vocabulary item, which will then appear in the Ordered List on the right of the screen.\'" />\
 				<img style="width: 2.4em; vertical-align:middle" src="images/buttons/replay_button.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'2.8em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/replay_button.png\';bing_info.innerHTML=\' This plays an audio recording of the item.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'2.8em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/replay_button.png\';bing_info.innerHTML=\' \
+					This plays an audio recording of the item.\'" />\
 				<img style="width: 3.6em; vertical-align:middle" src="images/buttons/review.jpg" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'4em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/review.jpg\';bing_info.innerHTML=\' These buttons are for review purposes. They step through the vocabulary items in the order that they have been called.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'4em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/review.jpg\';bing_info.innerHTML=\' \
+					These buttons are for review purposes. They step through the vocabulary items in the order that they have been called.\'" />\
 				<img style="width: 6.2em; vertical-align:middle" src="images/buttons/load_game.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5.7em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/load_game.png\';bing_info.innerHTML=\' This loads a game that you have previously saved to disk. It should then appear in the list.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5.7em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/load_game.png\';bing_info.innerHTML=\' \
+					This loads a game that you have previously saved to disk. It should then appear in the list.\'" />\
 				<img style="width: 6.2em; vertical-align:middle" src="images/buttons/save_game.png" \
-				onclick="document.getElementById(\'bing_inf_img\').style.width=\'5.7em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/save_game.png\';bing_info.innerHTML=\' This saves the current game to disk, for archiving, or for moving to another computer.\'" />\
+					onclick="document.getElementById(\'bing_inf_img\').style.width=\'5.7em\'; document.getElementById(\'bing_inf_img\').src=\'images/buttons/save_game.png\';bing_info.innerHTML=\' \
+					This saves the current game to disk, for archiving, or for moving to another computer.\'" />\
 				<div style="height:3em; width:95%; margin:1em 0; border: ridge gray 0.2em; padding:0.5em; background:#ccc; color:black"><img id="bing_inf_img" style="vertical-align:middle" /><span id="bing_info">&nbsp</span></div>';
 		break;
 		
+		case "make_bingo_sheets":
+			document.getElementById("helpBox").innerHTML="<p style='margin-bottom:0.5em; text-align:center' ><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Please wait</span></p>\
+			<p>Preparing your bingo sheets. This can take some time!!!</p>\
+			<p style= 'margin-left:7em; padding:1em'><img style='width:8em' src='images/formatting/eB_wait.gif' </p>";
+		break;
+
+		case "image_load_fail":
+			document.getElementById("helpBox").innerHTML="<p style='margin-bottom:0.5em; text-align:center' ><span style='padding:0 0.3em 0 0.3em; background-color:orange; color:black; border:0.15em grey ridge; font-weight:bold; font-size:150%' >\
+			Sorry</span></p>\
+			<p>The image for <span style='color:#64FFFF; font-weight:bold' >"+string_1+"</span> could not be loaded. Please choose another vocabulary item.</p>";
+			
+		break;
+
 		case "numbers":
 			document.getElementById("helpBox").innerHTML="<p><span style='font-weight:bold; background-color:green; border: ridge; padding: 0em 0.2em'>Say the Number:</span> is similar to Say the Word and Read and Say, but focusses on numbers. Learners are presented with a number, and must pronounce it as clearly as possible.</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:blue; border:#7bd8e8 ridge; padding:0em 0.2em'>Scoring:</span> This is a human-assessed activity, meaning that a teacher, parent or more advanced student is needed to award points.</p><p style='padding-top:0.5em'>There are two ways to score. When starting a new unit, focus on independence, giving 2 points if students can read the numbers without help (see Read and Say). Once students can generally read without help, move the focus to give 2 points for clarity (see Say the Word).</p><p style='padding-top:0.5em'><span style='font-weight:bold; background-color:#573F06; border:#E49C58 ridge;  padding:0em 0.2em'>Keyboard Shortcuts:</span> Click on <span id='b_method' style='border:#7bd8e8 ridge ; background-color:blue; padding:0em 0.2em; cursor: pointer' onclick='swapScoring()'>Scoring Method 1</span> to see alternative.</p><div id='scoringM1' style='margin:0.5em 5em 0.5em 5em'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p><span style='color:red'>cannot</span> read</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p>read <span style='color:#f60'>with help</span></p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p>read <span style='color:green'>without help</span></p><p>(2 points)</p></div></div><div id='scoringM2' style='margin:0.5em 5em 0.5em 5em; display:none'><div style='float:left; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_left.png' /></p><p style='color:red'>incorrect</p></div><div style='float:right; text-align:center'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_right.png' /></p><p style='color:#f60'>correct</p><p>(1 point)</p></div><div style='text-align:center; width:50%; margin-left:auto;margin-right:auto'><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_down.png' /></p><p style='color:green'>correct and clear</p><p>(2 points)</p></div></div><p><img style='width: 3.6em; vertical-align:middle' src='images/buttons/key_space.png' /> Start</p><p><img style='width: 1.7em; vertical-align:middle' src='images/buttons/key_Esc.png' /> Stop / Reset</p>";
 		break;
@@ -2518,6 +2765,9 @@ function setInfo(content,action,bCol,w,yPos,xPos) {
 	}
 	if (action=="open") {
 		document.getElementById("helpWin").style.display="block";
+	}
+	if (action=="close") {
+		document.getElementById("helpWin").style.display="none";
 	}
 }
 
@@ -2647,6 +2897,23 @@ function topicTitle(title) {
 		case "weather":
 			return("Weather and Seasons");
 		break;
+
+		case "ewap":
+			return("EWAP English Builder");
+		break;
+
+		case "srn":
+			return("Saranat English Builder");
+		break;
+
+		case "bko":
+			return("CP Smart English Builder");
+		break;
+
+		case "peer":
+			return("Khao Chamao English Resource Center English Builder");
+		break;
+
 	}
 }
 
@@ -2979,6 +3246,10 @@ function setUndoRedo(caller) {
 function setVocChoiceTable(button, data_1) {
 	if (data_1=="voc_bingo") {
 		bing_setup=true;
+		if (android) {
+			setMsg("err_android", "", "Making bingo games ", "You can import a game created with a PC into your tablet using the Load Game button.");
+			return;
+		}
 	}
 	if (curr_topic_title=="multi") {
 		selectTopic(availCats[0]);
@@ -3427,11 +3698,41 @@ function setVocChoiceTable(button, data_1) {
 
 function makeVocBingoSheets (caller) {
 
+	if (android) {
+		setMsg("err_android", "", "Creating bingo sheets ", "You can import a game created with a PC into your tablet using the Load Game button.");
+		return;
+	}
+
+	var t_array1=new Array();
+	var t_array2=new Array();
+	var host="srn";
+
+	if (localStorage.host) {
+		host=localStorage.host;
+	}	
+
+
+	pdfMake.fonts = {
+		Nunito: {
+			normal: "Nunito-Regular.ttf",
+		  	bold: "Nunito-Bold.ttf"
+	  	},
+	  	Comic: {
+	  		normal: "ComicNeue-Regular.ttf",
+	  		bold: "ComicNeue-Bold.ttf"
+	  	}
+	}
+
+
 	if (caller=="new") {
+		if (vocArray.localStorage==0) {
+			// fix me - need an error message
+			return
+		}
 		var title="Vocabulary Bingo: "+currentLev+" "+topicTitle(curr_topic_title);
 		var game_code=Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+"_"+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString();
 		var game_id="VB_"+currentLev+"_"+curr_topic_title+"_"+game_code;
-		var doc_title="Vocabulary_Bingo_"+currentLev+"_"+topicTitle(curr_topic_title)+"_"+game_id.slice(-10)+".pdf";
+		var doc_title="Vocabulary_Bingo_Text_"+currentLev+"_"+topicTitle(curr_topic_title)+"_"+game_id.slice(-10)+".pdf";
 
 		setVocBingSheet();
 
@@ -3445,9 +3746,78 @@ function makeVocBingoSheets (caller) {
 			localStorage.voc_bing_games=t_array_games;
 		}
 		localStorage[game_id]="English Builder Vocabulary Bingo Version: 1.0\ngame_id: ("+game_id+")\nbingArray: ("+bingArray+")";
+		localStorage.curr_vb_game=game_id;
+		setMsg("voc_bingo_sheets","success",game_id,"","10em");
+		return;
 	}
-	
+
+
+
+	else if (caller=="images") {
+
+		setInfo("make_bingo_sheets","open","#393","8em",1.5,14);
+		var counter=0;
+		var game_id=localStorage.curr_vb_game;
+		var title="Vocabulary Bingo: "+localStorage.curr_vb_game.slice(3,5)+" "+topicTitle(localStorage.curr_vb_game.slice(6,-10));
+		var doc_title="Vocabulary_Bingo_Images_"+localStorage.curr_vb_game.slice(3,5)+"_"+topicTitle(localStorage.curr_vb_game.slice(6,-10))+game_id.slice(-10)+".pdf";
+		var dir = localStorage.curr_vb_game.slice(6,-10);
+
+		if (localStorage.curr_vb_game.slice(6,-12) == "bc_d_B") {
+			dir = "dot_and_Ben";
+		}
+		
+		populateURIs();
+
+		function populateURIs() {
+			if (counter<bingArray.length) {
+				var img=new Image ();
+				img.setAttribute('crossOrigin', 'anonymous');
+				var t_voc =bingArray[counter].replace(/ /g, "_");
+				t_voc = t_voc.replace(/…/g, "x");
+				if (electron) {
+					img.src="http://localhost:9000/"+"images/vocab/"+dir+"/"+t_voc+".jpg";
+				}
+				else {
+					img.src="images/vocab/"+dir+"/"+t_voc+".jpg";
+				}
+				img.onload= function () {
+					getBase64Image(img);
+					counter++;
+					populateURIs();
+				}
+				img.onerror= function () {
+					setInfo("image_load_fail","open","#f60","8em",1.5,14,bingArray[counter]);
+				}
+			}
+		}
+		
+		function getBase64Image(img,ind) {
+			var canvas = document.createElement("canvas");
+			canvas.width = 150;
+			canvas.height = 90;
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0, 150, 90);
+			var dataURL = canvas.toDataURL("image/jpeg");
+			t_array2[counter] = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");	
+			contImgBingoSheets();
+		}
+
+		function contImgBingoSheets() {
+			if (counter + 1 == bingArray.length) {
+				for (var n=0; n<48;n++) {
+					t_array1[n]= new Array();
+					shuffle(t_array2);
+					for (var m=0; m<24; m++) {
+						t_array1[n][m]={image: t_array2[m], width: 98, style: 't_cell',verticalAlign: 'center'};	
+					}
+				}
+			makePDF();
+			}
+		}
+	}
+
 	else {
+		setInfo("make_bingo_sheets","open","#393","8em",1.5,14);
 		var t_string=localStorage[localStorage.curr_vb_game];
 		var t_start=t_string.indexOf("bingArray")+12;
 		var t_end=t_string.lastIndexOf(")");
@@ -3461,984 +3831,973 @@ function makeVocBingoSheets (caller) {
 		}
 		else {
 			var title="Vocabulary Bingo: "+t_string.slice(3,5)+" "+topicTitle(t_string.slice(6,-10));
-			var doc_title="Vocabulary_Bingo_"+localStorage.curr_vb_game.slice(3,5)+"_"+topicTitle(localStorage.curr_vb_game.slice(6,-10))+game_id.slice(-10)+".pdf";
+			var doc_title="Vocabulary_Bingo_Text_"+localStorage.curr_vb_game.slice(3,5)+"_"+topicTitle(localStorage.curr_vb_game.slice(6,-10))+game_id.slice(-10)+".pdf";
 		}
+		setArrays ();
 	}
 
-	var font_sizes={};
-	for (var i=0;i<bingArray.length;i++) {
-		document.getElementById('voc_width_tester').innerHTML=bingArray[i];
-		if (bingArray[i].indexOf(" ")!= -1 || document.getElementById('voc_width_tester').offsetWidth<97) {
-			font_sizes[bingArray[i]]=21;
-		}
-		else {
-			font_sizes[bingArray[i]]=Math.round(21*(97/document.getElementById('voc_width_tester').offsetWidth));
-		}
-	}
-
-	var t_array1=new Array();
-
-	for (var j=0;j<48;j++) {
-		t_array1[j] = bingArray.toString().split(",");
-		shuffle(t_array1[j]);
-		for (var i=0;i<24;i++) {
-			if (localStorage.curr_vb_game.slice(6,9)=="num" && isNaN(t_array1[j][i])) {
-				t_array1[j][i]={image: t_array1[j][i].toLowerCase()+'.jpg', width: 98, style: 't_cell',verticalAlign: 'center'};
+	function setArrays () {
+		var font_sizes={};
+		for (var i=0;i<bingArray.length;i++) {
+			document.getElementById('voc_width_tester').innerHTML=bingArray[i];
+			if (bingArray[i].indexOf(" ")!= -1 || document.getElementById('voc_width_tester').offsetWidth<97) {
+				font_sizes[bingArray[i]]=21;
 			}
 			else {
-				t_array1[j][i]={text: t_array1[j][i],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[j][i]]};
+				font_sizes[bingArray[i]]=Math.round(21*(97/document.getElementById('voc_width_tester').offsetWidth));
 			}
 		}
-	}
-	
-	pdfMake.fonts = {
-		Nunito: {
-			normal: "Nunito-Regular.ttf",
-		  	bold: "Nunito-Bold.ttf"
-	  	},
-	  	Comic: {
-	  		normal: "ComicNeue-Regular.ttf",
-	  		bold: "ComicNeue-Bold.ttf"
-	  	}
-	}
-	var host="srn";
-	if (localStorage.host) {
-		host=localStorage.host;
-	}
 
-	var bing_pdf = { 
-		pageSize: 'A4',
-		background: {image: 'bing_back_'+host+'.jpg', width:594},
-		info: {
-			title: title,
-			author: 'Ian Smith',
-		},
-		content: [
-			{	table: {
-					headerRows: 9,
-					widths:[15,"*",15],
-					body: [
-						[{ text: title, fontSize: 14, margin: [0, 0, 0, 2],fillColor: 'white',colSpan: 3}],
-						[{ text: "Game ID: "+game_id, fontSize: 12, margin: [0, 0, 0, 8],fillColor: 'white',colSpan: 3}],
-						[{text: "To play this game:",fontSize: 11, margin: [0, 0, 0, 0],fillColor: 'white',colSpan: 3}],
-						[{ol: [
-								'Open English Builder',
-								{text: ['Click: ', {text: 'Activities and Content', fontSize: 14, bold: true}]},
-								{text: ['Click: ', {text: 'Bingo in Class', fontSize: 14, bold: true}]},
-								{text: ['Select this game (', {text: game_id, fontSize: 14, bold: true},') from the list']},
-								{text: ['Click: ', {text: 'Start', fontSize: 14, bold: true}]},
-							],colSpan: 3, fillColor: 'white', margin: [15, 0, 0, 8]
-						},],
-						[{text: "If this game gets deleted from English Builder, or if you want to play this game on another computer, copy the following into a new text file and save it:",fillColor: 'white',colSpan: 3, margin: [0,0,0,20]}],
-						[{fillColor:"#fff"},{text: "English Builder Vocabulary Bingo Version: 1.0\n"+"game_id: ("+game_id+")\nbingArray: ("+bingArray+")",fillColor: "#eee"},{fillColor:"#fff"}],
-						[{text: "Then:", fillColor: 'white',colSpan: 3, margin: [0,20,0,0]}],
-						[{ol: [
-								'Open English Builder',
-								{text: ['Click: ', {text: 'Activities and Content', fontSize: 14, bold: true}]},
-								{text: ['Click: ', {text: 'Bingo in Class', fontSize: 14, bold: true}]},
-								{text: ['Click: ', {text: 'Load Game', fontSize: 14, bold: true}]},
-								{text: ['Locate the text file you saved and click: ', {text: 'OK', fontSize: 14, bold: true}]},
-								{text: ['This game (', {text: game_id, fontSize: 14, bold: true},') should appear in the list of games']},
-							],colSpan: 3, fillColor: 'white', margin: [15, 0, 0, 20]
-						},],
-						[{text: "",fillColor: '#fff',margin:[-10,0,0,200],colSpan: 3}]
-					]	
-				},
-				layout: 'noBorders',
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[0][0], t_array1[0][1], t_array1[0][2], t_array1[0][3], t_array1[0][4] ],
-						[ t_array1[0][5], t_array1[0][6], t_array1[0][7], t_array1[0][8], t_array1[0][9] ],
-						[ t_array1[0][10], t_array1[0][11], {text: 'Set 1',style: 'sheet_id',verticalAlign: 'center'}, t_array1[0][12], t_array1[0][13] ],
-						[ t_array1[0][14], t_array1[0][15], t_array1[0][16], t_array1[0][17], t_array1[0][18] ],
-						[ t_array1[0][19], t_array1[0][20], t_array1[0][21], t_array1[0][22], t_array1[0][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[1][0], t_array1[1][1], t_array1[1][2], t_array1[1][3], t_array1[1][4] ],
-						[ t_array1[1][5], t_array1[1][6], t_array1[1][7], t_array1[1][8], t_array1[1][9] ],
-						[ t_array1[1][10], t_array1[1][11], {text: 'Set 2',style: 'sheet_id',verticalAlign: 'center'}, t_array1[1][12], t_array1[1][13] ],
-						[ t_array1[1][14], t_array1[1][15], t_array1[1][16], t_array1[1][17], t_array1[1][18] ],
-						[ t_array1[1][19], t_array1[1][20], t_array1[1][21], t_array1[1][22], t_array1[1][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[2][0], t_array1[2][1], t_array1[2][2], t_array1[2][3], t_array1[2][4] ],
-						[ t_array1[2][5], t_array1[2][6], t_array1[2][7], t_array1[2][8], t_array1[2][9] ],
-						[ t_array1[2][10], t_array1[2][11], {text: 'Set 3',style: 'sheet_id',verticalAlign: 'center'}, t_array1[2][12], t_array1[2][13] ],
-						[ t_array1[2][14], t_array1[2][15], t_array1[2][16], t_array1[2][17], t_array1[2][18] ],
-						[ t_array1[2][19], t_array1[2][20], t_array1[2][21], t_array1[2][22], t_array1[2][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[3][0], t_array1[3][1], t_array1[3][2], t_array1[3][3], t_array1[3][4] ],
-						[ t_array1[3][5], t_array1[3][6], t_array1[3][7], t_array1[3][8], t_array1[3][9] ],
-						[ t_array1[3][10], t_array1[3][11], {text: 'Set 4',style: 'sheet_id',verticalAlign: 'center'}, t_array1[3][12], t_array1[3][13] ],
-						[ t_array1[3][14], t_array1[3][15], t_array1[3][16], t_array1[3][17], t_array1[3][18] ],
-						[ t_array1[3][19], t_array1[3][20], t_array1[3][21], t_array1[3][22], t_array1[3][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[4][0], t_array1[4][1], t_array1[4][2], t_array1[4][3], t_array1[4][4] ],
-						[ t_array1[4][5], t_array1[4][6], t_array1[4][7], t_array1[4][8], t_array1[4][9] ],
-						[ t_array1[4][10], t_array1[4][11], {text: 'Set 5',style: 'sheet_id',verticalAlign: 'center'}, t_array1[4][12], t_array1[4][13] ],
-						[ t_array1[4][14], t_array1[4][15], t_array1[4][16], t_array1[4][17], t_array1[4][18] ],
-						[ t_array1[4][19], t_array1[4][20], t_array1[4][21], t_array1[4][22], t_array1[4][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[5][0], t_array1[5][1], t_array1[5][2], t_array1[5][3], t_array1[5][4] ],
-						[ t_array1[5][5], t_array1[5][6], t_array1[5][7], t_array1[5][8], t_array1[5][9] ],
-						[ t_array1[5][10], t_array1[5][11], {text: 'Set 6',style: 'sheet_id',verticalAlign: 'center'}, t_array1[5][12], t_array1[5][13] ],
-						[ t_array1[5][14], t_array1[5][15], t_array1[5][16], t_array1[5][17], t_array1[5][18] ],
-						[ t_array1[5][19], t_array1[5][20], t_array1[5][21], t_array1[5][22], t_array1[5][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[6][0], t_array1[6][1], t_array1[6][2], t_array1[6][3], t_array1[6][4] ],
-						[ t_array1[6][5], t_array1[6][6], t_array1[6][7], t_array1[6][8], t_array1[6][9] ],
-						[ t_array1[6][10], t_array1[6][11], {text: 'Set 7',style: 'sheet_id',verticalAlign: 'center'}, t_array1[6][12], t_array1[6][13] ],
-						[ t_array1[6][14], t_array1[6][15], t_array1[6][16], t_array1[6][17], t_array1[6][18] ],
-						[ t_array1[6][19], t_array1[6][20], t_array1[6][21], t_array1[6][22], t_array1[6][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[7][0], t_array1[7][1], t_array1[7][2], t_array1[7][3], t_array1[7][4] ],
-						[ t_array1[7][5], t_array1[7][6], t_array1[7][7], t_array1[7][8], t_array1[7][9] ],
-						[ t_array1[7][10], t_array1[7][11], {text: 'Set 8',style: 'sheet_id',verticalAlign: 'center'}, t_array1[7][12], t_array1[7][13] ],
-						[ t_array1[7][14], t_array1[7][15], t_array1[7][16], t_array1[7][17], t_array1[7][18] ],
-						[ t_array1[7][19], t_array1[7][20], t_array1[7][21], t_array1[7][22], t_array1[7][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[8][0], t_array1[8][1], t_array1[8][2], t_array1[8][3], t_array1[8][4] ],
-						[ t_array1[8][5], t_array1[8][6], t_array1[8][7], t_array1[8][8], t_array1[8][9] ],
-						[ t_array1[8][10], t_array1[8][11], {text: 'Set 9',style: 'sheet_id',verticalAlign: 'center'}, t_array1[8][12], t_array1[8][13] ],
-						[ t_array1[8][14], t_array1[8][15], t_array1[8][16], t_array1[8][17], t_array1[8][18] ],
-						[ t_array1[8][19], t_array1[8][20], t_array1[8][21], t_array1[8][22], t_array1[8][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[9][0], t_array1[9][1], t_array1[9][2], t_array1[9][3], t_array1[9][4] ],
-						[ t_array1[9][5], t_array1[9][6], t_array1[9][7], t_array1[9][8], t_array1[9][9] ],
-						[ t_array1[9][10], t_array1[9][11], {text: 'Set 10',style: 'sheet_id',verticalAlign: 'center'}, t_array1[9][12], t_array1[9][13] ],
-						[ t_array1[9][14], t_array1[9][15], t_array1[9][16], t_array1[9][17], t_array1[9][18] ],
-						[ t_array1[9][19], t_array1[9][20], t_array1[9][21], t_array1[9][22], t_array1[9][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[10][0], t_array1[10][1], t_array1[10][2], t_array1[10][3], t_array1[10][4] ],
-						[ t_array1[10][5], t_array1[10][6], t_array1[10][7], t_array1[10][8], t_array1[10][9] ],
-						[ t_array1[10][10], t_array1[10][11], {text: 'Set 11',style: 'sheet_id',verticalAlign: 'center'}, t_array1[10][12], t_array1[10][13] ],
-						[ t_array1[10][14], t_array1[10][15], t_array1[10][16], t_array1[10][17], t_array1[10][18] ],
-						[ t_array1[10][19], t_array1[10][20], t_array1[10][21], t_array1[10][22], t_array1[10][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[11][0], t_array1[11][1], t_array1[11][2], t_array1[11][3], t_array1[11][4] ],
-						[ t_array1[11][5], t_array1[11][6], t_array1[11][7], t_array1[11][8], t_array1[11][9] ],
-						[ t_array1[11][10], t_array1[11][11], {text: 'Set 12',style: 'sheet_id',verticalAlign: 'center'}, t_array1[11][12], t_array1[11][13] ],
-						[ t_array1[11][14], t_array1[11][15], t_array1[11][16], t_array1[11][17], t_array1[11][18] ],
-						[ t_array1[11][19], t_array1[11][20], t_array1[11][21], t_array1[11][22], t_array1[11][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[12][0], t_array1[12][1], t_array1[12][2], t_array1[12][3], t_array1[12][4] ],
-						[ t_array1[12][5], t_array1[12][6], t_array1[12][7], t_array1[12][8], t_array1[12][9] ],
-						[ t_array1[12][10], t_array1[12][11], {text: 'Set 13',style: 'sheet_id',verticalAlign: 'center'}, t_array1[12][12], t_array1[12][13] ],
-						[ t_array1[12][14], t_array1[12][15], t_array1[12][16], t_array1[12][17], t_array1[12][18] ],
-						[ t_array1[12][19], t_array1[12][20], t_array1[12][21], t_array1[12][22], t_array1[12][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[13][0], t_array1[13][1], t_array1[13][2], t_array1[13][3], t_array1[13][4] ],
-						[ t_array1[13][5], t_array1[13][6], t_array1[13][7], t_array1[13][8], t_array1[13][9] ],
-						[ t_array1[13][10], t_array1[13][11], {text: 'Set 14',style: 'sheet_id',verticalAlign: 'center'}, t_array1[13][12], t_array1[13][13] ],
-						[ t_array1[13][14], t_array1[13][15], t_array1[13][16], t_array1[13][17], t_array1[13][18] ],
-						[ t_array1[13][19], t_array1[13][20], t_array1[13][21], t_array1[13][22], t_array1[13][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[14][0], t_array1[14][1], t_array1[14][2], t_array1[14][3], t_array1[14][4] ],
-						[ t_array1[14][5], t_array1[14][6], t_array1[14][7], t_array1[14][8], t_array1[14][9] ],
-						[ t_array1[14][10], t_array1[14][11], {text: 'Set 15',style: 'sheet_id',verticalAlign: 'center'}, t_array1[14][12], t_array1[14][13] ],
-						[ t_array1[14][14], t_array1[14][15], t_array1[14][16], t_array1[14][17], t_array1[14][18] ],
-						[ t_array1[14][19], t_array1[14][20], t_array1[14][21], t_array1[14][22], t_array1[14][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[15][0], t_array1[15][1], t_array1[15][2], t_array1[15][3], t_array1[15][4] ],
-						[ t_array1[15][5], t_array1[15][6], t_array1[15][7], t_array1[15][8], t_array1[15][9] ],
-						[ t_array1[15][10], t_array1[15][11], {text: 'Set 16',style: 'sheet_id',verticalAlign: 'center'}, t_array1[15][12], t_array1[15][13] ],
-						[ t_array1[15][14], t_array1[15][15], t_array1[15][16], t_array1[15][17], t_array1[15][18] ],
-						[ t_array1[15][19], t_array1[15][20], t_array1[15][21], t_array1[15][22], t_array1[15][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[16][0], t_array1[16][1], t_array1[16][2], t_array1[16][3], t_array1[16][4] ],
-						[ t_array1[16][5], t_array1[16][6], t_array1[16][7], t_array1[16][8], t_array1[16][9] ],
-						[ t_array1[16][10], t_array1[16][11], {text: 'Set 17',style: 'sheet_id',verticalAlign: 'center'}, t_array1[16][12], t_array1[16][13] ],
-						[ t_array1[16][14], t_array1[16][15], t_array1[16][16], t_array1[16][17], t_array1[16][18] ],
-						[ t_array1[16][19], t_array1[16][20], t_array1[16][21], t_array1[16][22], t_array1[16][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[17][0], t_array1[17][1], t_array1[17][2], t_array1[17][3], t_array1[17][4] ],
-						[ t_array1[17][5], t_array1[17][6], t_array1[17][7], t_array1[17][8], t_array1[17][9] ],
-						[ t_array1[17][10], t_array1[17][11], {text: 'Set 18',style: 'sheet_id',verticalAlign: 'center'}, t_array1[17][12], t_array1[17][13] ],
-						[ t_array1[17][14], t_array1[17][15], t_array1[17][16], t_array1[17][17], t_array1[17][18] ],
-						[ t_array1[17][19], t_array1[17][20], t_array1[17][21], t_array1[17][22], t_array1[17][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[18][0], t_array1[18][1], t_array1[18][2], t_array1[18][3], t_array1[18][4] ],
-						[ t_array1[18][5], t_array1[18][6], t_array1[18][7], t_array1[18][8], t_array1[18][9] ],
-						[ t_array1[18][10], t_array1[18][11], {text: 'Set 19',style: 'sheet_id',verticalAlign: 'center'}, t_array1[18][12], t_array1[18][13] ],
-						[ t_array1[18][14], t_array1[18][15], t_array1[18][16], t_array1[18][17], t_array1[18][18] ],
-						[ t_array1[18][19], t_array1[18][20], t_array1[18][21], t_array1[18][22], t_array1[18][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[19][0], t_array1[19][1], t_array1[19][2], t_array1[19][3], t_array1[19][4] ],
-						[ t_array1[19][5], t_array1[19][6], t_array1[19][7], t_array1[19][8], t_array1[19][9] ],
-						[ t_array1[19][10], t_array1[19][11], {text: 'Set 20',style: 'sheet_id',verticalAlign: 'center'}, t_array1[19][12], t_array1[19][13] ],
-						[ t_array1[19][14], t_array1[19][15], t_array1[19][16], t_array1[19][17], t_array1[19][18] ],
-						[ t_array1[19][19], t_array1[19][20], t_array1[19][21], t_array1[19][22], t_array1[19][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[20][0], t_array1[20][1], t_array1[20][2], t_array1[20][3], t_array1[20][4] ],
-						[ t_array1[20][5], t_array1[20][6], t_array1[20][7], t_array1[20][8], t_array1[20][9] ],
-						[ t_array1[20][10], t_array1[20][11], {text: 'Set 21',style: 'sheet_id',verticalAlign: 'center'}, t_array1[20][12], t_array1[20][13] ],
-						[ t_array1[20][14], t_array1[20][15], t_array1[20][16], t_array1[20][17], t_array1[20][18] ],
-						[ t_array1[20][19], t_array1[20][20], t_array1[20][21], t_array1[20][22], t_array1[20][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[21][0], t_array1[21][1], t_array1[21][2], t_array1[21][3], t_array1[21][4] ],
-						[ t_array1[21][5], t_array1[21][6], t_array1[21][7], t_array1[21][8], t_array1[21][9] ],
-						[ t_array1[21][10], t_array1[21][11], {text: 'Set 22',style: 'sheet_id',verticalAlign: 'center'}, t_array1[21][12], t_array1[21][13] ],
-						[ t_array1[21][14], t_array1[21][15], t_array1[21][16], t_array1[21][17], t_array1[21][18] ],
-						[ t_array1[21][19], t_array1[21][20], t_array1[21][21], t_array1[21][22], t_array1[21][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[22][0], t_array1[22][1], t_array1[22][2], t_array1[22][3], t_array1[22][4] ],
-						[ t_array1[22][5], t_array1[22][6], t_array1[22][7], t_array1[22][8], t_array1[22][9] ],
-						[ t_array1[22][10], t_array1[22][11], {text: 'Set 23',style: 'sheet_id',verticalAlign: 'center'}, t_array1[22][12], t_array1[22][13] ],
-						[ t_array1[22][14], t_array1[22][15], t_array1[22][16], t_array1[22][17], t_array1[22][18] ],
-						[ t_array1[22][19], t_array1[22][20], t_array1[22][21], t_array1[22][22], t_array1[22][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[23][0], t_array1[23][1], t_array1[23][2], t_array1[23][3], t_array1[23][4] ],
-						[ t_array1[23][5], t_array1[23][6], t_array1[23][7], t_array1[23][8], t_array1[23][9] ],
-						[ t_array1[23][10], t_array1[23][11], {text: 'Set 24',style: 'sheet_id',verticalAlign: 'center'}, t_array1[23][12], t_array1[23][13] ],
-						[ t_array1[23][14], t_array1[23][15], t_array1[23][16], t_array1[23][17], t_array1[23][18] ],
-						[ t_array1[23][19], t_array1[23][20], t_array1[23][21], t_array1[23][22], t_array1[23][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[24][0], t_array1[24][1], t_array1[24][2], t_array1[24][3], t_array1[24][4] ],
-						[ t_array1[24][5], t_array1[24][6], t_array1[24][7], t_array1[24][8], t_array1[24][9] ],
-						[ t_array1[24][10], t_array1[24][11], {text: 'Set 25',style: 'sheet_id',verticalAlign: 'center'}, t_array1[24][12], t_array1[24][13] ],
-						[ t_array1[24][14], t_array1[24][15], t_array1[24][16], t_array1[24][17], t_array1[24][18] ],
-						[ t_array1[24][19], t_array1[24][20], t_array1[24][21], t_array1[24][22], t_array1[24][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[25][0], t_array1[25][1], t_array1[25][2], t_array1[25][3], t_array1[25][4] ],
-						[ t_array1[25][5], t_array1[25][6], t_array1[25][7], t_array1[25][8], t_array1[25][9] ],
-						[ t_array1[25][10], t_array1[25][11], {text: 'Set 26',style: 'sheet_id',verticalAlign: 'center'}, t_array1[25][12], t_array1[25][13] ],
-						[ t_array1[25][14], t_array1[25][15], t_array1[25][16], t_array1[25][17], t_array1[25][18] ],
-						[ t_array1[25][19], t_array1[25][20], t_array1[25][21], t_array1[25][22], t_array1[25][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[26][0], t_array1[26][1], t_array1[26][2], t_array1[26][3], t_array1[26][4] ],
-						[ t_array1[26][5], t_array1[26][6], t_array1[26][7], t_array1[26][8], t_array1[26][9] ],
-						[ t_array1[26][10], t_array1[26][11], {text: 'Set 27',style: 'sheet_id',verticalAlign: 'center'}, t_array1[26][12], t_array1[26][13] ],
-						[ t_array1[26][14], t_array1[26][15], t_array1[26][16], t_array1[26][17], t_array1[26][18] ],
-						[ t_array1[26][19], t_array1[26][20], t_array1[26][21], t_array1[26][22], t_array1[26][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[27][0], t_array1[27][1], t_array1[27][2], t_array1[27][3], t_array1[27][4] ],
-						[ t_array1[27][5], t_array1[27][6], t_array1[27][7], t_array1[27][8], t_array1[27][9] ],
-						[ t_array1[27][10], t_array1[27][11], {text: 'Set 28',style: 'sheet_id',verticalAlign: 'center'}, t_array1[27][12], t_array1[27][13] ],
-						[ t_array1[27][14], t_array1[27][15], t_array1[27][16], t_array1[27][17], t_array1[27][18] ],
-						[ t_array1[27][19], t_array1[27][20], t_array1[27][21], t_array1[27][22], t_array1[27][23] ]
-					]
-				},
-			},
-			
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[28][0], t_array1[28][1], t_array1[28][2], t_array1[28][3], t_array1[28][4] ],
-						[ t_array1[28][5], t_array1[28][6], t_array1[28][7], t_array1[28][8], t_array1[28][9] ],
-						[ t_array1[28][10], t_array1[28][11], {text: 'Set 29',style: 'sheet_id',verticalAlign: 'center'}, t_array1[28][12], t_array1[28][13] ],
-						[ t_array1[28][14], t_array1[28][15], t_array1[28][16], t_array1[28][17], t_array1[28][18] ],
-						[ t_array1[28][19], t_array1[28][20], t_array1[28][21], t_array1[28][22], t_array1[28][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[29][0], t_array1[29][1], t_array1[29][2], t_array1[29][3], t_array1[29][4] ],
-						[ t_array1[29][5], t_array1[29][6], t_array1[29][7], t_array1[29][8], t_array1[29][9] ],
-						[ t_array1[29][10], t_array1[29][11], {text: 'Set 30',style: 'sheet_id',verticalAlign: 'center'}, t_array1[29][12], t_array1[29][13] ],
-						[ t_array1[29][14], t_array1[29][15], t_array1[29][16], t_array1[29][17], t_array1[29][18] ],
-						[ t_array1[29][19], t_array1[29][20], t_array1[29][21], t_array1[29][22], t_array1[29][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[30][0], t_array1[30][1], t_array1[30][2], t_array1[30][3], t_array1[30][4] ],
-						[ t_array1[30][5], t_array1[30][6], t_array1[30][7], t_array1[30][8], t_array1[30][9] ],
-						[ t_array1[30][10], t_array1[30][11], {text: 'Set 31',style: 'sheet_id',verticalAlign: 'center'}, t_array1[30][12], t_array1[30][13] ],
-						[ t_array1[30][14], t_array1[30][15], t_array1[30][16], t_array1[30][17], t_array1[30][18] ],
-						[ t_array1[30][19], t_array1[30][20], t_array1[30][21], t_array1[30][22], t_array1[30][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[31][0], t_array1[31][1], t_array1[31][2], t_array1[31][3], t_array1[31][4] ],
-						[ t_array1[31][5], t_array1[31][6], t_array1[31][7], t_array1[31][8], t_array1[31][9] ],
-						[ t_array1[31][10], t_array1[31][11], {text: 'Set 32',style: 'sheet_id',verticalAlign: 'center'}, t_array1[31][12], t_array1[31][13] ],
-						[ t_array1[31][14], t_array1[31][15], t_array1[31][16], t_array1[31][17], t_array1[31][18] ],
-						[ t_array1[31][19], t_array1[31][20], t_array1[31][21], t_array1[31][22], t_array1[31][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[32][0], t_array1[32][1], t_array1[32][2], t_array1[32][3], t_array1[32][4] ],
-						[ t_array1[32][5], t_array1[32][6], t_array1[32][7], t_array1[32][8], t_array1[32][9] ],
-						[ t_array1[32][10], t_array1[32][11], {text: 'Set 33',style: 'sheet_id',verticalAlign: 'center'}, t_array1[32][12], t_array1[32][13] ],
-						[ t_array1[32][14], t_array1[32][15], t_array1[32][16], t_array1[32][17], t_array1[32][18] ],
-						[ t_array1[32][19], t_array1[32][20], t_array1[32][21], t_array1[32][22], t_array1[32][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[33][0], t_array1[33][1], t_array1[33][2], t_array1[33][3], t_array1[33][4] ],
-						[ t_array1[33][5], t_array1[33][6], t_array1[33][7], t_array1[33][8], t_array1[33][9] ],
-						[ t_array1[33][10], t_array1[33][11], {text: 'Set 34',style: 'sheet_id',verticalAlign: 'center'}, t_array1[33][12], t_array1[33][13] ],
-						[ t_array1[33][14], t_array1[33][15], t_array1[33][16], t_array1[33][17], t_array1[33][18] ],
-						[ t_array1[33][19], t_array1[33][20], t_array1[33][21], t_array1[33][22], t_array1[33][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[34][0], t_array1[34][1], t_array1[34][2], t_array1[34][3], t_array1[34][4] ],
-						[ t_array1[34][5], t_array1[34][6], t_array1[34][7], t_array1[34][8], t_array1[34][9] ],
-						[ t_array1[34][10], t_array1[34][11], {text: 'Set 35',style: 'sheet_id',verticalAlign: 'center'}, t_array1[34][12], t_array1[34][13] ],
-						[ t_array1[34][14], t_array1[34][15], t_array1[34][16], t_array1[34][17], t_array1[34][18] ],
-						[ t_array1[34][19], t_array1[34][20], t_array1[34][21], t_array1[34][22], t_array1[34][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[35][0], t_array1[35][1], t_array1[35][2], t_array1[35][3], t_array1[35][4] ],
-						[ t_array1[35][5], t_array1[35][6], t_array1[35][7], t_array1[35][8], t_array1[35][9] ],
-						[ t_array1[35][10], t_array1[35][11], {text: 'Set 36',style: 'sheet_id',verticalAlign: 'center'}, t_array1[35][12], t_array1[35][13] ],
-						[ t_array1[35][14], t_array1[35][15], t_array1[35][16], t_array1[35][17], t_array1[35][18] ],
-						[ t_array1[35][19], t_array1[35][20], t_array1[35][21], t_array1[35][22], t_array1[35][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[36][0], t_array1[36][1], t_array1[36][2], t_array1[36][3], t_array1[36][4] ],
-						[ t_array1[36][5], t_array1[36][6], t_array1[36][7], t_array1[36][8], t_array1[36][9] ],
-						[ t_array1[36][10], t_array1[36][11], {text: 'Set 37',style: 'sheet_id',verticalAlign: 'center'}, t_array1[36][12], t_array1[36][13] ],
-						[ t_array1[36][14], t_array1[36][15], t_array1[36][16], t_array1[36][17], t_array1[36][18] ],
-						[ t_array1[36][19], t_array1[36][20], t_array1[36][21], t_array1[36][22], t_array1[36][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[37][0], t_array1[37][1], t_array1[37][2], t_array1[37][3], t_array1[37][4] ],
-						[ t_array1[37][5], t_array1[37][6], t_array1[37][7], t_array1[37][8], t_array1[37][9] ],
-						[ t_array1[37][10], t_array1[37][11], {text: 'Set 38',style: 'sheet_id',verticalAlign: 'center'}, t_array1[37][12], t_array1[37][13] ],
-						[ t_array1[37][14], t_array1[37][15], t_array1[37][16], t_array1[37][17], t_array1[37][18] ],
-						[ t_array1[37][19], t_array1[37][20], t_array1[37][21], t_array1[37][22], t_array1[37][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[38][0], t_array1[38][1], t_array1[38][2], t_array1[38][3], t_array1[38][4] ],
-						[ t_array1[38][5], t_array1[38][6], t_array1[38][7], t_array1[38][8], t_array1[38][9] ],
-						[ t_array1[38][10], t_array1[38][11], {text: 'Set 39',style: 'sheet_id',verticalAlign: 'center'}, t_array1[38][12], t_array1[38][13] ],
-						[ t_array1[38][14], t_array1[38][15], t_array1[38][16], t_array1[38][17], t_array1[38][18] ],
-						[ t_array1[38][19], t_array1[38][20], t_array1[38][21], t_array1[38][22], t_array1[38][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[39][0], t_array1[39][1], t_array1[39][2], t_array1[39][3], t_array1[39][4] ],
-						[ t_array1[39][5], t_array1[39][6], t_array1[39][7], t_array1[39][8], t_array1[39][9] ],
-						[ t_array1[39][10], t_array1[39][11], {text: 'Set 40',style: 'sheet_id',verticalAlign: 'center'}, t_array1[39][12], t_array1[39][13] ],
-						[ t_array1[39][14], t_array1[39][15], t_array1[39][16], t_array1[39][17], t_array1[39][18] ],
-						[ t_array1[39][19], t_array1[39][20], t_array1[39][21], t_array1[39][22], t_array1[39][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[40][0], t_array1[40][1], t_array1[40][2], t_array1[40][3], t_array1[40][4] ],
-						[ t_array1[40][5], t_array1[40][6], t_array1[40][7], t_array1[40][8], t_array1[40][9] ],
-						[ t_array1[40][10], t_array1[40][11], {text: 'Set 41',style: 'sheet_id',verticalAlign: 'center'}, t_array1[40][12], t_array1[40][13] ],
-						[ t_array1[40][14], t_array1[40][15], t_array1[40][16], t_array1[40][17], t_array1[40][18] ],
-						[ t_array1[40][19], t_array1[40][20], t_array1[40][21], t_array1[40][22], t_array1[40][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[41][0], t_array1[41][1], t_array1[41][2], t_array1[41][3], t_array1[41][4] ],
-						[ t_array1[41][5], t_array1[41][6], t_array1[41][7], t_array1[41][8], t_array1[41][9] ],
-						[ t_array1[41][10], t_array1[41][11], {text: 'Set 42',style: 'sheet_id',verticalAlign: 'center'}, t_array1[41][12], t_array1[41][13] ],
-						[ t_array1[41][14], t_array1[41][15], t_array1[41][16], t_array1[41][17], t_array1[41][18] ],
-						[ t_array1[41][19], t_array1[41][20], t_array1[41][21], t_array1[41][22], t_array1[41][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[42][0], t_array1[42][1], t_array1[42][2], t_array1[42][3], t_array1[42][4] ],
-						[ t_array1[42][5], t_array1[42][6], t_array1[42][7], t_array1[42][8], t_array1[42][9] ],
-						[ t_array1[42][10], t_array1[42][11], {text: 'Set 43',style: 'sheet_id',verticalAlign: 'center'}, t_array1[42][12], t_array1[42][13] ],
-						[ t_array1[42][14], t_array1[42][15], t_array1[42][16], t_array1[42][17], t_array1[42][18] ],
-						[ t_array1[42][19], t_array1[42][20], t_array1[42][21], t_array1[42][22], t_array1[42][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[43][0], t_array1[43][1], t_array1[43][2], t_array1[43][3], t_array1[43][4] ],
-						[ t_array1[43][5], t_array1[43][6], t_array1[43][7], t_array1[43][8], t_array1[43][9] ],
-						[ t_array1[43][10], t_array1[43][11], {text: 'Set 44',style: 'sheet_id',verticalAlign: 'center'}, t_array1[43][12], t_array1[43][13] ],
-						[ t_array1[43][14], t_array1[43][15], t_array1[43][16], t_array1[43][17], t_array1[43][18] ],
-						[ t_array1[43][19], t_array1[43][20], t_array1[43][21], t_array1[43][22], t_array1[43][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[44][0], t_array1[44][1], t_array1[44][2], t_array1[44][3], t_array1[44][4] ],
-						[ t_array1[44][5], t_array1[44][6], t_array1[44][7], t_array1[44][8], t_array1[44][9] ],
-						[ t_array1[44][10], t_array1[44][11], {text: 'Set 45',style: 'sheet_id',verticalAlign: 'center'}, t_array1[44][12], t_array1[44][13] ],
-						[ t_array1[44][14], t_array1[44][15], t_array1[44][16], t_array1[44][17], t_array1[44][18] ],
-						[ t_array1[44][19], t_array1[44][20], t_array1[44][21], t_array1[44][22], t_array1[44][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[45][0], t_array1[45][1], t_array1[45][2], t_array1[45][3], t_array1[45][4] ],
-						[ t_array1[45][5], t_array1[45][6], t_array1[45][7], t_array1[45][8], t_array1[45][9] ],
-						[ t_array1[45][10], t_array1[45][11], {text: 'Set 46',style: 'sheet_id',verticalAlign: 'center'}, t_array1[45][12], t_array1[45][13] ],
-						[ t_array1[45][14], t_array1[45][15], t_array1[45][16], t_array1[45][17], t_array1[45][18] ],
-						[ t_array1[45][19], t_array1[45][20], t_array1[45][21], t_array1[45][22], t_array1[45][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[46][0], t_array1[46][1], t_array1[46][2], t_array1[46][3], t_array1[46][4] ],
-						[ t_array1[46][5], t_array1[46][6], t_array1[46][7], t_array1[46][8], t_array1[46][9] ],
-						[ t_array1[46][10], t_array1[46][11], {text: 'Set 47',style: 'sheet_id',verticalAlign: 'center'}, t_array1[46][12], t_array1[46][13] ],
-						[ t_array1[46][14], t_array1[46][15], t_array1[46][16], t_array1[46][17], t_array1[46][18] ],
-						[ t_array1[46][19], t_array1[46][20], t_array1[46][21], t_array1[46][22], t_array1[46][23] ]
-					]
-				},
-			},
-			{	columns: [
-					{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
-					{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
-				]
-			},
-			{
-				table: {
-					widths: [ 98, 99, 98, 99, 99 ],
-					height:63,
-					body: [
-						[ t_array1[47][0], t_array1[47][1], t_array1[47][2], t_array1[47][3], t_array1[47][4] ],
-						[ t_array1[47][5], t_array1[47][6], t_array1[47][7], t_array1[47][8], t_array1[47][9] ],
-						[ t_array1[47][10], t_array1[47][11], {text: 'Set 48',style: 'sheet_id',verticalAlign: 'center'}, t_array1[47][12], t_array1[47][13] ],
-						[ t_array1[47][14], t_array1[47][15], t_array1[47][16], t_array1[47][17], t_array1[47][18] ],
-						[ t_array1[47][19], t_array1[47][20], t_array1[47][21], t_array1[47][22], t_array1[47][23] ]
-					]
-				},
-			},
-
-		],
-		pageMargins: [ 28, 46, 28, 28 ],
-		styles: {
-			t_cell: {
-				font: 'Comic',
-				fontSize: 21,
-				margin: [0,0,0,0],
-				bold: true,
-				alignment: 'center'
-			},
-			pad_cell: {
-				fontSize:1,
-				margin: [0,0,0,64]	
-			},
-			sheet_id: {
-				font: 'Nunito',
-				fontSize: 29,
-				bold: true,
-				alignment: 'center',		
-			},
-		},
-		defaultStyle: {
-			font: 'Nunito'
+		for (var j=0;j<48;j++) {
+			t_array1[j] = bingArray.toString().split(",");
+			shuffle(t_array1[j]);
+			for (var i=0;i<24;i++) {
+				if (localStorage.curr_vb_game.slice(6,9)=="num" && isNaN(t_array1[j][i])) {
+					t_array1[j][i]={image: t_array1[j][i].toLowerCase()+'.jpg', width: 98, style: 't_cell',verticalAlign: 'center'};
+				}
+				else {
+					t_array1[j][i]={text: t_array1[j][i],style: 't_cell',verticalAlign: 'center',fontSize:font_sizes[t_array1[j][i]]};
+				}
+			}
 		}
-	};
-	pdfMake.createPdf(bing_pdf).download(doc_title);
-	//pdfMake.createPdf(bing_pdf).open();
+		makePDF();
+	}
+
+	function makePDF(){
+
+		var bing_pdf = { 
+			pageSize: 'A4',
+			background: {image: 'bing_back_'+host+'.jpg', width:594},
+			info: {
+				title: title,
+				author: 'Ian Smith',
+			},
+			content: [
+				{	table: {
+						headerRows: 9,
+						widths:[15,"*",15],
+						body: [
+							[{ text: title, fontSize: 14, margin: [0, 0, 0, 2],fillColor: 'white',colSpan: 3}],
+							[{ text: "Game ID: "+game_id, fontSize: 12, margin: [0, 0, 0, 8],fillColor: 'white',colSpan: 3}],
+							[{text: "To play this game:",fontSize: 11, margin: [0, 0, 0, 0],fillColor: 'white',colSpan: 3}],
+							[{ol: [
+									'Open English Builder',
+									{text: ['Click: ', {text: 'Activities and Content', fontSize: 14, bold: true}]},
+									{text: ['Click: ', {text: 'Bingo in Class', fontSize: 14, bold: true}]},
+									{text: ['Select this game (', {text: game_id, fontSize: 14, bold: true},') from the list']},
+									{text: ['Click: ', {text: 'Start', fontSize: 14, bold: true}]},
+								],colSpan: 3, fillColor: 'white', margin: [15, 0, 0, 8]
+							},],
+							[{text: "If this game gets deleted from English Builder, or if you want to play this game on another computer, copy the following into a new text file and save it:",fillColor: 'white',colSpan: 3, margin: [0,0,0,20]}],
+							[{fillColor:"#fff"},{text: "English Builder Vocabulary Bingo Version: 1.0\n"+"game_id: ("+game_id+")\nbingArray: ("+bingArray+")",fillColor: "#eee"},{fillColor:"#fff"}],
+							[{text: "Then:", fillColor: 'white',colSpan: 3, margin: [0,20,0,0]}],
+							[{ol: [
+									'Open English Builder',
+									{text: ['Click: ', {text: 'Activities and Content', fontSize: 14, bold: true}]},
+									{text: ['Click: ', {text: 'Bingo in Class', fontSize: 14, bold: true}]},
+									{text: ['Click: ', {text: 'Load Game', fontSize: 14, bold: true}]},
+									{text: ['Locate the text file you saved and click: ', {text: 'OK', fontSize: 14, bold: true}]},
+									{text: ['This game (', {text: game_id, fontSize: 14, bold: true},') should appear in the list of games']},
+								],colSpan: 3, fillColor: 'white', margin: [15, 0, 0, 20]
+							},],
+							[{text: "",fillColor: '#fff',margin:[-10,0,0,200],colSpan: 3}]
+						]	
+					},
+					layout: 'noBorders',
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[0][0], t_array1[0][1], t_array1[0][2], t_array1[0][3], t_array1[0][4] ],
+							[ t_array1[0][5], t_array1[0][6], t_array1[0][7], t_array1[0][8], t_array1[0][9] ],
+							[ t_array1[0][10], t_array1[0][11], {text: 'Set 1',style: 'sheet_id',verticalAlign: 'center'}, t_array1[0][12], t_array1[0][13] ],
+							[ t_array1[0][14], t_array1[0][15], t_array1[0][16], t_array1[0][17], t_array1[0][18] ],
+							[ t_array1[0][19], t_array1[0][20], t_array1[0][21], t_array1[0][22], t_array1[0][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[1][0], t_array1[1][1], t_array1[1][2], t_array1[1][3], t_array1[1][4] ],
+							[ t_array1[1][5], t_array1[1][6], t_array1[1][7], t_array1[1][8], t_array1[1][9] ],
+							[ t_array1[1][10], t_array1[1][11], {text: 'Set 2',style: 'sheet_id',verticalAlign: 'center'}, t_array1[1][12], t_array1[1][13] ],
+							[ t_array1[1][14], t_array1[1][15], t_array1[1][16], t_array1[1][17], t_array1[1][18] ],
+							[ t_array1[1][19], t_array1[1][20], t_array1[1][21], t_array1[1][22], t_array1[1][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[2][0], t_array1[2][1], t_array1[2][2], t_array1[2][3], t_array1[2][4] ],
+							[ t_array1[2][5], t_array1[2][6], t_array1[2][7], t_array1[2][8], t_array1[2][9] ],
+							[ t_array1[2][10], t_array1[2][11], {text: 'Set 3',style: 'sheet_id',verticalAlign: 'center'}, t_array1[2][12], t_array1[2][13] ],
+							[ t_array1[2][14], t_array1[2][15], t_array1[2][16], t_array1[2][17], t_array1[2][18] ],
+							[ t_array1[2][19], t_array1[2][20], t_array1[2][21], t_array1[2][22], t_array1[2][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[3][0], t_array1[3][1], t_array1[3][2], t_array1[3][3], t_array1[3][4] ],
+							[ t_array1[3][5], t_array1[3][6], t_array1[3][7], t_array1[3][8], t_array1[3][9] ],
+							[ t_array1[3][10], t_array1[3][11], {text: 'Set 4',style: 'sheet_id',verticalAlign: 'center'}, t_array1[3][12], t_array1[3][13] ],
+							[ t_array1[3][14], t_array1[3][15], t_array1[3][16], t_array1[3][17], t_array1[3][18] ],
+							[ t_array1[3][19], t_array1[3][20], t_array1[3][21], t_array1[3][22], t_array1[3][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[4][0], t_array1[4][1], t_array1[4][2], t_array1[4][3], t_array1[4][4] ],
+							[ t_array1[4][5], t_array1[4][6], t_array1[4][7], t_array1[4][8], t_array1[4][9] ],
+							[ t_array1[4][10], t_array1[4][11], {text: 'Set 5',style: 'sheet_id',verticalAlign: 'center'}, t_array1[4][12], t_array1[4][13] ],
+							[ t_array1[4][14], t_array1[4][15], t_array1[4][16], t_array1[4][17], t_array1[4][18] ],
+							[ t_array1[4][19], t_array1[4][20], t_array1[4][21], t_array1[4][22], t_array1[4][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[5][0], t_array1[5][1], t_array1[5][2], t_array1[5][3], t_array1[5][4] ],
+							[ t_array1[5][5], t_array1[5][6], t_array1[5][7], t_array1[5][8], t_array1[5][9] ],
+							[ t_array1[5][10], t_array1[5][11], {text: 'Set 6',style: 'sheet_id',verticalAlign: 'center'}, t_array1[5][12], t_array1[5][13] ],
+							[ t_array1[5][14], t_array1[5][15], t_array1[5][16], t_array1[5][17], t_array1[5][18] ],
+							[ t_array1[5][19], t_array1[5][20], t_array1[5][21], t_array1[5][22], t_array1[5][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[6][0], t_array1[6][1], t_array1[6][2], t_array1[6][3], t_array1[6][4] ],
+							[ t_array1[6][5], t_array1[6][6], t_array1[6][7], t_array1[6][8], t_array1[6][9] ],
+							[ t_array1[6][10], t_array1[6][11], {text: 'Set 7',style: 'sheet_id',verticalAlign: 'center'}, t_array1[6][12], t_array1[6][13] ],
+							[ t_array1[6][14], t_array1[6][15], t_array1[6][16], t_array1[6][17], t_array1[6][18] ],
+							[ t_array1[6][19], t_array1[6][20], t_array1[6][21], t_array1[6][22], t_array1[6][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[7][0], t_array1[7][1], t_array1[7][2], t_array1[7][3], t_array1[7][4] ],
+							[ t_array1[7][5], t_array1[7][6], t_array1[7][7], t_array1[7][8], t_array1[7][9] ],
+							[ t_array1[7][10], t_array1[7][11], {text: 'Set 8',style: 'sheet_id',verticalAlign: 'center'}, t_array1[7][12], t_array1[7][13] ],
+							[ t_array1[7][14], t_array1[7][15], t_array1[7][16], t_array1[7][17], t_array1[7][18] ],
+							[ t_array1[7][19], t_array1[7][20], t_array1[7][21], t_array1[7][22], t_array1[7][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[8][0], t_array1[8][1], t_array1[8][2], t_array1[8][3], t_array1[8][4] ],
+							[ t_array1[8][5], t_array1[8][6], t_array1[8][7], t_array1[8][8], t_array1[8][9] ],
+							[ t_array1[8][10], t_array1[8][11], {text: 'Set 9',style: 'sheet_id',verticalAlign: 'center'}, t_array1[8][12], t_array1[8][13] ],
+							[ t_array1[8][14], t_array1[8][15], t_array1[8][16], t_array1[8][17], t_array1[8][18] ],
+							[ t_array1[8][19], t_array1[8][20], t_array1[8][21], t_array1[8][22], t_array1[8][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[9][0], t_array1[9][1], t_array1[9][2], t_array1[9][3], t_array1[9][4] ],
+							[ t_array1[9][5], t_array1[9][6], t_array1[9][7], t_array1[9][8], t_array1[9][9] ],
+							[ t_array1[9][10], t_array1[9][11], {text: 'Set 10',style: 'sheet_id',verticalAlign: 'center'}, t_array1[9][12], t_array1[9][13] ],
+							[ t_array1[9][14], t_array1[9][15], t_array1[9][16], t_array1[9][17], t_array1[9][18] ],
+							[ t_array1[9][19], t_array1[9][20], t_array1[9][21], t_array1[9][22], t_array1[9][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[10][0], t_array1[10][1], t_array1[10][2], t_array1[10][3], t_array1[10][4] ],
+							[ t_array1[10][5], t_array1[10][6], t_array1[10][7], t_array1[10][8], t_array1[10][9] ],
+							[ t_array1[10][10], t_array1[10][11], {text: 'Set 11',style: 'sheet_id',verticalAlign: 'center'}, t_array1[10][12], t_array1[10][13] ],
+							[ t_array1[10][14], t_array1[10][15], t_array1[10][16], t_array1[10][17], t_array1[10][18] ],
+							[ t_array1[10][19], t_array1[10][20], t_array1[10][21], t_array1[10][22], t_array1[10][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[11][0], t_array1[11][1], t_array1[11][2], t_array1[11][3], t_array1[11][4] ],
+							[ t_array1[11][5], t_array1[11][6], t_array1[11][7], t_array1[11][8], t_array1[11][9] ],
+							[ t_array1[11][10], t_array1[11][11], {text: 'Set 12',style: 'sheet_id',verticalAlign: 'center'}, t_array1[11][12], t_array1[11][13] ],
+							[ t_array1[11][14], t_array1[11][15], t_array1[11][16], t_array1[11][17], t_array1[11][18] ],
+							[ t_array1[11][19], t_array1[11][20], t_array1[11][21], t_array1[11][22], t_array1[11][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[12][0], t_array1[12][1], t_array1[12][2], t_array1[12][3], t_array1[12][4] ],
+							[ t_array1[12][5], t_array1[12][6], t_array1[12][7], t_array1[12][8], t_array1[12][9] ],
+							[ t_array1[12][10], t_array1[12][11], {text: 'Set 13',style: 'sheet_id',verticalAlign: 'center'}, t_array1[12][12], t_array1[12][13] ],
+							[ t_array1[12][14], t_array1[12][15], t_array1[12][16], t_array1[12][17], t_array1[12][18] ],
+							[ t_array1[12][19], t_array1[12][20], t_array1[12][21], t_array1[12][22], t_array1[12][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[13][0], t_array1[13][1], t_array1[13][2], t_array1[13][3], t_array1[13][4] ],
+							[ t_array1[13][5], t_array1[13][6], t_array1[13][7], t_array1[13][8], t_array1[13][9] ],
+							[ t_array1[13][10], t_array1[13][11], {text: 'Set 14',style: 'sheet_id',verticalAlign: 'center'}, t_array1[13][12], t_array1[13][13] ],
+							[ t_array1[13][14], t_array1[13][15], t_array1[13][16], t_array1[13][17], t_array1[13][18] ],
+							[ t_array1[13][19], t_array1[13][20], t_array1[13][21], t_array1[13][22], t_array1[13][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[14][0], t_array1[14][1], t_array1[14][2], t_array1[14][3], t_array1[14][4] ],
+							[ t_array1[14][5], t_array1[14][6], t_array1[14][7], t_array1[14][8], t_array1[14][9] ],
+							[ t_array1[14][10], t_array1[14][11], {text: 'Set 15',style: 'sheet_id',verticalAlign: 'center'}, t_array1[14][12], t_array1[14][13] ],
+							[ t_array1[14][14], t_array1[14][15], t_array1[14][16], t_array1[14][17], t_array1[14][18] ],
+							[ t_array1[14][19], t_array1[14][20], t_array1[14][21], t_array1[14][22], t_array1[14][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[15][0], t_array1[15][1], t_array1[15][2], t_array1[15][3], t_array1[15][4] ],
+							[ t_array1[15][5], t_array1[15][6], t_array1[15][7], t_array1[15][8], t_array1[15][9] ],
+							[ t_array1[15][10], t_array1[15][11], {text: 'Set 16',style: 'sheet_id',verticalAlign: 'center'}, t_array1[15][12], t_array1[15][13] ],
+							[ t_array1[15][14], t_array1[15][15], t_array1[15][16], t_array1[15][17], t_array1[15][18] ],
+							[ t_array1[15][19], t_array1[15][20], t_array1[15][21], t_array1[15][22], t_array1[15][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[16][0], t_array1[16][1], t_array1[16][2], t_array1[16][3], t_array1[16][4] ],
+							[ t_array1[16][5], t_array1[16][6], t_array1[16][7], t_array1[16][8], t_array1[16][9] ],
+							[ t_array1[16][10], t_array1[16][11], {text: 'Set 17',style: 'sheet_id',verticalAlign: 'center'}, t_array1[16][12], t_array1[16][13] ],
+							[ t_array1[16][14], t_array1[16][15], t_array1[16][16], t_array1[16][17], t_array1[16][18] ],
+							[ t_array1[16][19], t_array1[16][20], t_array1[16][21], t_array1[16][22], t_array1[16][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[17][0], t_array1[17][1], t_array1[17][2], t_array1[17][3], t_array1[17][4] ],
+							[ t_array1[17][5], t_array1[17][6], t_array1[17][7], t_array1[17][8], t_array1[17][9] ],
+							[ t_array1[17][10], t_array1[17][11], {text: 'Set 18',style: 'sheet_id',verticalAlign: 'center'}, t_array1[17][12], t_array1[17][13] ],
+							[ t_array1[17][14], t_array1[17][15], t_array1[17][16], t_array1[17][17], t_array1[17][18] ],
+							[ t_array1[17][19], t_array1[17][20], t_array1[17][21], t_array1[17][22], t_array1[17][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[18][0], t_array1[18][1], t_array1[18][2], t_array1[18][3], t_array1[18][4] ],
+							[ t_array1[18][5], t_array1[18][6], t_array1[18][7], t_array1[18][8], t_array1[18][9] ],
+							[ t_array1[18][10], t_array1[18][11], {text: 'Set 19',style: 'sheet_id',verticalAlign: 'center'}, t_array1[18][12], t_array1[18][13] ],
+							[ t_array1[18][14], t_array1[18][15], t_array1[18][16], t_array1[18][17], t_array1[18][18] ],
+							[ t_array1[18][19], t_array1[18][20], t_array1[18][21], t_array1[18][22], t_array1[18][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[19][0], t_array1[19][1], t_array1[19][2], t_array1[19][3], t_array1[19][4] ],
+							[ t_array1[19][5], t_array1[19][6], t_array1[19][7], t_array1[19][8], t_array1[19][9] ],
+							[ t_array1[19][10], t_array1[19][11], {text: 'Set 20',style: 'sheet_id',verticalAlign: 'center'}, t_array1[19][12], t_array1[19][13] ],
+							[ t_array1[19][14], t_array1[19][15], t_array1[19][16], t_array1[19][17], t_array1[19][18] ],
+							[ t_array1[19][19], t_array1[19][20], t_array1[19][21], t_array1[19][22], t_array1[19][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[20][0], t_array1[20][1], t_array1[20][2], t_array1[20][3], t_array1[20][4] ],
+							[ t_array1[20][5], t_array1[20][6], t_array1[20][7], t_array1[20][8], t_array1[20][9] ],
+							[ t_array1[20][10], t_array1[20][11], {text: 'Set 21',style: 'sheet_id',verticalAlign: 'center'}, t_array1[20][12], t_array1[20][13] ],
+							[ t_array1[20][14], t_array1[20][15], t_array1[20][16], t_array1[20][17], t_array1[20][18] ],
+							[ t_array1[20][19], t_array1[20][20], t_array1[20][21], t_array1[20][22], t_array1[20][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[21][0], t_array1[21][1], t_array1[21][2], t_array1[21][3], t_array1[21][4] ],
+							[ t_array1[21][5], t_array1[21][6], t_array1[21][7], t_array1[21][8], t_array1[21][9] ],
+							[ t_array1[21][10], t_array1[21][11], {text: 'Set 22',style: 'sheet_id',verticalAlign: 'center'}, t_array1[21][12], t_array1[21][13] ],
+							[ t_array1[21][14], t_array1[21][15], t_array1[21][16], t_array1[21][17], t_array1[21][18] ],
+							[ t_array1[21][19], t_array1[21][20], t_array1[21][21], t_array1[21][22], t_array1[21][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[22][0], t_array1[22][1], t_array1[22][2], t_array1[22][3], t_array1[22][4] ],
+							[ t_array1[22][5], t_array1[22][6], t_array1[22][7], t_array1[22][8], t_array1[22][9] ],
+							[ t_array1[22][10], t_array1[22][11], {text: 'Set 23',style: 'sheet_id',verticalAlign: 'center'}, t_array1[22][12], t_array1[22][13] ],
+							[ t_array1[22][14], t_array1[22][15], t_array1[22][16], t_array1[22][17], t_array1[22][18] ],
+							[ t_array1[22][19], t_array1[22][20], t_array1[22][21], t_array1[22][22], t_array1[22][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[23][0], t_array1[23][1], t_array1[23][2], t_array1[23][3], t_array1[23][4] ],
+							[ t_array1[23][5], t_array1[23][6], t_array1[23][7], t_array1[23][8], t_array1[23][9] ],
+							[ t_array1[23][10], t_array1[23][11], {text: 'Set 24',style: 'sheet_id',verticalAlign: 'center'}, t_array1[23][12], t_array1[23][13] ],
+							[ t_array1[23][14], t_array1[23][15], t_array1[23][16], t_array1[23][17], t_array1[23][18] ],
+							[ t_array1[23][19], t_array1[23][20], t_array1[23][21], t_array1[23][22], t_array1[23][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[24][0], t_array1[24][1], t_array1[24][2], t_array1[24][3], t_array1[24][4] ],
+							[ t_array1[24][5], t_array1[24][6], t_array1[24][7], t_array1[24][8], t_array1[24][9] ],
+							[ t_array1[24][10], t_array1[24][11], {text: 'Set 25',style: 'sheet_id',verticalAlign: 'center'}, t_array1[24][12], t_array1[24][13] ],
+							[ t_array1[24][14], t_array1[24][15], t_array1[24][16], t_array1[24][17], t_array1[24][18] ],
+							[ t_array1[24][19], t_array1[24][20], t_array1[24][21], t_array1[24][22], t_array1[24][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[25][0], t_array1[25][1], t_array1[25][2], t_array1[25][3], t_array1[25][4] ],
+							[ t_array1[25][5], t_array1[25][6], t_array1[25][7], t_array1[25][8], t_array1[25][9] ],
+							[ t_array1[25][10], t_array1[25][11], {text: 'Set 26',style: 'sheet_id',verticalAlign: 'center'}, t_array1[25][12], t_array1[25][13] ],
+							[ t_array1[25][14], t_array1[25][15], t_array1[25][16], t_array1[25][17], t_array1[25][18] ],
+							[ t_array1[25][19], t_array1[25][20], t_array1[25][21], t_array1[25][22], t_array1[25][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[26][0], t_array1[26][1], t_array1[26][2], t_array1[26][3], t_array1[26][4] ],
+							[ t_array1[26][5], t_array1[26][6], t_array1[26][7], t_array1[26][8], t_array1[26][9] ],
+							[ t_array1[26][10], t_array1[26][11], {text: 'Set 27',style: 'sheet_id',verticalAlign: 'center'}, t_array1[26][12], t_array1[26][13] ],
+							[ t_array1[26][14], t_array1[26][15], t_array1[26][16], t_array1[26][17], t_array1[26][18] ],
+							[ t_array1[26][19], t_array1[26][20], t_array1[26][21], t_array1[26][22], t_array1[26][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[27][0], t_array1[27][1], t_array1[27][2], t_array1[27][3], t_array1[27][4] ],
+							[ t_array1[27][5], t_array1[27][6], t_array1[27][7], t_array1[27][8], t_array1[27][9] ],
+							[ t_array1[27][10], t_array1[27][11], {text: 'Set 28',style: 'sheet_id',verticalAlign: 'center'}, t_array1[27][12], t_array1[27][13] ],
+							[ t_array1[27][14], t_array1[27][15], t_array1[27][16], t_array1[27][17], t_array1[27][18] ],
+							[ t_array1[27][19], t_array1[27][20], t_array1[27][21], t_array1[27][22], t_array1[27][23] ]
+						]
+					},
+				},
+
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[28][0], t_array1[28][1], t_array1[28][2], t_array1[28][3], t_array1[28][4] ],
+							[ t_array1[28][5], t_array1[28][6], t_array1[28][7], t_array1[28][8], t_array1[28][9] ],
+							[ t_array1[28][10], t_array1[28][11], {text: 'Set 29',style: 'sheet_id',verticalAlign: 'center'}, t_array1[28][12], t_array1[28][13] ],
+							[ t_array1[28][14], t_array1[28][15], t_array1[28][16], t_array1[28][17], t_array1[28][18] ],
+							[ t_array1[28][19], t_array1[28][20], t_array1[28][21], t_array1[28][22], t_array1[28][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[29][0], t_array1[29][1], t_array1[29][2], t_array1[29][3], t_array1[29][4] ],
+							[ t_array1[29][5], t_array1[29][6], t_array1[29][7], t_array1[29][8], t_array1[29][9] ],
+							[ t_array1[29][10], t_array1[29][11], {text: 'Set 30',style: 'sheet_id',verticalAlign: 'center'}, t_array1[29][12], t_array1[29][13] ],
+							[ t_array1[29][14], t_array1[29][15], t_array1[29][16], t_array1[29][17], t_array1[29][18] ],
+							[ t_array1[29][19], t_array1[29][20], t_array1[29][21], t_array1[29][22], t_array1[29][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[30][0], t_array1[30][1], t_array1[30][2], t_array1[30][3], t_array1[30][4] ],
+							[ t_array1[30][5], t_array1[30][6], t_array1[30][7], t_array1[30][8], t_array1[30][9] ],
+							[ t_array1[30][10], t_array1[30][11], {text: 'Set 31',style: 'sheet_id',verticalAlign: 'center'}, t_array1[30][12], t_array1[30][13] ],
+							[ t_array1[30][14], t_array1[30][15], t_array1[30][16], t_array1[30][17], t_array1[30][18] ],
+							[ t_array1[30][19], t_array1[30][20], t_array1[30][21], t_array1[30][22], t_array1[30][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[31][0], t_array1[31][1], t_array1[31][2], t_array1[31][3], t_array1[31][4] ],
+							[ t_array1[31][5], t_array1[31][6], t_array1[31][7], t_array1[31][8], t_array1[31][9] ],
+							[ t_array1[31][10], t_array1[31][11], {text: 'Set 32',style: 'sheet_id',verticalAlign: 'center'}, t_array1[31][12], t_array1[31][13] ],
+							[ t_array1[31][14], t_array1[31][15], t_array1[31][16], t_array1[31][17], t_array1[31][18] ],
+							[ t_array1[31][19], t_array1[31][20], t_array1[31][21], t_array1[31][22], t_array1[31][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[32][0], t_array1[32][1], t_array1[32][2], t_array1[32][3], t_array1[32][4] ],
+							[ t_array1[32][5], t_array1[32][6], t_array1[32][7], t_array1[32][8], t_array1[32][9] ],
+							[ t_array1[32][10], t_array1[32][11], {text: 'Set 33',style: 'sheet_id',verticalAlign: 'center'}, t_array1[32][12], t_array1[32][13] ],
+							[ t_array1[32][14], t_array1[32][15], t_array1[32][16], t_array1[32][17], t_array1[32][18] ],
+							[ t_array1[32][19], t_array1[32][20], t_array1[32][21], t_array1[32][22], t_array1[32][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[33][0], t_array1[33][1], t_array1[33][2], t_array1[33][3], t_array1[33][4] ],
+							[ t_array1[33][5], t_array1[33][6], t_array1[33][7], t_array1[33][8], t_array1[33][9] ],
+							[ t_array1[33][10], t_array1[33][11], {text: 'Set 34',style: 'sheet_id',verticalAlign: 'center'}, t_array1[33][12], t_array1[33][13] ],
+							[ t_array1[33][14], t_array1[33][15], t_array1[33][16], t_array1[33][17], t_array1[33][18] ],
+							[ t_array1[33][19], t_array1[33][20], t_array1[33][21], t_array1[33][22], t_array1[33][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[34][0], t_array1[34][1], t_array1[34][2], t_array1[34][3], t_array1[34][4] ],
+							[ t_array1[34][5], t_array1[34][6], t_array1[34][7], t_array1[34][8], t_array1[34][9] ],
+							[ t_array1[34][10], t_array1[34][11], {text: 'Set 35',style: 'sheet_id',verticalAlign: 'center'}, t_array1[34][12], t_array1[34][13] ],
+							[ t_array1[34][14], t_array1[34][15], t_array1[34][16], t_array1[34][17], t_array1[34][18] ],
+							[ t_array1[34][19], t_array1[34][20], t_array1[34][21], t_array1[34][22], t_array1[34][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[35][0], t_array1[35][1], t_array1[35][2], t_array1[35][3], t_array1[35][4] ],
+							[ t_array1[35][5], t_array1[35][6], t_array1[35][7], t_array1[35][8], t_array1[35][9] ],
+							[ t_array1[35][10], t_array1[35][11], {text: 'Set 36',style: 'sheet_id',verticalAlign: 'center'}, t_array1[35][12], t_array1[35][13] ],
+							[ t_array1[35][14], t_array1[35][15], t_array1[35][16], t_array1[35][17], t_array1[35][18] ],
+							[ t_array1[35][19], t_array1[35][20], t_array1[35][21], t_array1[35][22], t_array1[35][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[36][0], t_array1[36][1], t_array1[36][2], t_array1[36][3], t_array1[36][4] ],
+							[ t_array1[36][5], t_array1[36][6], t_array1[36][7], t_array1[36][8], t_array1[36][9] ],
+							[ t_array1[36][10], t_array1[36][11], {text: 'Set 37',style: 'sheet_id',verticalAlign: 'center'}, t_array1[36][12], t_array1[36][13] ],
+							[ t_array1[36][14], t_array1[36][15], t_array1[36][16], t_array1[36][17], t_array1[36][18] ],
+							[ t_array1[36][19], t_array1[36][20], t_array1[36][21], t_array1[36][22], t_array1[36][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[37][0], t_array1[37][1], t_array1[37][2], t_array1[37][3], t_array1[37][4] ],
+							[ t_array1[37][5], t_array1[37][6], t_array1[37][7], t_array1[37][8], t_array1[37][9] ],
+							[ t_array1[37][10], t_array1[37][11], {text: 'Set 38',style: 'sheet_id',verticalAlign: 'center'}, t_array1[37][12], t_array1[37][13] ],
+							[ t_array1[37][14], t_array1[37][15], t_array1[37][16], t_array1[37][17], t_array1[37][18] ],
+							[ t_array1[37][19], t_array1[37][20], t_array1[37][21], t_array1[37][22], t_array1[37][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[38][0], t_array1[38][1], t_array1[38][2], t_array1[38][3], t_array1[38][4] ],
+							[ t_array1[38][5], t_array1[38][6], t_array1[38][7], t_array1[38][8], t_array1[38][9] ],
+							[ t_array1[38][10], t_array1[38][11], {text: 'Set 39',style: 'sheet_id',verticalAlign: 'center'}, t_array1[38][12], t_array1[38][13] ],
+							[ t_array1[38][14], t_array1[38][15], t_array1[38][16], t_array1[38][17], t_array1[38][18] ],
+							[ t_array1[38][19], t_array1[38][20], t_array1[38][21], t_array1[38][22], t_array1[38][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[39][0], t_array1[39][1], t_array1[39][2], t_array1[39][3], t_array1[39][4] ],
+							[ t_array1[39][5], t_array1[39][6], t_array1[39][7], t_array1[39][8], t_array1[39][9] ],
+							[ t_array1[39][10], t_array1[39][11], {text: 'Set 40',style: 'sheet_id',verticalAlign: 'center'}, t_array1[39][12], t_array1[39][13] ],
+							[ t_array1[39][14], t_array1[39][15], t_array1[39][16], t_array1[39][17], t_array1[39][18] ],
+							[ t_array1[39][19], t_array1[39][20], t_array1[39][21], t_array1[39][22], t_array1[39][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[40][0], t_array1[40][1], t_array1[40][2], t_array1[40][3], t_array1[40][4] ],
+							[ t_array1[40][5], t_array1[40][6], t_array1[40][7], t_array1[40][8], t_array1[40][9] ],
+							[ t_array1[40][10], t_array1[40][11], {text: 'Set 41',style: 'sheet_id',verticalAlign: 'center'}, t_array1[40][12], t_array1[40][13] ],
+							[ t_array1[40][14], t_array1[40][15], t_array1[40][16], t_array1[40][17], t_array1[40][18] ],
+							[ t_array1[40][19], t_array1[40][20], t_array1[40][21], t_array1[40][22], t_array1[40][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[41][0], t_array1[41][1], t_array1[41][2], t_array1[41][3], t_array1[41][4] ],
+							[ t_array1[41][5], t_array1[41][6], t_array1[41][7], t_array1[41][8], t_array1[41][9] ],
+							[ t_array1[41][10], t_array1[41][11], {text: 'Set 42',style: 'sheet_id',verticalAlign: 'center'}, t_array1[41][12], t_array1[41][13] ],
+							[ t_array1[41][14], t_array1[41][15], t_array1[41][16], t_array1[41][17], t_array1[41][18] ],
+							[ t_array1[41][19], t_array1[41][20], t_array1[41][21], t_array1[41][22], t_array1[41][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[42][0], t_array1[42][1], t_array1[42][2], t_array1[42][3], t_array1[42][4] ],
+							[ t_array1[42][5], t_array1[42][6], t_array1[42][7], t_array1[42][8], t_array1[42][9] ],
+							[ t_array1[42][10], t_array1[42][11], {text: 'Set 43',style: 'sheet_id',verticalAlign: 'center'}, t_array1[42][12], t_array1[42][13] ],
+							[ t_array1[42][14], t_array1[42][15], t_array1[42][16], t_array1[42][17], t_array1[42][18] ],
+							[ t_array1[42][19], t_array1[42][20], t_array1[42][21], t_array1[42][22], t_array1[42][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[43][0], t_array1[43][1], t_array1[43][2], t_array1[43][3], t_array1[43][4] ],
+							[ t_array1[43][5], t_array1[43][6], t_array1[43][7], t_array1[43][8], t_array1[43][9] ],
+							[ t_array1[43][10], t_array1[43][11], {text: 'Set 44',style: 'sheet_id',verticalAlign: 'center'}, t_array1[43][12], t_array1[43][13] ],
+							[ t_array1[43][14], t_array1[43][15], t_array1[43][16], t_array1[43][17], t_array1[43][18] ],
+							[ t_array1[43][19], t_array1[43][20], t_array1[43][21], t_array1[43][22], t_array1[43][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[44][0], t_array1[44][1], t_array1[44][2], t_array1[44][3], t_array1[44][4] ],
+							[ t_array1[44][5], t_array1[44][6], t_array1[44][7], t_array1[44][8], t_array1[44][9] ],
+							[ t_array1[44][10], t_array1[44][11], {text: 'Set 45',style: 'sheet_id',verticalAlign: 'center'}, t_array1[44][12], t_array1[44][13] ],
+							[ t_array1[44][14], t_array1[44][15], t_array1[44][16], t_array1[44][17], t_array1[44][18] ],
+							[ t_array1[44][19], t_array1[44][20], t_array1[44][21], t_array1[44][22], t_array1[44][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[45][0], t_array1[45][1], t_array1[45][2], t_array1[45][3], t_array1[45][4] ],
+							[ t_array1[45][5], t_array1[45][6], t_array1[45][7], t_array1[45][8], t_array1[45][9] ],
+							[ t_array1[45][10], t_array1[45][11], {text: 'Set 46',style: 'sheet_id',verticalAlign: 'center'}, t_array1[45][12], t_array1[45][13] ],
+							[ t_array1[45][14], t_array1[45][15], t_array1[45][16], t_array1[45][17], t_array1[45][18] ],
+							[ t_array1[45][19], t_array1[45][20], t_array1[45][21], t_array1[45][22], t_array1[45][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 0, 0, 2], pageBreak: 'before'},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 5, 0, 0], pageBreak: 'before'},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[46][0], t_array1[46][1], t_array1[46][2], t_array1[46][3], t_array1[46][4] ],
+							[ t_array1[46][5], t_array1[46][6], t_array1[46][7], t_array1[46][8], t_array1[46][9] ],
+							[ t_array1[46][10], t_array1[46][11], {text: 'Set 47',style: 'sheet_id',verticalAlign: 'center'}, t_array1[46][12], t_array1[46][13] ],
+							[ t_array1[46][14], t_array1[46][15], t_array1[46][16], t_array1[46][17], t_array1[46][18] ],
+							[ t_array1[46][19], t_array1[46][20], t_array1[46][21], t_array1[46][22], t_array1[46][23] ]
+						]
+					},
+				},
+				{	columns: [
+						{width:"auto",text: title, fontSize: 14, bold: true, alignment:'left', margin: [0, 30, 0, 2]},
+						{width:"*",text: "Game ID: "+game_id, fontSize: 9, alignment:'right', margin: [0, 35, 0, 0]},
+					]
+				},
+				{
+					table: {
+						widths: [ 98, 99, 98, 99, 99 ],
+						height:63,
+						body: [
+							[ t_array1[47][0], t_array1[47][1], t_array1[47][2], t_array1[47][3], t_array1[47][4] ],
+							[ t_array1[47][5], t_array1[47][6], t_array1[47][7], t_array1[47][8], t_array1[47][9] ],
+							[ t_array1[47][10], t_array1[47][11], {text: 'Set 48',style: 'sheet_id',verticalAlign: 'center'}, t_array1[47][12], t_array1[47][13] ],
+							[ t_array1[47][14], t_array1[47][15], t_array1[47][16], t_array1[47][17], t_array1[47][18] ],
+							[ t_array1[47][19], t_array1[47][20], t_array1[47][21], t_array1[47][22], t_array1[47][23] ]
+						]
+					},
+				},
+
+			],
+			pageMargins: [ 28, 46, 28, 28 ],
+			styles: {
+				t_cell: {
+					font: 'Comic',
+					fontSize: 21,
+					margin: [0,0,0,0],
+					bold: true,
+					alignment: 'center'
+				},
+				pad_cell: {
+					fontSize:1,
+					margin: [0,0,0,64]	
+				},
+				sheet_id: {
+					font: 'Nunito',
+					fontSize: 29,
+					bold: true,
+					alignment: 'center',		
+				},
+			},
+			defaultStyle: {
+				font: 'Nunito'
+			}
+		};
+		pdfMake.createPdf(bing_pdf).download(doc_title, function () { setInfo ("","close") });
+	}
 }
 
 
@@ -4627,7 +4986,7 @@ function saveSetup(save_type) {
 			save_str += "bing_back_unit: (" +localStorage.phon_bing_back_unit+")\n";
 		}
 		else if (uMode == "voc_bingo_class") {
-			var file_name = "EB Vocabulary Bingo - "+topicTitle(curr_topic_title)+" - "+localStorage.curr_vb_game;
+			var file_name = "EB Vocabulary Bingo - "+localStorage.curr_vb_game.slice(3,5)+"_"+topicTitle(localStorage.curr_vb_game.slice(6,-10))+localStorage.curr_vb_game.slice(-10);
 			var file_elem = document.createElement("a");
 			var save_str =localStorage[localStorage.curr_vb_game];
 		}
@@ -5777,7 +6136,7 @@ function setVocArrays() {
 				curr_topic_dir = "places_and_transport";
 				break;
 			case "school":
-				vocArray = new Array("Art", "backpack", "bag", "bell", "bin", "blackboard", "book", "bookshelf", "calculator", "calendar", "canteen", "chalk", "classroom", "clock", "coloured pencils", "computer", "computer room", "crayons", "desk", "English", "eraser", "globe", "glue", "homework", "ink", "library", "lunch box", "map", "Math", "Music", "music room", "notebook", "paper", "P.E.", "pencil case", "pencil", "pencil sharpener", "pen", "playground", "ruler", "school", "Science", "scissors", "social studies", "toilet", "umbrella", "violin", "waste paper basket", "whiteboard");
+				vocArray = new Array("Art", "backpack", "bag", "bell", "bin", "blackboard", "book", "bookshelf", "calculator", "calendar", "canteen", "chalk", "classroom", "clock", "coloured pencils", "computer", "computer room", "crayons", "desk", "English", "eraser", "globe", "glue", "homework", "ink", "library", "lunch box", "map", "Math", "Music", "music room", "notebook", "paper", "P.E.", "pencil case", "pencil", "pencil sharpener", "pen", "playground", "ruler", "school", "Science", "scissors", "Social Studies", "toilet", "umbrella", "violin", "waste paper basket", "whiteboard");
 				curr_topic_dir = "school";
 				break;
 			case "socialising":
@@ -6908,7 +7267,7 @@ function resetBingTestArray() {
 }
 
 function setListenTypeArray () {
-	bingArray=["good bye","tomorrow","holiday","weekend","dream","summer","spring","winter","fall","season","rainy","warm","hail","rainbow","stormy","muggy","windy","foggy","snowy","cloudy","sunny","hazy","rainy","drizzle","thunder","lightning","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","January","February","March","April","May","June","July","August","September","October","November","December","add","plus","sum","subtract","minus","divide","fraction","percentage","negative","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty","grey","dark blue","light blue","brown","purple","orange","white","art","Chinese","English","history","math","music","science","social studies","classroom","blackboard","crayon","desk","eraser","globe","notebook","school bag","scissors","whiteboard","grandfather","grandmother","great-grandfather","great-grandmother","father-in-law","mother-in-law","uncle","aunt","elder brother","younger brother","elder sister","younger sister","husband","wife","brother-in-law","sister-in-law","son-in-law","daughter","nephew","niece","adopted child","armchair","curtain","wallpaper","photograph","picture frame","stereo","telephone","television","remote","flower","magazine","newspaper","comic book","dustbin","home-maker","sink","refrigerator","toaster","grater","toothpick","kettle","matchbox","mortar","rolling pin","mouse trap","broom","brush","bucket","electric panel","dryer","socket","plug","saw","drill","hammer","paint","crate","vacuum cleaner","iron","trash-can","bin"];
+	bingArray=["good bye","tomorrow","holiday","weekend","dream","summer","spring","winter","fall","season","rainy","warm","hail","rainbow","stormy","muggy","windy","foggy","snowy","cloudy","sunny","hazy","rainy","drizzle","thunder","lightning","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","January","February","March","April","May","June","July","August","September","October","November","December","add","plus","sum","subtract","minus","divide","fraction","percentage","negative","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty","grey","dark blue","light blue","brown","purple","orange","white","art","Chinese","English","history","math","music","science","Social Studies","classroom","blackboard","crayon","desk","eraser","globe","notebook","school bag","scissors","whiteboard","grandfather","grandmother","great-grandfather","great-grandmother","father-in-law","mother-in-law","uncle","aunt","elder brother","younger brother","elder sister","younger sister","husband","wife","brother-in-law","sister-in-law","son-in-law","daughter","nephew","niece","adopted child","armchair","curtain","wallpaper","photograph","picture frame","stereo","telephone","television","remote","flower","magazine","newspaper","comic book","dustbin","home-maker","sink","refrigerator","toaster","grater","toothpick","kettle","matchbox","mortar","rolling pin","mouse trap","broom","brush","bucket","electric panel","dryer","socket","plug","saw","drill","hammer","paint","crate","vacuum cleaner","iron","trash-can","bin"];
 	shuffle(bingArray);
 }
 
@@ -7303,30 +7662,8 @@ function choices(imgInd) {
 				audVoc.src = "audio/vocab/"+vocEx+".mp3";
 			}
 		}
-		audVoc.load();
-		if (tablet==true) {
-			if (penalty==true) {
-				tickFast.pause();
-				audVoc.play();
-				setTimeout (function() {
-					vocDuration = (audVoc.duration * 1000)-400;
-				}, 500);
-				setTimeout(function(){
-					if (penalty==true) {
-						tickFast.play();
-					}
-				}, vocDuration);
-			}
-			else {
-				tick.pause();
-				tock.pause();
-				audVoc.play();
-			}
-		}
-		else {
-			//audVoc.play();
-			playVocab();
-		}
+		//audVoc.load();
+		playVocab();
 	}
 	else if (uMode == "read_choose") {
 	}
@@ -7477,6 +7814,7 @@ function playVocab() {
 	else bingoPlay();
 }
 
+
 function setTimbre(){
 	if (timbre_select=="random"){
 		var i=Math.floor(Math.random()*timbreArray.length);
@@ -7518,17 +7856,28 @@ function humanNumPlay(){
 	}
 	else {
 		audVoc.src = "audio/numbers/"+(Math.floor(bingEx/100)).toString()+ "nn.mp3";
+		console.log(audVoc.duration);
 		audVoc.play();
 		remPlayed=false;
-		audVoc.onended = function() {
-			if (remPlayed==false){
+		if (!android) {
+			audVoc.onended = function() {
+				if (remPlayed==false){
+					audVoc.src = "audio/numbers/"+rem.toString()+ ".mp3";
+					audVoc.play();
+					remPlayed=true;
+				}
+			};
+		}
+		else {
+			setTimeout(function() {
 				audVoc.src = "audio/numbers/"+rem.toString()+ ".mp3";
 				audVoc.play();
-				remPlayed=true;
-			}
-		};
+			},1100);
+		}	
 	}
 }
+
+
 
 function setHiKeys() {
 	for (var i=0; i<26;i++) {
@@ -8639,10 +8988,18 @@ function procVocBingGame(game_id,action) {
 		return;
 	}
 
+	for (var i=0; i<document.getElementById('voc_bing_list').childNodes.length;i++) {
+		if (document.getElementById('voc_bing_list').childNodes[i].childNodes[1].innerHTML == localStorage.curr_vb_game) {
+			document.getElementById('voc_bing_list').childNodes[i].scrollIntoView();
+			document.getElementById('vb_id').innerHTML=localStorage.curr_vb_game;
+		}
+	}
+
 	if (game_id!="") {
 		localStorage.curr_vb_game=game_id.innerHTML;
 		hiVocBingGame();
 	}
+
 
 	if (game_id=='' && localStorage.curr_vb_game) {
 		var t_string=localStorage[localStorage.curr_vb_game];

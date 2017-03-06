@@ -1,5 +1,10 @@
 {
-  "name"    : "English Builder",
-  "version" : "0.1.0",
-  "main"    : "main.js"
-} 
+	"name": "english_builder",
+	"productName": "English Builder",
+	"description": "English Builder helps Thai students of English to build vocabulary and skills, through competitive timed activities.",
+	"version": "v0.9.50",
+	"author": "Ian Smith <iansamit@gmail.com> ",
+	"homepage": "https://github.com/Iansamit/English_Builder",
+	"license": "CC-BY-SA-4.0",
+	"main": "main.js"
+}
